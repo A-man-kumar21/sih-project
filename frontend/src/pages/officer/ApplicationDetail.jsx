@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import ComplianceSummary from "../../components/compliance/ComplianceSummary";
+import StatutoryCheckCard from "../../components/compliance/StatutoryCheckCard";
 
 export default function ApplicationDetail() {
   const { id: applicationId } = useParams();
@@ -184,7 +186,17 @@ export default function ApplicationDetail() {
       {actionSuccess && <div className="alert-box alert-success">{actionSuccess}</div>}
       {actionError && <div className="alert-box alert-error">{actionError}</div>}
 
-      {/* Top Banner with Score Gauge and Status */}
+      {/* Top Compliance Summary Section (Section 2) */}
+      <ComplianceSummary
+        score={app.compliance_score}
+        riskLevel={app.risk_level}
+        checks={app.checks || []}
+        companyName={app.company_name}
+        bidderId={app.bidder_id}
+        tenderId={app.tender_id}
+      />
+
+      {/* Top Banner with Applicant Meta */}
       <div className="application-detail-banner">
         <div className="banner-left">
           <span className={`badge status-${app.status}`}>
@@ -272,16 +284,27 @@ export default function ApplicationDetail() {
         </div>
       )}
 
-      {/* Gemini LLM Executive Briefing */}
+      {/* AI Advisory — Decision Support (Section 15) */}
       {app.llm_briefing && (
-        <div className="llm-briefing-card">
-          <div className="llm-header">
-            <h4>Google Gemini Advisory Briefing</h4>
-            <span className="badge-gemini">
-              AI: {app.llm_briefing.model || "gemini-3.5-flash"}
+        <div className="ai-advisory-section">
+          <div className="ai-advisory-header">
+            <div className="ai-advisory-title-group">
+              <span className="ai-advisory-subtitle">Executive Decision Support</span>
+              <h4>AI Advisory — Decision Support</h4>
+            </div>
+            <span className="ai-advisory-model-badge">
+              {app.llm_briefing.is_fallback
+                ? "Deterministic Fallback Engine"
+                : `AI: ${app.llm_briefing.model || "Gemini 1.5 Flash"}`}
             </span>
           </div>
-          <p className="llm-text">{app.llm_briefing.text || app.llm_briefing}</p>
+          <p className="ai-advisory-text">{app.llm_briefing.text || app.llm_briefing}</p>
+          <div className="ai-advisory-disclaimer">
+            <span className="disclaimer-icon">ℹ️</span>
+            <span>
+              <strong>Decision Authority:</strong> AI output is advisory only. Final procurement decisions remain with the authorized Procurement Officer.
+            </span>
+          </div>
         </div>
       )}
 
@@ -332,33 +355,26 @@ export default function ApplicationDetail() {
         )}
       </div>
 
-      {/* Statutory Checks Evaluation Cards */}
+      {/* Statutory Checks Evaluation Cards (Sections 1, 3, 4, 5, 6, 7-14, 16, 17, 18, 19, 21, 22) */}
       <div className="dashboard-section">
         <div className="section-header">
           <div>
             <h3>Statutory Verification Breakdown</h3>
             <p className="section-subtext">
-              Detailed breakdown of deterministic scoring verification across all statutory government registries.
+              Detailed breakdown of deterministic statutory compliance verification across official registries.
             </p>
           </div>
         </div>
 
-        <div className="checks-detail-grid">
-          {app.checks?.map((chk) => (
-            <div key={chk.source} className={`check-result-card border-${chk.status}`}>
-              <div className="check-card-header">
-                <span className="check-source-title">{chk.source_label || chk.source}</span>
-                <span className={`badge check-status-${chk.status}`}>{chk.status}</span>
-              </div>
-              <div className="check-confidence">
-                Confidence: {(chk.confidence * 100).toFixed(0)}%
-              </div>
-              <div className="check-raw-box">
-                <pre>{JSON.stringify(chk.raw_fields, null, 2)}</pre>
-              </div>
-            </div>
-          ))}
-        </div>
+        {(!app.checks || app.checks.length === 0) ? (
+          <div className="empty-state-card">No statutory checks available for this evaluation.</div>
+        ) : (
+          <div className="statutory-verification-grid">
+            {app.checks.map((chk) => (
+              <StatutoryCheckCard key={chk.source || chk.check_type} check={chk} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Reject Reason Modal */}

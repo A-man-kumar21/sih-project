@@ -1,0 +1,847 @@
+/**
+ * Professional Statutory Verification & Compliance Cockpit Stylesheet
+ * Enterprise-grade Government Procurement aesthetic (TenderFlow / GeM)
+ */
+
+/* ==========================================================================
+   1. Compliance Summary Hero Section
+   ========================================================================== */
+.compliance-summary-hero {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.summary-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 1rem;
+}
+
+.summary-eyebrow {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0369a1;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+}
+
+.summary-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.35rem;
+  line-height: 1.2;
+}
+
+.summary-target {
+  font-size: 0.9rem;
+  color: #475569;
+  margin: 0;
+}
+
+.summary-seal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.45rem 0.85rem;
+}
+
+.seal-icon {
+  font-size: 1.25rem;
+}
+
+.seal-text {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summary-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-metric-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metric-header-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.metric-score-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.score-big-num {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.score-denom {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.metric-risk-display {
+  margin: 0.35rem 0 0.5rem;
+}
+
+.risk-badge-large {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.risk-badge-large.risk-low {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.risk-badge-large.risk-medium {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+
+.risk-badge-large.risk-high {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.metric-checks-display {
+  margin-bottom: 0.35rem;
+}
+
+.checks-fraction {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.checks-breakdown-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.breakdown-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.breakdown-tag.tag-passed {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.breakdown-tag.tag-failed {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.breakdown-tag.tag-review {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.metric-sub-note {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+.summary-status-banner {
+  border-radius: 8px;
+  padding: 0.85rem 1.25rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+
+.summary-banner-compliant {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #15803d;
+}
+
+.summary-banner-failed {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+.summary-banner-warning {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #b45309;
+}
+
+
+/* ==========================================================================
+   2. Status Badges
+   ========================================================================== */
+.compliance-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.badge-symbol {
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.badge-compliant {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.badge-failed {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.badge-expired {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+
+.badge-not-found {
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.badge-warning {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+
+.badge-pending {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.badge-default {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+
+/* ==========================================================================
+   3. Confidence Indicator
+   ========================================================================== */
+.compliance-confidence-container {
+  margin: 0.85rem 0 1.25rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.confidence-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.45rem;
+}
+
+.confidence-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.confidence-score-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.confidence-percentage {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.confidence-level-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tag-high {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.tag-medium {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.tag-low {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.confidence-track {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.confidence-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.fill-high {
+  background: #16a34a;
+}
+
+.fill-medium {
+  background: #d97706;
+}
+
+.fill-low {
+  background: #dc2626;
+}
+
+
+/* ==========================================================================
+   4. Statutory Verification Cards Grid
+   ========================================================================== */
+.statutory-verification-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statutory-check-card {
+  background: #ffffff;
+  border: 1px solid #dbe4f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.statutory-check-card:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+.statutory-check-card.border-compliant {
+  border-top: 4px solid #16a34a;
+}
+
+.statutory-check-card.border-non_compliant,
+.statutory-check-card.border-failed {
+  border-top: 4px solid #dc2626;
+}
+
+.statutory-check-card.border-expired,
+.statutory-check-card.border-warning {
+  border-top: 4px solid #d97706;
+}
+
+.statutory-check-card.border-not_found {
+  border-top: 4px solid #64748b;
+}
+
+.statutory-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.85rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.statutory-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.statutory-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.statutory-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.statutory-registry-sub {
+  font-size: 0.78rem;
+  color: #64748b;
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.statutory-badges-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.compliance-scope-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.scope-mandatory {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+.scope-informational {
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px dashed #cbd5e1;
+}
+
+.statutory-provenance-banner {
+  background: #f0fdf4;
+  border-left: 3px solid #16a34a;
+  border-radius: 0 6px 6px 0;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #15803d;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+}
+
+.statutory-error-banner {
+  background: #fffbeb;
+  border-left: 4px solid #d97706;
+  border-radius: 0 6px 6px 0;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  color: #92400e;
+  margin: 1rem 0;
+}
+
+.error-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+
+/* ==========================================================================
+   5. Structured Key-Value Information Grid
+   ========================================================================== */
+.statutory-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem 1rem;
+  margin-bottom: 1.25rem;
+  background: #ffffff;
+}
+
+.statutory-field-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.statutory-field-item.field-span-2 {
+  grid-column: span 2;
+}
+
+.field-label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.2rem;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+}
+
+.field-value-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.field-value-text {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1e293b;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+.field-value-text.val-muted {
+  color: #94a3b8;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.field-value-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.badge-val-success {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-val-danger {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.badge-val-warning {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.badge-val-muted {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+
+/* ==========================================================================
+   6. Statutory Meta Footer
+   ========================================================================== */
+.statutory-meta-footer {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 6px;
+  padding: 0.6rem 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.statutory-meta-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.meta-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.meta-value.code-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: #0f172a;
+}
+
+
+/* ==========================================================================
+   7. Expandable Technical Details Drawer
+   ========================================================================== */
+.technical-details-drawer {
+  border-top: 1px solid #f1f5f9;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.technical-details-toggle {
+  width: 100%;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.technical-details-toggle:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #1e293b;
+}
+
+.toggle-icon {
+  font-size: 0.7rem;
+  margin-right: 0.4rem;
+  color: #64748b;
+}
+
+.toggle-label {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.technical-badge {
+  font-size: 0.7rem;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.technical-details-content {
+  margin-top: 0.65rem;
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+.technical-details-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #1e293b;
+}
+
+.technical-details-meta {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-copy-json {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #f1f5f9;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-copy-json:hover {
+  background: #334155;
+}
+
+.technical-json-block {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #38bdf8;
+  max-height: 240px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+
+/* ==========================================================================
+   8. AI Advisory Decision Support Section (Section 15)
+   ========================================================================== */
+.ai-advisory-section {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-left: 5px solid #4f46e5;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.ai-advisory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ai-advisory-title-group h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #1e1b4b;
+  font-weight: 800;
+}
+
+.ai-advisory-subtitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #4f46e5;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ai-advisory-model-badge {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  color: #3730a3;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.ai-advisory-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #334155;
+  margin: 0 0 1rem;
+}
+
+.ai-advisory-disclaimer {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.disclaimer-icon {
+  font-size: 1rem;
+}
+
+
+/* ==========================================================================
+   9. Responsive Design (Section 17)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .statutory-verification-grid {
+    grid-template-columns: 1fr;
+  }
+  .summary-metrics-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .statutory-fields-grid {
+    grid-template-columns: 1fr;
+  }
+  .statutory-field-item.field-span-2 {
+    grid-column: span 1;
+  }
+  .compliance-summary-hero {
+    padding: 1.25rem;
+  }
+  .statutory-check-card {
+    padding: 1.15rem;
+  }
+}

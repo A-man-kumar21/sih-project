@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import ComplianceSummary from "../components/compliance/ComplianceSummary";
+import StatutoryCheckCard from "../components/compliance/StatutoryCheckCard";
 
 const ALL_SOURCES = ["udyam", "gstn", "pan_it", "epfo_esic", "digilocker", "blacklist"];
 
@@ -877,151 +879,63 @@ export default function ComplianceCockpit() {
           {/* Verification Detail View */}
           {assessment ? (
             <section className="detail">
-              {/* Deterministic Scoring Header */}
-              <section className="title">
-                <div>
-                  <p className="eyebrow">
-                    Deterministic Compliance Engine · Tender: {assessment.tender_id || selectedTenderId}
-                  </p>
-                  <h2>{assessment.bidder_id}</h2>
-                  <small style={{ color: "#475569" }}>{activeBidder?.display_name}</small>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <strong className="score">{assessment.compliance_score}</strong>
-                  <Risk value={assessment.risk_level} />
-                  <p className="score-confidence-note">
-                    Score reflects verification confidence; not all checks report 100% certainty.
-                  </p>
-                </div>
-              </section>
+              {/* Top Compliance Summary (Section 2) */}
+              <ComplianceSummary
+                score={assessment.compliance_score}
+                riskLevel={assessment.risk_level}
+                checks={assessment.checks || []}
+                companyName={activeBidder?.display_name || assessment.bidder_id}
+                bidderId={assessment.bidder_id}
+                tenderId={assessment.tender_id || selectedTenderId}
+              />
 
-              {/* LLM-Generated Executive Briefing */}
+              {/* AI Advisory — Decision Support (Section 15) */}
               {assessment.llm_briefing && (
-                <section
-                  className={`card briefing-card ${
-                    assessment.llm_briefing.is_fallback ? "briefing-fallback" : "briefing-ai"
-                  }`}
-                >
-                  <div className="briefing-header">
-                    <div>
-                      <p
-                        className="eyebrow"
-                        style={{ color: assessment.llm_briefing.is_fallback ? "#b45309" : "#4338ca" }}
-                      >
-                        AI-Generated Executive Summary · Decision Support
-                      </p>
-                      <h3 style={{ margin: 0 }}>Procurement Officer Briefing</h3>
+                <div className="ai-advisory-section">
+                  <div className="ai-advisory-header">
+                    <div className="ai-advisory-title-group">
+                      <span className="ai-advisory-subtitle">Executive Decision Support</span>
+                      <h4>AI Advisory — Decision Support</h4>
                     </div>
-                    <span className={`badge ${assessment.llm_briefing.is_fallback ? "badge-fallback" : "badge-ai"}`}>
+                    <span className="ai-advisory-model-badge">
                       {assessment.llm_briefing.is_fallback
                         ? "Deterministic Fallback Engine"
                         : `AI: ${assessment.llm_briefing.model || "Gemini 1.5 Flash"}`}
                     </span>
                   </div>
-                  <p className="briefing-text">{assessment.llm_briefing.text}</p>
+                  <p className="ai-advisory-text">{assessment.llm_briefing.text}</p>
                   {assessment.llm_briefing.notice && (
-                    <small className="briefing-notice">Notice: {assessment.llm_briefing.notice}</small>
-                  )}
-                  <div className="briefing-disclaimer">
-                    <small>
-                      <strong>Decision Authority:</strong> Advisory only. The AI summarizes findings and suggests
-                      verification next steps; the final award or rejection decision rests solely with the Procurement
-                      Officer via the action buttons below.
+                    <small className="briefing-notice" style={{ display: "block", marginBottom: "0.5rem" }}>
+                      Notice: {assessment.llm_briefing.notice}
                     </small>
+                  )}
+                  <div className="ai-advisory-disclaimer">
+                    <span className="disclaimer-icon">ℹ️</span>
+                    <span>
+                      <strong>Decision Authority:</strong> AI output is advisory only. Final procurement decisions remain with the authorized Procurement Officer via the governance actions below.
+                    </span>
                   </div>
-                </section>
+                </div>
               )}
 
-              {/* Verification Checks Grid */}
-              <section className="card">
-                <h3>
-                  Verification Checks ({assessment.checks.length})
-                  <small style={{ fontWeight: "normal", fontSize: "0.8rem", color: "#64748b", marginLeft: "0.5rem" }}>
-                    Only mandatory checks affect the score & risk level.
-                  </small>
-                </h3>
-                {assessment.checks.map((check) => {
-                  const verifiedVal =
-                    check.verified_value ||
-                    check.raw_fields?.udyam_registration_number ||
-                    check.raw_fields?.gstin ||
-                    check.raw_fields?.pan ||
-                    check.raw_fields?.epfo_establishment_id ||
-                    (check.raw_fields?.debarment_status ? `${check.raw_fields.debarment_status} (${check.raw_fields.registry_search_reference || "Registry"})` : null);
+              {/* Statutory Verification Breakdown (Sections 1, 3, 4, 5, 6, 7-14, 16, 17, 18, 19, 21, 22) */}
+              <section className="card" style={{ padding: "1.5rem" }}>
+                <div className="section-header" style={{ marginBottom: "1.25rem" }}>
+                  <div>
+                    <h3 style={{ margin: 0 }}>
+                      Statutory Verification Breakdown ({assessment.checks.length})
+                    </h3>
+                    <p className="section-subtext" style={{ margin: "0.25rem 0 0", color: "#64748b", fontSize: "0.85rem" }}>
+                      Detailed breakdown of deterministic statutory compliance verification across official registries.
+                    </p>
+                  </div>
+                </div>
 
-                  const extractionSource =
-                    check.extraction_source ||
-                    check.provenance?.source ||
-                    (check.status === "compliant"
-                      ? check.source === "udyam"
-                        ? "✓ Auto-extracted from Udyam / MSME Certificate"
-                        : check.source === "gstn"
-                        ? "✓ Auto-extracted from GST Certificate"
-                        : check.source === "pan_it"
-                        ? "✓ Auto-extracted from PAN Document"
-                        : check.source === "epfo_esic"
-                        ? "✓ Auto-extracted from EPFO / ESIC Establishment Proof"
-                        : check.source === "digilocker"
-                        ? "✓ Auto-verified via DigiLocker Legal Entity Anchor"
-                        : "✓ Verified against Central Procurement Debarment Registry"
-                      : null);
-
-                  return (
-                    <details key={check.source} open={check.is_mandatory || check.status !== "compliant"}>
-                      <summary>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
-                          <span>
-                            <strong>{SOURCE_LABELS[check.source] || check.source}</strong>{" "}
-                            <code style={{ fontSize: "0.78rem", color: "#64748b" }}>({check.source})</code>
-                          </span>
-                          {extractionSource && check.status === "compliant" && (
-                            <span style={{ fontSize: "0.78rem", color: "#16a34a", fontWeight: "600" }}>
-                              {extractionSource}
-                            </span>
-                          )}
-                        </div>
-                        <div className="summary-badges">
-                          {check.is_mandatory ? (
-                            <span className="badge tag-mandatory">Mandatory</span>
-                          ) : (
-                            <span className="badge tag-optional">Informational (Excluded)</span>
-                          )}
-                          <Status value={check.status} />
-                        </div>
-                      </summary>
-                      <dl>
-                        {verifiedVal && (
-                          <div>
-                            <dt>Verified Identifier / Record</dt>
-                            <dd>
-                              <code style={{ fontSize: "0.9rem", fontWeight: "700", color: "#0f172a" }}>
-                                {verifiedVal}
-                              </code>
-                            </dd>
-                          </div>
-                        )}
-                        {extractionSource && (
-                          <div>
-                            <dt>Extraction Source</dt>
-                            <dd style={{ color: "#16a34a", fontWeight: "600" }}>{extractionSource}</dd>
-                          </div>
-                        )}
-                        <div>
-                          <dt>Confidence</dt>
-                          <dd>{Math.round(check.confidence * 100)}%</dd>
-                        </div>
-                        <div>
-                          <dt>Weight Applied</dt>
-                          <dd>{check.weight_applied} pts</dd>
-                        </div>
-                        <div>
-                          <dt>Engine Evaluation Note</dt>
-                          <dd>{check.note}</dd>
-                        </div>
-                      </dl>
-                    </details>
-                  );
-                })}
+                <div className="statutory-verification-grid">
+                  {assessment.checks.map((check) => (
+                    <StatutoryCheckCard key={check.source || check.check_type} check={check} />
+                  ))}
+                </div>
               </section>
 
               {/* Pending Manual Review */}
