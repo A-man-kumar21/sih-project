@@ -12,7 +12,7 @@
 > **Smart India Hackathon (SIH 2026) Prototype.**  
 > **Problem Statement:** AI-Powered Integrated Bid Compliance Verification Platform for Government e-Marketplace (GeM) Procurement.
 
-live - https://bid-compliance-verification-platfor-kappa.vercel.app/
+live - https://sih-project-icrz.onrender.com
 
 ---
 
