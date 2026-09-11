@@ -119,10 +119,87 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
     return text
 
 
+MONTH_MAP = {
+    "jan": 1, "january": 1, "feb": 2, "february": 2, "mar": 3, "march": 3,
+    "apr": 4, "april": 4, "may": 5, "jun": 6, "june": 6, "jul": 7, "july": 7,
+    "aug": 8, "august": 8, "sep": 9, "september": 9, "oct": 10, "october": 10,
+    "nov": 11, "november": 11, "dec": 12, "december": 12,
+}
+
+
+def parse_date_to_dmy(raw_val: str) -> str | None:
+    """Parse various date formats into standardized DD/MM/YYYY."""
+    if not raw_val:
+        return None
+    val = raw_val.strip()
+    # 1. DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+    m1 = re.search(r"\b(0?[1-9]|[12][0-9]|3[01])[\/\-\.](0?[1-9]|1[0-2])[\/\-\.]((?:19|20)\d{2})\b", val)
+    if m1:
+        d, m, y = int(m1.group(1)), int(m1.group(2)), int(m1.group(3))
+        return f"{d:02d}/{m:02d}/{y:04d}"
+    # 2. YYYY-MM-DD or YYYY/MM/DD
+    m2 = re.search(r"\b((?:19|20)\d{2})[\/\-\.](0?[1-9]|1[0-2])[\/\-\.](0?[1-9]|[12][0-9]|3[01])\b", val)
+    if m2:
+        y, m, d = int(m2.group(1)), int(m2.group(2)), int(m2.group(3))
+        return f"{d:02d}/{m:02d}/{y:04d}"
+    # 3. DD Month YYYY (e.g. 15 June 2020 or 15-Jun-2020)
+    m3 = re.search(r"\b(0?[1-9]|[12][0-9]|3[01])[\s\-]+([A-Za-z]{3,10})[\s\-]+((?:19|20)\d{2})\b", val)
+    if m3:
+        d = int(m3.group(1))
+        mon_str = m3.group(2).lower()
+        y = int(m3.group(3))
+        if mon_str in MONTH_MAP:
+            return f"{d:02d}/{MONTH_MAP[mon_str]:02d}/{y:04d}"
+    # 4. Month DD, YYYY (e.g. June 15, 2020)
+    m4 = re.search(r"\b([A-Za-z]{3,10})[\s\-]+(0?[1-9]|[12][0-9]|3[01]),?[\s\-]+((?:19|20)\d{2})\b", val)
+    if m4:
+        mon_str = m4.group(1).lower()
+        d = int(m4.group(2))
+        y = int(m4.group(3))
+        if mon_str in MONTH_MAP:
+            return f"{d:02d}/{MONTH_MAP[mon_str]:02d}/{y:04d}"
+    return None
+
+
+def normalize_enterprise_type(val: str) -> str | None:
+    """Map enterprise classification variants to canonical types: Micro, Small, Medium, Large."""
+    if not val:
+        return None
+    s = val.strip().lower()
+    if "micro" in s:
+        return "Micro"
+    if "small" in s:
+        return "Small"
+    if "medium" in s:
+        return "Medium"
+    if "large" in s or "non-msme" in s:
+        return "Large"
+    if "startup" in s:
+        return "Micro"
+    return None
+
+
+KNOWN_HEADER_WORDS = {
+    "field", "mock value", "value", "details", "description", "document",
+    "verification note", "expected prototype result", "expected compliance score"
+}
+
+
+def is_header_or_skip(line: str) -> bool:
+    """Check if line is a table header or test disclaimer that should be skipped."""
+    l_low = line.strip().lower()
+    if l_low in KNOWN_HEADER_WORDS:
+        return True
+    if l_low.startswith("verification note") or l_low.startswith("this is fabricated") or l_low.startswith("mock / synthetic"):
+        return True
+    return False
+
+
 def normalize_text(text: str) -> str:
     """
     Normalize extracted document text before pattern extraction.
     Handles OCR spacing, unified punctuation, hyphens, and Unicode variants while keeping IDs accurate.
+    Reconstructs labels split across multiple lines in PDF text layers.
     """
     if not text:
         return ""
@@ -136,8 +213,8 @@ def normalize_text(text: str) -> str:
     # 3. Standardize hyphens and dashes (em-dash, en-dash, minus to standard hyphen)
     norm = re.sub(r"[—–−‐‑]", "-", norm)
 
-    # 4. Standardize quotes and colons
-    norm = norm.replace("：", ":").replace("“", '"').replace("”", '"').replace("’", "'")
+    # 4. Standardize quotes, colons, and slashes
+    norm = norm.replace("：", ":").replace("“", '"').replace("”", '"').replace("’", "'").replace("／", "/")
 
     # 5. Handle common OCR spaced keywords
     norm = re.sub(r"(?i)\bU\s*D\s*Y\s*A\s*M\b", "UDYAM", norm)
@@ -146,70 +223,71 @@ def normalize_text(text: str) -> str:
     norm = re.sub(r"(?i)\bC\s*I\s*N\b", "CIN", norm)
     norm = re.sub(r"(?i)\bE\s*P\s*F\s*O\b", "EPFO", norm)
     norm = re.sub(r"(?i)\bE\s*S\s*I\s*C\b", "ESIC", norm)
+    norm = re.sub(r"(?i)\bM\s*S\s*M\s*E\b", "MSME", norm)
 
-    # 6. Normalize whitespace per line while preserving line breaks
+    # 6. Reconstruct labels split across lines
+    norm = re.sub(r"(?i)Date\s+of\s+Registration\s*/\s*\n\s*Incorporation", "Date of Registration / Incorporation", norm)
+    norm = re.sub(r"(?i)Date\s+of\s*\n\s*Registration", "Date of Registration", norm)
+    norm = re.sub(r"(?i)Date\s+of\s*\n\s*Incorporation", "Date of Incorporation", norm)
+    norm = re.sub(r"(?i)Registered\s+Address\s*/\s*Principal\s+Place\s+of\s*\n\s*Business", "Registered Address / Principal Place of Business", norm)
+    norm = re.sub(r"(?i)Principal\s+Place\s+of\s*\n\s*Business", "Principal Place of Business", norm)
+    norm = re.sub(r"(?i)Enterprise\s+Classification\s*/\s*\n\s*Category", "Enterprise Classification / Category", norm)
+    norm = re.sub(r"(?i)EPFO\s+Establishment\s*\n\s*Code", "EPFO Establishment Code", norm)
+    norm = re.sub(r"(?i)ESIC\s+Employer\s*\n\s*Code", "ESIC Employer Code", norm)
+    norm = re.sub(r"(?i)Permanent\s+Account\s+Number\s*\n\s*\(PAN\)", "Permanent Account Number (PAN)", norm)
+    norm = re.sub(r"(?i)GST\s+Identification\s+Number\s*\n\s*\(GSTIN\)", "GST Identification Number (GSTIN)", norm)
+    norm = re.sub(r"(?i)Corporate\s+Identification\s+Number\s*\n\s*\(CIN\)", "Corporate Identification Number (CIN)", norm)
+    norm = re.sub(r"(?i)Udyam\s*/\s*MSME\s+Registration\s*\n\s*Number", "Udyam / MSME Registration Number", norm)
+    norm = re.sub(r"(?i)Constitution\s+of\s*\n\s*Business", "Constitution of Business", norm)
+    norm = re.sub(r"(?i)Authorized\s+Contact\s*\n\s*Person", "Authorized Contact Person", norm)
+
+    # 7. Normalize whitespace per line while preserving line breaks
     lines = [re.sub(r"[ \t]+", " ", line).strip() for line in norm.split("\n")]
     return "\n".join(lines)
 
 
-
-def call_gemini(prompt: str, system_instruction: str = "", json_mode: bool = False, timeout: float = 12.0) -> tuple[str, str]:
-    """Call Google Gemini REST API. Raises exception if key missing, network error, or timeout.
-    Returns (response_text, model_name).
+def extract_field_near_label(
+    lines: list[str],
+    label_patterns: list[str],
+    cleaner_fn,
+    validator_fn,
+    max_lines_ahead: int = 3,
+) -> tuple[str | None, int]:
     """
-    api_key = get_gemini_api_key()
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY is not configured.")
+    Search for known field labels in document lines.
+    Once a label is matched:
+    1. Inspect same line after the label.
+    2. If no valid candidate on same line, inspect the next 1-3 lines (table format).
+    3. Return (cleaned_candidate, confidence) if validated, else (None, 0).
+    """
+    compiled = [re.compile(rf"(?:^|\b)(?:{p})(?:$|\b|\s*[:\-–])", re.IGNORECASE) for p in label_patterns]
+    for idx, line in enumerate(lines):
+        for pattern in compiled:
+            m = pattern.search(line)
+            if m:
+                # 1. Check remainder on same line after label
+                remainder = line[m.end():].strip().lstrip(":-–= ").strip()
+                if remainder:
+                    cand = cleaner_fn(remainder)
+                    if cand and validator_fn(cand):
+                        return cand, 96
 
-    models_to_try = [
-        os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite"),
-        "gemini-3.5-flash-lite",
-        "gemini-3.5-flash",
-        "gemini-flash-latest",
-        "gemini-3.6-flash",
-    ]
-    seen = set()
-    models = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
-
-    last_error = None
-    for model_name in models:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
-        
-        contents = [{"role": "user", "parts": [{"text": prompt}]}]
-        payload: dict[str, Any] = {
-            "contents": contents,
-            "generationConfig": {
-                "temperature": 0.2,
-                "maxOutputTokens": 800,
-            },
-        }
-
-        if system_instruction:
-            payload["systemInstruction"] = {"parts": [{"text": system_instruction}]}
-
-        if json_mode:
-            payload["generationConfig"]["responseMimeType"] = "application/json"
-
-        headers = {"Content-Type": "application/json"}
-        try:
-            response = requests.post(url, headers=headers, json=payload, timeout=timeout)
-            if response.status_code == 200:
-                data = response.json()
-                candidates = data.get("candidates", [])
-                if not candidates:
-                    continue
-                text_parts = candidates[0].get("content", {}).get("parts", [])
-                if not text_parts:
-                    continue
-                return text_parts[0].get("text", "").strip(), model_name
-            else:
-                last_error = f"Gemini API ({model_name}) returned status {response.status_code}: {response.text}"
-        except Exception as e:
-            last_error = str(e)
-            continue
-
-    raise RuntimeError(last_error or "Gemini API failed on all attempted models.")
-
+                # 2. Check subsequent lines (handling table rows where label is on one line and value is on the next)
+                for ahead in range(1, max_lines_ahead + 1):
+                    if idx + ahead >= len(lines):
+                        break
+                    next_line = lines[idx + ahead].strip()
+                    if not next_line or is_header_or_skip(next_line):
+                        continue
+                    # If this next line matches any other label pattern itself, stop looking ahead
+                    is_other_label = any(p.search(next_line) for p in compiled)
+                    if is_other_label:
+                        break
+                    cand = cleaner_fn(next_line)
+                    if cand and validator_fn(cand):
+                        return cand, 96
+                break
+    return None, 0
 
 
 # =====================================================================
@@ -247,47 +325,66 @@ def deterministic_extract_fields(norm_text: str, raw_text: str = "", document_ty
     }
     field_conf: dict[str, int] = {}
     combined_text = f"{norm_text}\n{raw_text}"
+    lines = [line.strip() for line in norm_text.split("\n") if line.strip()]
 
     # 1. PAN EXTRACTION (AAAAA9999A)
     # Prefer matches near PAN labels: "PAN", "Permanent Account Number", "PAN No"
-    pan_labeled = re.search(
-        r"(?:Permanent Account Number|PAN\s*No|PAN\s*Card|PAN\s*Number|\bPAN\b)\s*[:\-–]?\s*([A-Z]{5}\s*[0-9]{4}\s*[A-Z]{1})\b",
-        norm_text,
-        re.IGNORECASE,
+    pan_labels = [
+        r"Permanent\s+Account\s+Number\s*\(PAN\)",
+        r"Permanent\s+Account\s+Number",
+        r"PAN\s*Card",
+        r"PAN\s*Number",
+        r"PAN\s*No",
+        r"\bPAN\b",
+    ]
+    pan_val, pan_conf = extract_field_near_label(
+        lines,
+        pan_labels,
+        lambda s: re.sub(r"\s+", "", s).upper(),
+        lambda s: bool(re.match(r"^[A-Z]{5}[0-9]{4}[A-Z]$", s)),
     )
-    if pan_labeled:
-        pan_val = re.sub(r"\s+", "", pan_labeled.group(1)).upper()
+    if pan_val:
         fields["pan"] = pan_val
-        # Structural check: 4th char is entity type (C, P, H, F, A, T, B, L, J, G)
-        is_struct_valid = len(pan_val) == 10 and pan_val[3] in "CPHFATBLJG"
-        field_conf["pan"] = 98 if is_struct_valid else 92
+        is_struct_valid = pan_val[3] in "CPHFATBLJG"
+        field_conf["pan"] = 98 if is_struct_valid else 94
     else:
         # Generic PAN pattern match
         pan_match = re.search(r"\b([A-Z]{5}[0-9]{4}[A-Z]{1})\b", norm_text)
         if pan_match:
-            pan_val = pan_match.group(1).upper()
-            fields["pan"] = pan_val
-            is_struct_valid = pan_val[3] in "CPHFATBLJG"
+            p_val = pan_match.group(1).upper()
+            fields["pan"] = p_val
+            is_struct_valid = p_val[3] in "CPHFATBLJG"
             field_conf["pan"] = 94 if is_struct_valid else 88
 
     # 2. GSTIN EXTRACTION (2 digits, 10 PAN, 1 entity, Z, 1 checksum)
-    gstin_labeled = re.search(
-        r"(?:GST Identification Number|GSTIN/UIN|GSTIN\s*No|GSTIN\s*Number|\bGSTIN\b)\s*[:\-–]?\s*([0-9]{2}\s*[A-Z]{5}\s*[0-9]{4}\s*[A-Z]{1}\s*[1-9A-Z]{1}\s*Z\s*[0-9A-Z]{1})\b",
-        norm_text,
-        re.IGNORECASE,
+    gstin_labels = [
+        r"GST\s+Identification\s+Number\s*\(GSTIN\)",
+        r"GST\s+Identification\s+Number",
+        r"GST\s+Identification\s+No\.?",
+        r"GSTIN/UIN",
+        r"GSTIN\s*No\.?",
+        r"GSTIN\s*Number",
+        r"GST\s*No\.?",
+        r"GST\s*Number",
+        r"\bGSTIN\b",
+    ]
+    gstin_val, gstin_conf = extract_field_near_label(
+        lines,
+        gstin_labels,
+        lambda s: re.sub(r"\s+", "", s).upper(),
+        lambda s: bool(re.match(r"^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$", s)),
     )
-    if gstin_labeled:
-        gstin_val = re.sub(r"\s+", "", gstin_labeled.group(1)).upper()
+    if gstin_val:
         fields["gstin"] = gstin_val
         state_code = gstin_val[:2]
         is_state_valid = state_code.isdigit() and (1 <= int(state_code) <= 38 or state_code in ("97", "99"))
-        field_conf["gstin"] = 99 if is_state_valid else 93
+        field_conf["gstin"] = 99 if is_state_valid else 94
     else:
         gstin_match = re.search(r"\b([0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1})\b", norm_text)
         if gstin_match:
-            gstin_val = gstin_match.group(1).upper()
-            fields["gstin"] = gstin_val
-            state_code = gstin_val[:2]
+            g_val = gstin_match.group(1).upper()
+            fields["gstin"] = g_val
+            state_code = g_val[:2]
             is_state_valid = state_code.isdigit() and (1 <= int(state_code) <= 38 or state_code in ("97", "99"))
             field_conf["gstin"] = 95 if is_state_valid else 90
 
@@ -302,20 +399,31 @@ def deterministic_extract_fields(norm_text: str, raw_text: str = "", document_ty
             field_conf["gstin"] = min(100, field_conf.get("gstin", 90) + 2)
 
     # 3. UDYAM / MSME REGISTRATION NUMBER (UDYAM-XX-00-0000000)
-    udyam_labeled = re.search(
-        r"(?:Udyam Registration Number|Udyam Registration No|Udyam No|UDYAM\s*Reg|UDYAM|MSME\s*Reg|MSME)\s*[:\-–]?\s*(UDYAM\s*-\s*[A-Z]{2}\s*-\s*[0-9]{2}\s*-\s*[0-9]{7})\b",
-        norm_text,
-        re.IGNORECASE,
+    udyam_labels = [
+        r"Udyam\s*/\s*MSME\s+Registration\s+Number",
+        r"Udyam/MSME\s+Registration\s+Number",
+        r"Udyam\s+Registration\s+Number",
+        r"Udyam\s+Registration\s+No\.?",
+        r"Udyam\s+Number",
+        r"Udyam\s+No\.?",
+        r"UDYAM\s*Reg\.?",
+        r"MSME\s*Registration\s*Number",
+        r"MSME\s*Reg\.?",
+        r"\bUDYAM\b",
+        r"\bMSME\b",
+    ]
+    udyam_val, udyam_conf = extract_field_near_label(
+        lines,
+        udyam_labels,
+        lambda s: re.sub(r"\s+", "", s).upper().replace("—", "-"),
+        lambda s: bool(re.match(r"^UDYAM-[A-Z]{2}-[A-Z0-9]{2}-[0-9]{7}$", s)),
     )
-    if udyam_labeled:
-        u_val = re.sub(r"\s+", "", udyam_labeled.group(1)).upper()
-        fields["udyam"] = u_val
-        fields["udyam_number"] = u_val
+    if udyam_val:
+        fields["udyam"] = udyam_val
+        fields["udyam_number"] = udyam_val
         field_conf["udyam"] = 98
     else:
-        udyam_match = re.search(r"\b(UDYAM-[A-Z]{2}-[0-9]{2}-[0-9]{7})\b", norm_text, re.IGNORECASE)
-        if not udyam_match:
-            udyam_match = re.search(r"\b(UDYAM-[A-Z]{2}-[A-Z0-9]{2}-[0-9]{7})\b", norm_text, re.IGNORECASE)
+        udyam_match = re.search(r"\b(UDYAM-[A-Z]{2}-[A-Z0-9]{2}-[0-9]{7})\b", norm_text, re.IGNORECASE)
         if udyam_match:
             u_val = udyam_match.group(1).upper()
             fields["udyam"] = u_val
@@ -323,15 +431,23 @@ def deterministic_extract_fields(norm_text: str, raw_text: str = "", document_ty
             field_conf["udyam"] = 95
 
     # 4. CORPORATE IDENTIFICATION NUMBER (CIN - 21 chars: U12345MH2018PTC123456)
-    cin_labeled = re.search(
-        r"(?:Corporate Identification Number|Corporate Identity Number|CIN\s*No|\bCIN\b)\s*[:\-–]?\s*([LUu]\s*[0-9]{5}\s*[A-Z]{2}\s*[0-9]{4}\s*[A-Z]{3}\s*[0-9]{6})\b",
-        norm_text,
-        re.IGNORECASE,
+    cin_labels = [
+        r"Corporate\s+Identification\s+Number\s*\(CIN\)",
+        r"Corporate\s+Identification\s+Number",
+        r"Corporate\s+Identity\s+Number",
+        r"CIN\s*Number",
+        r"CIN\s*No\.?",
+        r"\bCIN\b",
+    ]
+    cin_val, cin_conf = extract_field_near_label(
+        lines,
+        cin_labels,
+        lambda s: re.sub(r"\s+", "", s).upper(),
+        lambda s: bool(re.match(r"^[LUu][0-9]{5}[A-Z]{2}[0-9]{4}[A-Z]{3}[0-9]{6}$", s)),
     )
-    if cin_labeled:
-        c_val = re.sub(r"\s+", "", cin_labeled.group(1)).upper()
-        fields["cin"] = c_val
-        field_conf["cin"] = 97
+    if cin_val:
+        fields["cin"] = cin_val
+        field_conf["cin"] = 98
     else:
         cin_match = re.search(r"\b([LUu][0-9]{5}[A-Z]{2}[0-9]{4}[A-Z]{3}[0-9]{6})\b", norm_text)
         if cin_match:
@@ -339,64 +455,157 @@ def deterministic_extract_fields(norm_text: str, raw_text: str = "", document_ty
             field_conf["cin"] = 93
 
     # 5. EPFO ESTABLISHMENT IDENTIFIER
-    epfo_labeled = re.search(
-        r"(?:EPFO\s*Code|EPFO\s*Registration|EPFO|PF\s*Code|PF\s*Registration|Establishment\s*Code)\s*[:\-–]?\s*([A-Z]{2}\s*/?\s*[A-Z]{3}\s*/?\s*[0-9]{7}\s*/?\s*[0-9]{3}|[A-Z]{5}[0-9]{17}|[A-Z]{2}[0-9]{7,10})\b",
-        norm_text,
-        re.IGNORECASE,
+    epfo_labels = [
+        r"EPFO\s+Establishment\s+Code",
+        r"EPFO\s+Code",
+        r"PF\s+Establishment\s+Code",
+        r"Establishment\s+Code",
+        r"Provident\s+Fund\s+Code",
+        r"PF\s+Code",
+        r"EPF\s+Code",
+        r"EPFO\s+Registration",
+        r"\bEPFO\b",
+    ]
+    epfo_val, epfo_conf = extract_field_near_label(
+        lines,
+        epfo_labels,
+        lambda s: re.sub(r"\s+", "", s).upper(),
+        lambda s: bool(re.match(r"^(?:[A-Z]{2}/[A-Z0-9\-_/]{4,30}|[A-Z]{2}[A-Z0-9]{3}\d{7}\d{3})$", s)),
     )
-    if epfo_labeled:
-        ep_val = re.sub(r"\s+", "", epfo_labeled.group(1)).upper()
-        fields["epfo"] = ep_val
-        fields["epfo_number"] = ep_val
-        fields["epfo_esic_number"] = ep_val
-        field_conf["epfo"] = 94
+    if epfo_val:
+        fields["epfo"] = epfo_val
+        fields["epfo_number"] = epfo_val
+        fields["epfo_esic_number"] = epfo_val
+        field_conf["epfo"] = 97
     else:
-        epfo_match = re.search(r"\b([A-Z]{2}/[A-Z]{3}/[0-9]{7}/[0-9]{3})\b", norm_text)
+        epfo_match = re.search(r"\b([A-Z]{2}/[A-Z0-9\-_/]{4,30})\b", norm_text)
         if epfo_match:
-            fields["epfo"] = epfo_match.group(1)
-            fields["epfo_number"] = epfo_match.group(1)
-            fields["epfo_esic_number"] = epfo_match.group(1)
-            field_conf["epfo"] = 92
+            val_found = epfo_match.group(1).upper()
+            fields["epfo"] = val_found
+            fields["epfo_number"] = val_found
+            fields["epfo_esic_number"] = val_found
+            field_conf["epfo"] = 91
 
-    # 6. ESIC IDENTIFIER (17 digits)
-    esic_labeled = re.search(
-        r"(?:ESIC\s*Code|ESIC\s*Registration|ESIC|ESI\s*Code|ESI\s*Registration|Employees\s*State\s*Insurance)\s*[:\-–]?\s*([0-9]{2}\s*-\s*[0-9]{2}\s*-\s*[0-9]{6}\s*-\s*[0-9]{3}\s*-\s*[0-9]{4}|[0-9]{17})\b",
-        norm_text,
-        re.IGNORECASE,
+    # 6. ESIC IDENTIFIER (15-17 digits or formatted)
+    esic_labels = [
+        r"ESIC\s+Employer\s+Code",
+        r"ESIC\s+Code",
+        r"ESI\s+Employer\s+Code",
+        r"ESI\s+Code",
+        r"Employer\s+Code",
+        r"ESIC\s+Registration\s+Number",
+        r"ESI\s+Registration\s+Number",
+        r"ESIC\s+Registration",
+        r"Employees\s+State\s+Insurance",
+        r"\bESIC\b",
+        r"\bESI\b",
+    ]
+    esic_val, esic_conf = extract_field_near_label(
+        lines,
+        esic_labels,
+        lambda s: re.sub(r"[\s\-_]+", "", s),
+        lambda s: bool(re.match(r"^[0-9]{15,17}$", s)),
     )
-    if esic_labeled:
-        es_val = re.sub(r"[\s\-]+", "", esic_labeled.group(1))
-        fields["esic"] = es_val
-        fields["esic_number"] = es_val
+    if esic_val:
+        fields["esic"] = esic_val
+        fields["esic_number"] = esic_val
         if not fields["epfo_esic_number"]:
-            fields["epfo_esic_number"] = es_val
-        field_conf["esic"] = 94
+            fields["epfo_esic_number"] = esic_val
+        field_conf["esic"] = 97
     else:
-        esic_match = re.search(r"\b([0-9]{2}-[0-9]{2}-[0-9]{6}-[0-9]{3}-[0-9]{4})\b", norm_text)
+        esic_match = re.search(r"\b([0-9]{2}-[0-9]{2}-[0-9]{4,6}-[0-9]{3}-[0-9]{4})\b", norm_text)
+        if not esic_match:
+            esic_match = re.search(r"\b([0-9]{15,17})\b", norm_text)
         if esic_match:
-            fields["esic"] = esic_match.group(1)
-            fields["esic_number"] = esic_match.group(1)
+            val_clean = re.sub(r"[\s\-]+", "", esic_match.group(1))
+            fields["esic"] = val_clean
+            fields["esic_number"] = val_clean
             if not fields["epfo_esic_number"]:
-                fields["epfo_esic_number"] = esic_match.group(1)
-            field_conf["esic"] = 91
+                fields["epfo_esic_number"] = val_clean
+            field_conf["esic"] = 90
 
-    # 7. COMPANY / ENTERPRISE NAME
-    name_labeled = re.search(
-        r"(?:Name of Enterprise|Enterprise Name|Legal Name|Trade Name|Company Name|Name of the Entity|Name of Firm|M/s\.?)\s*[:\-–]?\s*([A-Za-z0-9\s,\.\-&'()]+?(?:Private Limited|Pvt\.?\s*Ltd\.?|Limited|LLP|Enterprise|Enterprises|Solutions|Technologies|Works|Systems|Industries|Corporation|India)?)(?:\n|$|\s{2,})",
-        norm_text,
-        re.IGNORECASE,
+    # 7. DATE OF REGISTRATION / INCORPORATION
+    date_labels = [
+        r"Date\s+of\s+Registration\s*/\s*Incorporation",
+        r"Date\s+of\s+Registration/Incorporation",
+        r"Date\s+of\s+Registration",
+        r"Registration\s+Date",
+        r"Date\s+of\s+Incorporation",
+        r"Incorporation\s+Date",
+        r"Date\s+of\s+Commencement",
+        r"Date\s+of\s+Establishment",
+    ]
+    reg_date_val, reg_date_conf = extract_field_near_label(
+        lines,
+        date_labels,
+        lambda s: parse_date_to_dmy(s),
+        lambda s: bool(s and len(s) == 10),
     )
-    if name_labeled and len(name_labeled.group(1).strip()) > 3:
-        n_raw = name_labeled.group(1).strip().strip(":").strip("-").strip()
-        n_clean = re.split(r"(?i)\b(?:UDYAM|GSTIN|PAN|CIN|Date|Type|Address)\b", n_raw)[0].strip()
-        if len(n_clean) >= 3:
-            fields["companyName"] = n_clean
-            fields["company_name"] = n_clean
-            fields["enterprise_name"] = n_clean
-            fields["legal_name"] = n_clean
-            field_conf["companyName"] = 96
+    if reg_date_val:
+        fields["registration_date"] = reg_date_val
+        field_conf["registration_date"] = 97
+    else:
+        date_match = re.search(
+            r"(?:Date\s+of\s+(?:Registration|Incorporation|Liability|Validity)|Registration\s+Date)\s*[:\-–]?\s*([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{2,4}|[0-9]{4}-[0-9]{2}-[0-9]{2})",
+            norm_text,
+            re.IGNORECASE,
+        )
+        if date_match:
+            parsed = parse_date_to_dmy(date_match.group(1).strip())
+            if parsed:
+                fields["registration_date"] = parsed
+                field_conf["registration_date"] = 92
 
-    if not fields["companyName"]:
+    # 8. ENTERPRISE CLASSIFICATION / CATEGORY
+    type_labels = [
+        r"Enterprise\s+Classification\s*/\s*Category",
+        r"Enterprise\s+Classification",
+        r"Enterprise\s+Category",
+        r"Enterprise\s+Type",
+        r"Type\s+of\s+Enterprise",
+        r"MSME\s+Classification",
+        r"\bClassification\b",
+    ]
+    type_val, type_conf = extract_field_near_label(
+        lines,
+        type_labels,
+        lambda s: normalize_enterprise_type(s),
+        lambda s: bool(s in ("Micro", "Small", "Medium", "Large")),
+    )
+    if type_val:
+        fields["enterprise_type"] = type_val
+        field_conf["enterprise_type"] = 97
+    else:
+        type_match = re.search(r"\b(Micro|Small|Medium|Large)\b", norm_text, re.IGNORECASE)
+        if type_match:
+            fields["enterprise_type"] = type_match.group(1).capitalize()
+            field_conf["enterprise_type"] = 90
+
+    # 9. COMPANY / ENTERPRISE NAME
+    name_labels = [
+        r"Enterprise\s+Legal\s+Name",
+        r"Name\s+of\s+Enterprise",
+        r"Enterprise\s+Name",
+        r"Legal\s+Name",
+        r"Trade\s+Name",
+        r"Company\s+Name",
+        r"Name\s+of\s+the\s+Entity",
+        r"Name\s+of\s+Firm",
+        r"\bM/s\.?",
+    ]
+    name_val, name_conf = extract_field_near_label(
+        lines,
+        name_labels,
+        lambda s: re.split(r"(?i)\b(?:UDYAM|GSTIN|PAN|CIN|Date|Type|Address|Field|Mock)\b", s.strip().strip(":-–= ").strip())[0].strip(),
+        lambda s: len(s) >= 3 and not is_header_or_skip(s),
+    )
+    if name_val and len(name_val) >= 3:
+        fields["companyName"] = name_val
+        fields["company_name"] = name_val
+        fields["enterprise_name"] = name_val
+        fields["legal_name"] = name_val
+        field_conf["companyName"] = 97
+    else:
         co_match = re.search(
             r"\b([A-Z][A-Za-z0-9\s,\.\-&]{2,55}(?:Private Limited|Pvt\.?\s*Ltd\.?|Limited Liability Partnership|LLP|Limited))\b",
             combined_text,
@@ -414,40 +623,22 @@ def deterministic_extract_fields(norm_text: str, raw_text: str = "", document_ty
     if trade_labeled:
         fields["trade_name"] = trade_labeled.group(1).strip().split("\n")[0].strip()
 
-    # 8. ADDRESS / PRINCIPAL PLACE OF BUSINESS
-    addr_labeled = re.search(
-        r"(?:Principal Place of Business|Registered Address|Official Address|Enterprise Address|Business Address|Location of Plant/Unit|Address)\s*[:\-–]?\s*([A-Za-z0-9\s,\.\-#/()]+?(?:Delhi|Mumbai|Chennai|Kolkata|Bengaluru|Bangalore|Hyderabad|Pune|Ahmedabad|India|[1-9][0-9]{5}))(?:\n|$)",
-        norm_text,
-        re.IGNORECASE,
-    )
-    if addr_labeled:
-        a_val = addr_labeled.group(1).strip().strip(":").strip("-").strip()
-        fields["address"] = a_val[:140]
-        fields["registered_address"] = a_val[:140]
-        field_conf["address"] = 92
-    else:
-        pin_match = re.search(r"([A-Za-z0-9\s,\.\-#/()]{15,100}\b[1-9][0-9]{5}\b)", norm_text)
-        if pin_match:
-            a_val = pin_match.group(1).strip()
-            fields["address"] = a_val[:140]
-            fields["registered_address"] = a_val[:140]
-            field_conf["address"] = 86
-
-    # 9. ENTERPRISE TYPE (Micro, Small, Medium, Large)
-    type_match = re.search(r"\b(Micro|Small|Medium|Large)\b", norm_text, re.IGNORECASE)
-    if type_match:
-        fields["enterprise_type"] = type_match.group(1).capitalize()
-        field_conf["enterprise_type"] = 95
-
     # 10. BUSINESS CONSTITUTION
-    const_match = re.search(
-        r"(?:Constitution of Business|Business Constitution|Constitution|Organisation Type|Type of Enterprise)\s*[:\-–]?\s*([A-Za-z0-9\s,\.\-&]+?(?:Limited|LLP|Partnership|Proprietorship|Company)?)(?:\n|$)",
-        norm_text,
-        re.IGNORECASE,
+    const_labels = [
+        r"Constitution\s+of\s+Business",
+        r"Business\s+Constitution",
+        r"Organisation\s+Type",
+        r"\bConstitution\b",
+    ]
+    const_val, const_conf = extract_field_near_label(
+        lines,
+        const_labels,
+        lambda s: s.strip().strip(":-–= ").strip(),
+        lambda s: len(s) >= 3 and not is_header_or_skip(s),
     )
-    if const_match and len(const_match.group(1).strip()) > 2:
-        fields["business_constitution"] = const_match.group(1).strip()
-        field_conf["business_constitution"] = 94
+    if const_val and len(const_val) > 2:
+        fields["business_constitution"] = const_val
+        field_conf["business_constitution"] = 96
     else:
         if re.search(r"\b(?:Private Limited|Pvt\.?\s*Ltd\.?)\b", norm_text, re.IGNORECASE):
             fields["business_constitution"] = "Private Limited Company"
@@ -462,15 +653,36 @@ def deterministic_extract_fields(norm_text: str, raw_text: str = "", document_ty
             fields["business_constitution"] = "Partnership"
             field_conf["business_constitution"] = 90
 
-    # 11. REGISTRATION / INCORPORATION DATE
-    date_match = re.search(
-        r"(?:Date of (?:Registration|Incorporation|Liability|Validity)|Registration Date)\s*[:\-–]?\s*([0-9]{1,2}[\/\-][0-9]{1,2}[\/\-][0-9]{2,4}|[0-9]{4}-[0-9]{2}-[0-9]{2})",
-        norm_text,
-        re.IGNORECASE,
+    # 11. ADDRESS / PRINCIPAL PLACE OF BUSINESS
+    addr_labels = [
+        r"Registered\s+Address\s*/\s*Principal\s+Place\s+of\s+Business",
+        r"Principal\s+Place\s+of\s+Business",
+        r"Registered\s+Address",
+        r"Official\s+Address",
+        r"Enterprise\s+Address",
+        r"Business\s+Address",
+        r"Location\s+of\s+Plant/Unit",
+        r"\bAddress\b",
+    ]
+    addr_val, addr_conf = extract_field_near_label(
+        lines,
+        addr_labels,
+        lambda s: s.strip().strip(":-–= ").strip(),
+        lambda s: len(s) >= 10 and not is_header_or_skip(s),
     )
-    if date_match:
-        fields["registration_date"] = date_match.group(1).strip()
-        field_conf["registration_date"] = 95
+    if addr_val:
+        # Clean up any leftover label headers if present in multi-line address
+        clean_addr = re.sub(r"(?i)^(?:Registered\s+Address\s*/\s*Principal\s+Place\s+of\s+Business|Business|Address)\s*[:\-–]?\s*", "", addr_val).strip()
+        fields["address"] = clean_addr[:160]
+        fields["registered_address"] = clean_addr[:160]
+        field_conf["address"] = 95
+    else:
+        pin_match = re.search(r"([A-Za-z0-9\s,\.\-#/()]{15,100}\b[1-9][0-9]{5}\b)", norm_text)
+        if pin_match:
+            a_val = pin_match.group(1).strip()
+            fields["address"] = a_val[:160]
+            fields["registered_address"] = a_val[:160]
+            field_conf["address"] = 86
 
     # Overall deterministic confidence calculation
     conf_scores = list(field_conf.values())

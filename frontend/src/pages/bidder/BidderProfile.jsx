@@ -342,7 +342,13 @@ export default function BidderProfile() {
               {renderProvenanceBadge("enterprise_type")}
             </div>
             <select
-              value={formData.enterprise_type}
+              value={
+                formData.enterprise_type === "Small Enterprise" ? "Small" :
+                formData.enterprise_type === "Micro Enterprise" ? "Micro" :
+                formData.enterprise_type === "Medium Enterprise" ? "Medium" :
+                formData.enterprise_type === "Large Enterprise" ? "Large" :
+                formData.enterprise_type
+              }
               onChange={(e) => setFormData({ ...formData, enterprise_type: e.target.value })}
               style={{ padding: "0.6rem" }}
             >

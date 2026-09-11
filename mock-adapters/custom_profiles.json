@@ -5103,30 +5103,366 @@
     }
   },
   "BIDDER-NIMBUS-QE4P": {
-    "display_name": "Nimbus CloudWorks India Pvt. Ltd.",
+    "display_name": "Solaris GreenTech India Pvt. Ltd.",
     "scenario": "registered_bidder",
     "business_constitution": "Private Limited Company",
-    "registered_address": "/ Principal Place of\nBusiness\n5 Cloud Avenue, HITEC City, Hyderabad, Telangana - 500081",
-    "registration_date": "",
-    "enterprise_type": "",
+    "registered_address": "8 Renewable Energy Avenue, Ahmedabad, Gujarat - 380015",
+    "registration_date": "10/02/2021",
+    "enterprise_type": "Small",
     "udyam": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:11:55.583196Z",
+      "last_updated": "2026-09-11T21:40:05.507247Z",
       "confidence": 0.98,
       "raw_fields": {
-        "udyam_registration_number": "UDYAM-TS-00-0000007",
-        "enterprise_name": "Nimbus CloudWorks India Pvt. Ltd.",
+        "udyam_registration_number": "UDYAM-GJ-00-0000003",
+        "enterprise_name": "Solaris GreenTech India Pvt. Ltd.",
         "registration_valid_until": "2029-03-31",
         "enterprise_category": "Small",
-        "registration_date": "",
-        "registered_address": "/ Principal Place of\nBusiness\n5 Cloud Avenue, HITEC City, Hyderabad, Telangana - 500081",
+        "registration_date": "10/02/2021",
+        "registered_address": "8 Renewable Energy Avenue, Ahmedabad, Gujarat - 380015",
         "business_constitution": "Private Limited Company",
         "registration_active": true
       }
     },
     "gstn": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:11:55.583196Z",
+      "last_updated": "2026-09-11T21:40:05.507247Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "24AABCS1003C1Z7",
+        "legal_name": "Solaris GreenTech India Pvt. Ltd.",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "8 Renewable Energy Avenue, Ahmedabad, Gujarat - 380015",
+        "registration_date": "10/02/2021"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:40:05.507247Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCS1003C",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:40:05.507247Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "GJ/EPF/TEST/000003",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "GJ/EPF/TEST/000003",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:40:05.507247Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:40:05.507247Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:40:05.507247Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-NIMBUS-QE4P"
+      }
+    }
+  },
+  "BIDDER-INITIA-90QD": {
+    "display_name": "Asteron Digital Systems Pvt. Ltd.",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "12 Innovation Park, Salt Lake, Kolkata, West Bengal - 700091",
+    "registration_date": "15/06/2020",
+    "enterprise_type": "Small",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:34:28.732194Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-WB-00-0000001",
+        "enterprise_name": "Asteron Digital Systems Pvt. Ltd.",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "15/06/2020",
+        "registered_address": "12 Innovation Park, Salt Lake, Kolkata, West Bengal - 700091",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:34:28.732194Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "19AABCA1001A1Z5",
+        "legal_name": "Asteron Digital Systems Pvt. Ltd.",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "12 Innovation Park, Salt Lake, Kolkata, West Bengal - 700091",
+        "registration_date": "15/06/2020"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:34:28.732194Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1001A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:34:28.732194Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "WB/EPF/TEST/000001",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "WB/EPF/TEST/000001",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:34:28.732194Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:34:28.732194Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:34:28.732194Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-INITIA-90QD"
+      }
+    }
+  },
+  "BIDDER-INITIA-VVKI": {
+    "display_name": "Asteron Digital Systems Pvt. Ltd.",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "12 Innovation Park, Salt Lake, Kolkata, West Bengal - 700091",
+    "registration_date": "15/06/2020",
+    "enterprise_type": "Small",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:24.134853Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-WB-00-0000001",
+        "enterprise_name": "Asteron Digital Systems Pvt. Ltd.",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "15/06/2020",
+        "registered_address": "12 Innovation Park, Salt Lake, Kolkata, West Bengal - 700091",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:24.134853Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "19AABCA1001A1Z5",
+        "legal_name": "Asteron Digital Systems Pvt. Ltd.",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "12 Innovation Park, Salt Lake, Kolkata, West Bengal - 700091",
+        "registration_date": "15/06/2020"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:24.134853Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1001A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:24.134853Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "WB/EPF/TEST/000001",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "WB/EPF/TEST/000001",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:24.134853Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:35:24.134853Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:24.134853Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-INITIA-VVKI"
+      }
+    }
+  },
+  "BIDDER-INITIA-VTRK": {
+    "display_name": "Asteron Digital Systems Pvt. Ltd.",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "12 Innovation Park, Salt Lake, Kolkata, West Bengal - 700091",
+    "registration_date": "15/06/2020",
+    "enterprise_type": "Small",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:54.786462Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-WB-00-0000001",
+        "enterprise_name": "Asteron Digital Systems Pvt. Ltd.",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "15/06/2020",
+        "registered_address": "12 Innovation Park, Salt Lake, Kolkata, West Bengal - 700091",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:54.786462Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "19AABCA1001A1Z5",
+        "legal_name": "Asteron Digital Systems Pvt. Ltd.",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "12 Innovation Park, Salt Lake, Kolkata, West Bengal - 700091",
+        "registration_date": "15/06/2020"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:54.786462Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1001A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:54.786462Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "WB/EPF/TEST/000001",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "WB/EPF/TEST/000001",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:54.786462Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:35:54.786462Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:35:54.786462Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-INITIA-VTRK"
+      }
+    }
+  },
+  "BIDDER-INITIA-728Q": {
+    "display_name": "Nimbus CloudWorks India Pvt. Ltd.",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "5 Cloud Avenue, HITEC City, Hyderabad, Telangana - 500081",
+    "registration_date": "05/01/2022",
+    "enterprise_type": "Micro",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:08.467081Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-TS-00-0000007",
+        "enterprise_name": "Nimbus CloudWorks India Pvt. Ltd.",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Micro",
+        "registration_date": "05/01/2022",
+        "registered_address": "5 Cloud Avenue, HITEC City, Hyderabad, Telangana - 500081",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:08.467081Z",
       "confidence": 0.99,
       "raw_fields": {
         "gstin": "36AABCN1007G1Z1",
@@ -5136,13 +5472,13 @@
         "latest_return_filed": true,
         "filing_status": "Regular",
         "business_constitution": "Private Limited Company",
-        "registered_address": "/ Principal Place of\nBusiness\n5 Cloud Avenue, HITEC City, Hyderabad, Telangana - 500081",
-        "registration_date": ""
+        "registered_address": "5 Cloud Avenue, HITEC City, Hyderabad, Telangana - 500081",
+        "registration_date": "05/01/2022"
       }
     },
     "pan_it": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:11:55.583196Z",
+      "last_updated": "2026-09-11T21:36:08.467081Z",
       "confidence": 0.97,
       "raw_fields": {
         "pan": "AABCN1007G",
@@ -5153,34 +5489,606 @@
       }
     },
     "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:08.467081Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "TS/EPF/TEST/000007",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "TS/EPF/TEST/000007",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:08.467081Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:36:08.467081Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:08.467081Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-INITIA-728Q"
+      }
+    }
+  },
+  "BIDDER-APEXGL-6JY5": {
+    "display_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "Plot 54 Cyber City Phase 2 Pune 411001",
+    "registration_date": "12/05/2018",
+    "enterprise_type": "Small",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:17.218414Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0054321",
+        "enterprise_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "12/05/2018",
+        "registered_address": "Plot 54 Cyber City Phase 2 Pune 411001",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:17.218414Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AAACK1234D1Z8",
+        "legal_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "Plot 54 Cyber City Phase 2 Pune 411001",
+        "registration_date": "12/05/2018"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:17.218414Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AAACK1234D",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:17.218414Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0012345/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0012345/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:17.218414Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:36:17.218414Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:17.218414Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXGL-6JY5"
+      }
+    }
+  },
+  "BIDDER-KAVACH-5EDS": {
+    "display_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "12/05/2018",
+    "enterprise_type": "Small",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:22.080484Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0054321",
+        "enterprise_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "12/05/2018",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:22.080484Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AAACK1234D1Z8",
+        "legal_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "12/05/2018"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:22.080484Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AAACK1234D",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
       "status": "not_found",
-      "last_updated": "2026-09-11T21:11:55.583196Z",
+      "last_updated": "2026-09-11T21:36:22.080484Z",
       "confidence": 0.0,
       "raw_fields": {
-        "bidder_id": "BIDDER-NIMBUS-QE4P",
+        "bidder_id": "BIDDER-KAVACH-5EDS",
         "registry_match": false,
         "provided_value": ""
       }
     },
     "digilocker": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:11:55.583196Z",
+      "last_updated": "2026-09-11T21:36:22.080484Z",
       "confidence": 0.96,
       "raw_fields": {
         "consent_status": "Granted",
         "identity_document_verified": true,
         "authorized_signatory_verified": true,
-        "credential_issued_at": "2026-09-11T21:11:55.583196Z"
+        "credential_issued_at": "2026-09-11T21:36:22.080484Z"
       }
     },
     "blacklist": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:11:55.583196Z",
+      "last_updated": "2026-09-11T21:36:22.080484Z",
       "confidence": 0.93,
       "raw_fields": {
         "registry_match": false,
         "debarment_status": "Not listed",
-        "registry_search_reference": "BLR-REG-BIDDER-NIMBUS-QE4P"
+        "registry_search_reference": "BLR-REG-BIDDER-KAVACH-5EDS"
+      }
+    }
+  },
+  "BIDDER-APEXHY-2XNJ": {
+    "display_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "PRIVATE LIMITED COMPANY",
+    "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+    "registration_date": "15/08/2021",
+    "enterprise_type": "Micro",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:41.280109Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0077889",
+        "enterprise_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Micro",
+        "registration_date": "15/08/2021",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:41.280109Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCA1234A1Z5",
+        "legal_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "registration_date": "15/08/2021"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:41.280109Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:41.280109Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0012345/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0012345/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:41.280109Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:36:41.280109Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:41.280109Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXHY-2XNJ"
+      }
+    }
+  },
+  "BIDDER-APEXCY-FIOO": {
+    "display_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "14/08/2019",
+    "enterprise_type": "",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:57.929234Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0088776",
+        "enterprise_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "14/08/2019",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:57.929234Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCK9988G1Z3",
+        "legal_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "14/08/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:57.929234Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCK9988G",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:57.929234Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:57.929234Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:36:57.929234Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:57.929234Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXCY-FIOO"
+      }
+    }
+  },
+  "BIDDER-ZENITH-CSL0": {
+    "display_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "14/08/2019",
+    "enterprise_type": "",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:58.296668Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0088776",
+        "enterprise_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "14/08/2019",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:58.296668Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCK9988G1Z3",
+        "legal_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "14/08/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:58.296668Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCK9988G",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:58.296668Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:58.296668Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:36:58.296668Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:36:58.296668Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ZENITH-CSL0"
+      }
+    }
+  },
+  "BIDDER-ACMEIN-CCUP": {
+    "display_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "PRIVATE LIMITED COMPANY",
+    "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+    "registration_date": "15/08/2021",
+    "enterprise_type": "Micro",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:37:21.452588Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0077889",
+        "enterprise_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Micro",
+        "registration_date": "15/08/2021",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:37:21.452588Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCA1234A1Z5",
+        "legal_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "registration_date": "15/08/2021"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:37:21.452588Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:37:21.452588Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0012345/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0012345/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:37:21.452588Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:37:21.452588Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:37:21.452588Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ACMEIN-CCUP"
+      }
+    }
+  },
+  "BIDDER-UNREAD-KAXE": {
+    "display_name": "Unready Enterprise",
+    "scenario": "registered_bidder",
+    "business_constitution": "",
+    "registered_address": "",
+    "registration_date": "",
+    "enterprise_type": "",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T21:37:21.747566Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-UNREAD-KAXE",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "gstn": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T21:37:21.747566Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-UNREAD-KAXE",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "pan_it": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T21:37:21.747566Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-UNREAD-KAXE",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T21:37:21.747566Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-UNREAD-KAXE",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T21:37:21.747566Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-UNREAD-KAXE",
+        "registry_match": false,
+        "reason": "No valid PAN or GSTIN to anchor document verification"
+      }
+    },
+    "blacklist": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T21:37:21.747566Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-UNREAD-KAXE",
+        "registry_match": false,
+        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
       }
     }
   }

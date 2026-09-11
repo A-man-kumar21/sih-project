@@ -1,18 +1,17 @@
 {
   "GEM/2026/B/100001": {
     "tender_id": "GEM/2026/B/100001",
-    "title": "Industrial Water Pump",
-    "category": "Goods",
+    "title": "Supply of High-Security Cyber Defense Hardware",
+    "category": "IT & Telecom",
     "mandatory_checks": [
+      "udyam",
       "gstn",
       "pan_it",
-      "blacklist",
-      "udyam",
-      "digilocker",
-      "epfo_esic"
+      "epfo_esic",
+      "blacklist"
     ],
-    "description": "Custom tender requiring: gstn, pan_it, blacklist, udyam, digilocker, epfo_esic",
-    "created_at": "2026-09-06T20:20:23.682002Z"
+    "description": "Procurement scope and technical specifications for Supply of High-Security Cyber Defense Hardware as outlined in the tender notification.",
+    "created_at": "2026-09-11T21:23:52.189382Z"
   },
   "TENDER-DEBUG-001": {
     "tender_id": "TENDER-DEBUG-001",
@@ -396,7 +395,7 @@
       "blacklist"
     ],
     "description": "Comprehensive supply, installation, and multi-year calibration of hospital MANDATORY STATUTORY ELIGIBILITY REQUIREMENTS: 1. Valid UDYAM / MSME Registration certificate.",
-    "created_at": "2026-09-11T20:54:33.317276Z"
+    "created_at": "2026-09-11T21:36:13.065658Z"
   },
   "TENDER-STAT-1789160085639": {
     "tender_id": "TENDER-STAT-1789160085639",
@@ -480,5 +479,140 @@
     ],
     "description": "Procurement of high efficiency solar PV modules for government buildings",
     "created_at": "2026-09-11T20:56:58.692584Z"
+  },
+  "TND-GEM-EXT-1789162466707": {
+    "tender_id": "TND-GEM-EXT-1789162466707",
+    "title": "GeM IT Infrastructure Supply & Services",
+    "category": "Works",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam",
+      "epfo_esic"
+    ],
+    "description": "Procurement requiring PAN, GSTIN, Udyam MSME, and EPFO/ESIC labor compliance.",
+    "created_at": "2026-09-11T21:34:27.621371Z"
+  },
+  "TND-GEM-EXT-1789162521431": {
+    "tender_id": "TND-GEM-EXT-1789162521431",
+    "title": "GeM IT Infrastructure Supply & Services",
+    "category": "Works",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam",
+      "epfo_esic"
+    ],
+    "description": "Procurement requiring PAN, GSTIN, Udyam MSME, and EPFO/ESIC labor compliance.",
+    "created_at": "2026-09-11T21:35:22.335618Z"
+  },
+  "TND-GEM-EXT-1789162553235": {
+    "tender_id": "TND-GEM-EXT-1789162553235",
+    "title": "GeM IT Infrastructure Supply & Services",
+    "category": "Works",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam",
+      "epfo_esic"
+    ],
+    "description": "Procurement requiring PAN, GSTIN, Udyam MSME, and EPFO/ESIC labor compliance.",
+    "created_at": "2026-09-11T21:35:53.520273Z"
+  },
+  "TND-GEM-EXT-1789162566668": {
+    "tender_id": "TND-GEM-EXT-1789162566668",
+    "title": "GeM IT Infrastructure Supply & Services",
+    "category": "Works",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam",
+      "epfo_esic"
+    ],
+    "description": "Procurement requiring PAN, GSTIN, Udyam MSME, and EPFO/ESIC labor compliance.",
+    "created_at": "2026-09-11T21:36:06.920958Z"
+  },
+  "TENDER-STAT-1789162579790": {
+    "tender_id": "TENDER-STAT-1789162579790",
+    "title": "Statutory Verification Compliance Tender",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Requires PAN, GST, and Udyam compliance verification.",
+    "created_at": "2026-09-11T21:36:20.050144Z"
+  },
+  "TENDER-A1-1789162584832": {
+    "tender_id": "TENDER-A1-1789162584832",
+    "title": "Officer A High-Performance Computing Cluster",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Procurement of specialized supercomputing GPU cluster nodes",
+    "created_at": "2026-09-11T21:36:25.661967Z"
+  },
+  "TENDER-B1-1789162584832": {
+    "tender_id": "TENDER-B1-1789162584832",
+    "title": "Officer B Drone Surveillance Equipment",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "blacklist"
+    ],
+    "description": "Procurement of aerial UAV surveillance equipment for border defense",
+    "created_at": "2026-09-11T21:36:25.741415Z"
+  },
+  "TENDER-C1-1789162584832": {
+    "tender_id": "TENDER-C1-1789162584832",
+    "title": "Officer C Clean Energy Solar Grid",
+    "category": "Works",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn"
+    ],
+    "description": "Installation and verification of solar PV grid infrastructure",
+    "created_at": "2026-09-11T21:36:27.337180Z"
+  },
+  "TENDER-A-1789162614803": {
+    "tender_id": "TENDER-A-1789162614803",
+    "title": "Secure Server Infrastructure Tender A",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T21:36:55.440987Z"
+  },
+  "TENDER-B-1789162614803": {
+    "tender_id": "TENDER-B-1789162614803",
+    "title": "Office Stationery Supplies Tender B",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T21:36:55.525574Z"
+  },
+  "TENDER-DET-1789162634015": {
+    "tender_id": "TENDER-DET-1789162634015",
+    "title": "Solar PV Rooftop Generation Equipment",
+    "category": "Solar Equipment",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it"
+    ],
+    "description": "Procurement of high efficiency solar PV modules for government buildings",
+    "created_at": "2026-09-11T21:37:21.104946Z"
   }
 }

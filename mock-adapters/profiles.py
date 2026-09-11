@@ -261,7 +261,8 @@ import re
 UDYAM_REGEX = re.compile(r"^UDYAM-[A-Z]{2}-[A-Z0-9]{2}-\d{7}$", re.IGNORECASE)
 GSTIN_REGEX = re.compile(r"^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$", re.IGNORECASE)
 PAN_REGEX = re.compile(r"^[A-Z]{5}\d{4}[A-Z]$", re.IGNORECASE)
-EPFO_ESIC_REGEX = re.compile(r"^(?:[A-Z]{2}[A-Z0-9]{3}\d{7}\d{3}|[A-Z]{2}/[A-Z0-9]+/\d+/\d+|\d{17})$", re.IGNORECASE)
+EPFO_ESIC_REGEX = re.compile(r"^(?:[A-Z]{2}[A-Z0-9]{3}\d{7}\d{3}|[A-Z]{2}/[A-Z0-9\-_/]{4,30}|\d{15,17})$", re.IGNORECASE)
+
 
 
 def register_bidder_profile(

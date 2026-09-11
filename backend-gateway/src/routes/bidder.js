@@ -249,7 +249,15 @@ export function mergeExtractedIntoProfile(existingProfile, extracted, docType, d
   }
 
   if (fields.enterprise_type) {
-    updateField("enterprise_type", fields.enterprise_type);
+    let et = fields.enterprise_type;
+    if (typeof et === "string") {
+      const etLow = et.toLowerCase();
+      if (etLow.includes("micro") || etLow.includes("startup")) et = "Micro";
+      else if (etLow.includes("small")) et = "Small";
+      else if (etLow.includes("medium")) et = "Medium";
+      else if (etLow.includes("large") || etLow.includes("non-msme")) et = "Large";
+    }
+    updateField("enterprise_type", et);
   }
 
   // GST aliases
@@ -286,15 +294,15 @@ export function mergeExtractedIntoProfile(existingProfile, extracted, docType, d
   }
 
   // EPFO / ESIC aliases
-  const epfoVal = fields.epfo_number || fields.epfo || fields.epfo_esic_number;
+  const epfoVal = fields.epfo_number || fields.epfo || fields.epfo_code;
   if (epfoVal) {
     const cleanedEpfo = cleanIdentifier(epfoVal);
     updateField("epfo_number", cleanedEpfo);
-    if (!fields.epfo_esic_number) {
+    if (!profile.epfo_esic_number?.value) {
       updateField("epfo_esic_number", cleanedEpfo);
     }
   }
-  const esicVal = fields.esic_number || fields.esic;
+  const esicVal = fields.esic_number || fields.esic || fields.esic_code;
   if (esicVal) {
     const cleanedEsic = cleanIdentifier(esicVal);
     updateField("esic_number", cleanedEsic);
@@ -382,6 +390,33 @@ router.get("/profile", requireAuth, requireRole("bidder"), async (request, respo
           currentStat.epfo_esic_number = (ext.epfo_esic_number || ext.epfo_number).trim().toUpperCase();
           hasBackfillUpdates = true;
         }
+        if (ext.registration_date && !currentStat.registration_date) {
+          currentStat.registration_date = ext.registration_date;
+          hasBackfillUpdates = true;
+        }
+        if (ext.enterprise_type && !currentStat.enterprise_type) {
+          currentStat.enterprise_type = ext.enterprise_type;
+          hasBackfillUpdates = true;
+        }
+        if (ext.registered_address && !currentStat.registered_address) {
+          currentStat.registered_address = ext.registered_address;
+          hasBackfillUpdates = true;
+        }
+        if (ext.business_constitution && !currentStat.business_constitution) {
+          currentStat.business_constitution = ext.business_constitution;
+          hasBackfillUpdates = true;
+        }
+      }
+    }
+
+    const profileKeys = [
+      "enterprise_name", "udyam_number", "pan", "gstin", "cin",
+      "epfo_number", "esic_number", "enterprise_type", "registration_date",
+      "registered_address", "business_constitution"
+    ];
+    for (const k of profileKeys) {
+      if (enterpriseProfile[k]?.value && (!user.enterprise_profile || !user.enterprise_profile[k]?.value)) {
+        hasBackfillUpdates = true;
       }
     }
 
@@ -396,6 +431,11 @@ router.get("/profile", requireAuth, requireRole("bidder"), async (request, respo
           },
         }
       );
+
+      // Re-resolve canonical compliance & sync AI Engine
+      try {
+        await resolveBidderCompliance(request.user.id);
+      } catch (e) {}
 
       // Sync repaired statutory details with AI Engine
       try {
@@ -886,6 +926,18 @@ router.get("/tenders", requireAuth, requireRole("bidder"), async (request, respo
         if (!hasDoc && (docType === "other" || docType === "other_statutory")) {
           hasDoc = availableDocTypes.has("other") || availableDocTypes.has("other_statutory");
         }
+        // Also check if any uploaded document in vault (e.g. other_statutory / 00_Bidder_Profile.pdf) contains verified statutory field
+        if (!hasDoc) {
+          hasDoc = myDocs.some((d) => {
+            const ext = d.extracted_data?.fields || d.extracted_data?.extracted || d.extracted_data;
+            if (!ext) return false;
+            if (check === "pan_it" && ext.pan) return true;
+            if (check === "gstn" && ext.gstin) return true;
+            if (check === "udyam" && (ext.udyam || ext.udyam_number)) return true;
+            if (check === "epfo_esic" && (ext.epfo_number || ext.epfo || ext.esic_number || ext.esic || ext.epfo_esic_number)) return true;
+            return false;
+          });
+        }
         return {
           check_key: check,
           doc_type: docType || null,
@@ -986,6 +1038,17 @@ export const applyForTender = async (request, response, next) => {
           found = docMap.get("other_statutory") || docMap.get("other");
         }
         if (!found) {
+          found = myDocs.find((d) => {
+            const ext = d.extracted_data?.fields || d.extracted_data?.extracted || d.extracted_data;
+            if (!ext) return false;
+            if (check === "pan_it" && ext.pan) return true;
+            if (check === "gstn" && ext.gstin) return true;
+            if (check === "udyam" && (ext.udyam || ext.udyam_number)) return true;
+            if (check === "epfo_esic" && (ext.epfo_number || ext.epfo || ext.esic_number || ext.esic || ext.epfo_esic_number)) return true;
+            return false;
+          });
+        }
+        if (!found) {
           missingDocs.push({
             check,
             document_type: requiredDocType,
@@ -994,7 +1057,7 @@ export const applyForTender = async (request, response, next) => {
         } else {
           // Reusing existing document from vault
           submittedDocuments.push({
-            document_type: requiredDocType,
+            document_type: found.document_type || requiredDocType,
             document_id: found._id.toString(),
             file_name: found.original_name || found.file_name,
             uploaded_at: found.uploaded_at,

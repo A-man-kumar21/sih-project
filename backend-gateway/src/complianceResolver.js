@@ -7,7 +7,7 @@ const ENGINE_URL = process.env.AI_ENGINE_URL || "http://127.0.0.1:8000";
 export const PAN_REGEX = /^[A-Z]{5}\d{4}[A-Z]$/i;
 export const GSTIN_REGEX = /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/i;
 export const UDYAM_REGEX = /^UDYAM-[A-Z]{2}-[A-Z0-9]{2}-\d{7}$/i;
-export const EPFO_ESIC_REGEX = /^(?:[A-Z]{2}[A-Z0-9]{3}\d{7}\d{3}|[A-Z]{2}\/[A-Z0-9]+\/\d+\/\d+|\d{17})$/i;
+export const EPFO_ESIC_REGEX = /^(?:[A-Z]{2}[A-Z0-9]{3}\d{7}\d{3}|[A-Z]{2}\/[A-Z0-9\-_/]{4,30}|\d{15,17})$/i;
 export const CIN_REGEX = /^[LUu]\d{5}[A-Z]{2}\d{4}[A-Z]{3}\d{6}$/i;
 
 export const DOC_TYPE_LABELS = {
