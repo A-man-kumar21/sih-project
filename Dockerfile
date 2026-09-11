@@ -24,7 +24,8 @@ RUN cd frontend && npm run build
 # Install Python dependencies into an isolated virtual environment.
 COPY ai-engine/requirements.txt ai-engine/requirements.txt
 RUN python3 -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-cache-dir -r ai-engine/requirements.txt
+    && /opt/venv/bin/pip install --no-cache-dir -r ai-engine/requirements.txt \
+    && /opt/venv/bin/pip install --no-cache-dir python-dotenv
 
 # Copy runtime source code and production process configuration.
 COPY backend-gateway/ backend-gateway/
