@@ -30,6 +30,10 @@ class BidderCreateRequest(BaseModel):
     gstin: str = Field(default="", examples=["33AABCP1234E1Z9"])
     pan: str = Field(default="", examples=["AABCP1234E"])
     epfo_esic_number: str = Field(default="", examples=["TN/MAS/0078901/000"])
+    business_constitution: str = Field(default="")
+    registered_address: str = Field(default="")
+    registration_date: str = Field(default="")
+    enterprise_type: str = Field(default="")
 
 
 class TenderCreateRequest(BaseModel):
@@ -59,6 +63,10 @@ def create_bidder(request: BidderCreateRequest) -> dict:
         gstin=request.gstin,
         pan=request.pan,
         epfo_esic_number=request.epfo_esic_number,
+        business_constitution=request.business_constitution,
+        registered_address=request.registered_address,
+        registration_date=request.registration_date,
+        enterprise_type=request.enterprise_type,
     )
     return {"status": "registered", "bidder": created}
 
@@ -105,10 +113,11 @@ def remove_tender(tender_id: str) -> dict:
 @app.post("/extract-bidder-pdf")
 async def extract_bidder_pdf(
     file: UploadFile = File(...),
+    document_type: str | None = Query(None),
     simulate_failure: bool = Query(False),
 ) -> dict:
     content = await file.read()
-    return extract_bidder_from_pdf(content, simulate_failure=simulate_failure)
+    return extract_bidder_from_pdf(content, document_type=document_type, simulate_failure=simulate_failure)
 
 
 @app.post("/extract-tender-pdf")

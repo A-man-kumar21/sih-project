@@ -270,6 +270,10 @@ def register_bidder_profile(
     gstin: str = "",
     pan: str = "",
     epfo_esic_number: str = "",
+    business_constitution: str = "",
+    registered_address: str = "",
+    registration_date: str = "",
+    enterprise_type: str = "",
 ) -> dict:
     """Register a new bidder in the exact format consumable by all mock adapters.
     
@@ -285,6 +289,10 @@ def register_bidder_profile(
     g_clean = gstin.strip().upper()
     p_clean = pan.strip().upper()
     e_clean = epfo_esic_number.strip().upper()
+
+    # If PAN is empty but a valid GSTIN is present, auto-extract PAN from characters 3-12 of GSTIN
+    if not p_clean and g_clean and GSTIN_REGEX.match(g_clean):
+        p_clean = g_clean[2:12]
 
     has_valid_udyam = bool(u_clean and UDYAM_REGEX.match(u_clean))
     has_valid_gstin = bool(g_clean and GSTIN_REGEX.match(g_clean))
@@ -303,7 +311,10 @@ def register_bidder_profile(
                 "udyam_registration_number": u_clean,
                 "enterprise_name": company_name.strip(),
                 "registration_valid_until": "2029-03-31",
-                "enterprise_category": "Small",
+                "enterprise_category": enterprise_type or "Small",
+                "registration_date": registration_date,
+                "registered_address": registered_address,
+                "business_constitution": business_constitution,
                 "registration_active": True,
             },
         }
@@ -327,6 +338,9 @@ def register_bidder_profile(
                 "latest_return_period": "2026-07",
                 "latest_return_filed": True,
                 "filing_status": "Regular",
+                "business_constitution": business_constitution,
+                "registered_address": registered_address,
+                "registration_date": registration_date,
             },
         }
     else:
@@ -423,6 +437,10 @@ def register_bidder_profile(
     new_profile = {
         "display_name": company_name.strip(),
         "scenario": "registered_bidder",
+        "business_constitution": business_constitution,
+        "registered_address": registered_address,
+        "registration_date": registration_date,
+        "enterprise_type": enterprise_type,
         "udyam": udyam_data,
         "gstn": gstn_data,
         "pan_it": pan_data,
@@ -450,6 +468,10 @@ def get_all_bidders() -> list[dict]:
                 "gstin": prof.get("gstn", {}).get("raw_fields", {}).get("gstin", ""),
                 "pan": prof.get("pan_it", {}).get("raw_fields", {}).get("pan", ""),
                 "epfo_esic": prof.get("epfo_esic", {}).get("raw_fields", {}).get("epfo_establishment_id", ""),
+                "business_constitution": prof.get("business_constitution", ""),
+                "registered_address": prof.get("registered_address", ""),
+                "registration_date": prof.get("registration_date", ""),
+                "enterprise_type": prof.get("enterprise_type", ""),
             },
         })
     return bidders

@@ -205,5 +205,77 @@
     ],
     "description": "High-integrity procurement requiring verified PAN, GSTN, and Udyam MSME certification.",
     "created_at": "2026-09-11T18:09:52.117855Z"
+  },
+  "TENDER-V2P-921249": {
+    "tender_id": "TENDER-V2P-921249",
+    "title": "Advanced Surveillance Systems",
+    "category": "Electronics",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it"
+    ],
+    "description": "Custom tender requiring: udyam, gstn, pan_it",
+    "created_at": "2026-09-11T18:38:41.478479Z"
+  },
+  "TENDER-V2P-934085": {
+    "tender_id": "TENDER-V2P-934085",
+    "title": "Advanced Surveillance Systems",
+    "category": "Electronics",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it"
+    ],
+    "description": "Custom tender requiring: udyam, gstn, pan_it",
+    "created_at": "2026-09-11T18:38:54.311490Z"
+  },
+  "TENDER-V2P-112732": {
+    "tender_id": "TENDER-V2P-112732",
+    "title": "Advanced Surveillance Systems",
+    "category": "Electronics",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it"
+    ],
+    "description": "Custom tender requiring: udyam, gstn, pan_it",
+    "created_at": "2026-09-11T18:41:52.969949Z"
+  },
+  "TENDER-V2P-187009": {
+    "tender_id": "TENDER-V2P-187009",
+    "title": "Advanced Surveillance Systems",
+    "category": "Electronics",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it"
+    ],
+    "description": "Custom tender requiring: udyam, gstn, pan_it",
+    "created_at": "2026-09-11T18:43:07.398672Z"
+  },
+  "TENDER-A-1789152257163": {
+    "tender_id": "TENDER-A-1789152257163",
+    "title": "Secure Server Infrastructure Tender A",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T18:44:17.720285Z"
+  },
+  "TENDER-B-1789152257163": {
+    "tender_id": "TENDER-B-1789152257163",
+    "title": "Office Stationery Supplies Tender B",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T18:44:17.809556Z"
   }
 }

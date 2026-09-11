@@ -74,9 +74,93 @@ export const DOC_TYPE_LABELS = {
   other: "Other Statutory Document",
 };
 
+// Validation patterns for statutory identifiers
+const PAN_REGEX = /^[A-Z]{5}\d{4}[A-Z]$/i;
+const GSTIN_REGEX = /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/i;
+const UDYAM_REGEX = /^UDYAM-[A-Z]{2}-[A-Z0-9]{2}-\d{7}$/i;
+
+export function buildDefaultEnterpriseProfile() {
+  const emptyField = () => ({
+    value: "",
+    source: null,
+    source_doc_id: null,
+    source_doc_name: null,
+    confidence: null,
+    extraction_status: "empty",
+    last_updated: null,
+  });
+
+  return {
+    enterprise_name: emptyField(),
+    udyam_number: emptyField(),
+    enterprise_type: emptyField(),
+    gstin: emptyField(),
+    pan: emptyField(),
+    business_constitution: emptyField(),
+    registered_address: emptyField(),
+    registration_date: emptyField(),
+    epfo_esic_number: emptyField(),
+  };
+}
+
+export function mergeExtractedIntoProfile(existingProfile, extracted, docType, docId, docName, confidence = 0.98) {
+  const profile = existingProfile || buildDefaultEnterpriseProfile();
+  const nowIso = new Date().toISOString();
+  const sourceLabel = DOC_TYPE_LABELS[docType] || docType || "Uploaded Document";
+
+  const updateField = (key, val) => {
+    if (val && typeof val === "string" && val.trim()) {
+      profile[key] = {
+        value: val.trim(),
+        source: sourceLabel,
+        source_doc_id: docId ? docId.toString() : null,
+        source_doc_name: docName || null,
+        confidence: confidence || 0.98,
+        extraction_status: "successful",
+        last_updated: nowIso,
+      };
+    }
+  };
+
+  if (extracted.enterprise_name || extracted.company_name || extracted.legal_name) {
+    updateField("enterprise_name", extracted.enterprise_name || extracted.company_name || extracted.legal_name);
+  }
+  if (extracted.udyam_number) {
+    updateField("udyam_number", extracted.udyam_number.toUpperCase());
+  }
+  if (extracted.enterprise_type) {
+    updateField("enterprise_type", extracted.enterprise_type);
+  }
+  if (extracted.gstin) {
+    updateField("gstin", extracted.gstin.toUpperCase());
+    // Auto-derive PAN if not separately provided
+    if (!extracted.pan && extracted.gstin.length === 15) {
+      updateField("pan", extracted.gstin.substring(2, 12).toUpperCase());
+    }
+  }
+  if (extracted.pan) {
+    updateField("pan", extracted.pan.toUpperCase());
+  }
+  if (extracted.business_constitution) {
+    updateField("business_constitution", extracted.business_constitution);
+  }
+  if (extracted.registered_address) {
+    updateField("registered_address", extracted.registered_address);
+  }
+  if (extracted.registration_date) {
+    updateField("registration_date", extracted.registration_date);
+  }
+  if (extracted.epfo_esic_number) {
+    updateField("epfo_esic_number", extracted.epfo_esic_number);
+  }
+
+  return profile;
+}
+
 /**
  * GET /api/bidder/profile
- * Returns bidder profile and statutory credentials.
+ * Returns bidder profile, Enterprise Profile with field provenance, and statutory credentials.
+ * Includes auto-backfill from existing Document Vault items if profile fields are empty.
  */
 router.get("/profile", requireAuth, requireRole("bidder"), async (request, response, next) => {
   try {
@@ -86,21 +170,101 @@ router.get("/profile", requireAuth, requireRole("bidder"), async (request, respo
       return response.status(404).json({ error: "Bidder profile not found." });
     }
 
+    let enterpriseProfile = user.enterprise_profile || buildDefaultEnterpriseProfile();
+    let currentStat = user.statutory || { pan: "", gstin: "", udyam_number: "", epfo_esic_number: "" };
+    let hasBackfillUpdates = false;
+
+    // Self-healing / backfill: check Document Vault for existing extracted certificates
+    const docs = await getDocumentsCollection();
+    const myDocs = await docs
+      .find({
+        $or: [{ bidder_user_id: request.user.id }, { bidder_id: request.user.bidder_id }],
+      })
+      .toArray();
+
+    for (const doc of myDocs) {
+      const ext = doc.extracted_data?.extracted || doc.extracted_data;
+      if (ext && typeof ext === "object") {
+        const conf = doc.extracted_data?.confidence || 0.98;
+        enterpriseProfile = mergeExtractedIntoProfile(
+          enterpriseProfile,
+          ext,
+          doc.document_type,
+          doc._id,
+          doc.original_name || doc.file_name,
+          conf
+        );
+
+        // Update statutory credentials if document has verified statutory values
+        if (ext.pan && PAN_REGEX.test(ext.pan) && (!currentStat.pan || !PAN_REGEX.test(currentStat.pan))) {
+          currentStat.pan = ext.pan.trim().toUpperCase();
+          hasBackfillUpdates = true;
+        }
+        if (ext.gstin && GSTIN_REGEX.test(ext.gstin) && (!currentStat.gstin || !GSTIN_REGEX.test(currentStat.gstin))) {
+          currentStat.gstin = ext.gstin.trim().toUpperCase();
+          hasBackfillUpdates = true;
+          if (!currentStat.pan || !PAN_REGEX.test(currentStat.pan)) {
+            currentStat.pan = currentStat.gstin.substring(2, 12).toUpperCase();
+            hasBackfillUpdates = true;
+          }
+        }
+        if (ext.udyam_number && UDYAM_REGEX.test(ext.udyam_number) && (!currentStat.udyam_number || !UDYAM_REGEX.test(currentStat.udyam_number))) {
+          currentStat.udyam_number = ext.udyam_number.trim().toUpperCase();
+          hasBackfillUpdates = true;
+        }
+        if (ext.epfo_esic_number && (!currentStat.epfo_esic_number || currentStat.epfo_esic_number.length < 5)) {
+          currentStat.epfo_esic_number = ext.epfo_esic_number.trim().toUpperCase();
+          hasBackfillUpdates = true;
+        }
+      }
+    }
+
+    if (hasBackfillUpdates || !user.enterprise_profile) {
+      await users.updateOne(
+        { _id: new ObjectId(request.user.id) },
+        {
+          $set: {
+            enterprise_profile: enterpriseProfile,
+            statutory: currentStat,
+            updated_at: new Date(),
+          },
+        }
+      );
+
+      // Sync repaired statutory details with AI Engine
+      try {
+        await fetch(`${ENGINE_URL}/bidders`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            bidder_id: user.bidder_id,
+            company_name: enterpriseProfile.enterprise_name?.value || user.company_name,
+            udyam_number: currentStat.udyam_number || "",
+            gstin: currentStat.gstin || "",
+            pan: currentStat.pan || "",
+            epfo_esic_number: currentStat.epfo_esic_number || "",
+            business_constitution: enterpriseProfile.business_constitution?.value || "",
+            registered_address: enterpriseProfile.registered_address?.value || "",
+            registration_date: enterpriseProfile.registration_date?.value || "",
+            enterprise_type: enterpriseProfile.enterprise_type?.value || "",
+          }),
+        });
+      } catch (syncErr) {
+        console.warn("Notice: AI Engine sync on backfill:", syncErr.message);
+      }
+    }
+
     return response.json({
       success: true,
       profile: {
         id: user._id.toString(),
-        company_name: user.company_name || "",
+        company_name: enterpriseProfile.enterprise_name?.value || user.company_name || "",
         contact_person: user.contact_person || "",
         email: user.email,
         phone: user.phone || "",
         bidder_id: user.bidder_id,
-        statutory: user.statutory || {
-          pan: "",
-          gstin: "",
-          udyam_number: "",
-          epfo_esic_number: "",
-        },
+        enterprise_profile: enterpriseProfile,
+        statutory: currentStat,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
@@ -112,7 +276,8 @@ router.get("/profile", requireAuth, requireRole("bidder"), async (request, respo
 
 /**
  * PUT /api/bidder/profile
- * Updates bidder profile and synchronizes statutory details with AI Engine.
+ * Updates bidder profile, handles manual Enterprise Profile overrides with provenance,
+ * and synchronizes statutory details with AI Engine.
  */
 router.put("/profile", requireAuth, requireRole("bidder"), async (request, response, next) => {
   try {
@@ -120,10 +285,15 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
       company_name,
       contact_person,
       phone,
+      enterprise_name,
       pan,
       gstin,
       udyam_number,
       epfo_esic_number,
+      business_constitution,
+      registered_address,
+      registration_date,
+      enterprise_type,
     } = request.body;
 
     const users = await getUsersCollection();
@@ -132,17 +302,63 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
       return response.status(404).json({ error: "Bidder profile not found." });
     }
 
-    const updatedCompany = company_name ? company_name.trim() : existing.company_name;
-    const updatedContact = contact_person ? contact_person.trim() : existing.contact_person;
+    const updatedCompany = (enterprise_name || company_name || existing.company_name || "").trim();
+    const updatedContact = contact_person !== undefined ? contact_person.trim() : existing.contact_person;
     const updatedPhone = phone !== undefined ? phone.trim() : existing.phone;
+
+    let enterpriseProfile = existing.enterprise_profile || buildDefaultEnterpriseProfile();
+    const nowIso = new Date().toISOString();
+
+    const applyManualField = (key, val) => {
+      if (val !== undefined) {
+        const cleanVal = typeof val === "string" ? val.trim() : "";
+        enterpriseProfile[key] = {
+          value: cleanVal,
+          source: "Manual Entry",
+          source_doc_id: null,
+          source_doc_name: null,
+          confidence: cleanVal ? 1.0 : null,
+          extraction_status: cleanVal ? "manual" : "empty",
+          last_updated: nowIso,
+        };
+      }
+    };
+
+    if (enterprise_name !== undefined || company_name !== undefined) {
+      applyManualField("enterprise_name", updatedCompany);
+    }
+    if (pan !== undefined) applyManualField("pan", pan.toUpperCase());
+    if (gstin !== undefined) applyManualField("gstin", gstin.toUpperCase());
+    if (udyam_number !== undefined) applyManualField("udyam_number", udyam_number.toUpperCase());
+    if (epfo_esic_number !== undefined) applyManualField("epfo_esic_number", epfo_esic_number);
+    if (business_constitution !== undefined) applyManualField("business_constitution", business_constitution);
+    if (registered_address !== undefined) applyManualField("registered_address", registered_address);
+    if (registration_date !== undefined) applyManualField("registration_date", registration_date);
+    if (enterprise_type !== undefined) applyManualField("enterprise_type", enterprise_type);
 
     const currentStat = existing.statutory || {};
     const updatedStatutory = {
-      pan: pan !== undefined ? pan.trim().toUpperCase() : currentStat.pan || "",
-      gstin: gstin !== undefined ? gstin.trim().toUpperCase() : currentStat.gstin || "",
-      udyam_number: udyam_number !== undefined ? udyam_number.trim().toUpperCase() : currentStat.udyam_number || "",
-      epfo_esic_number: epfo_esic_number !== undefined ? epfo_esic_number.trim() : currentStat.epfo_esic_number || "",
+      pan: pan !== undefined ? pan.trim().toUpperCase() : enterpriseProfile.pan?.value || currentStat.pan || "",
+      gstin: gstin !== undefined ? gstin.trim().toUpperCase() : enterpriseProfile.gstin?.value || currentStat.gstin || "",
+      udyam_number: udyam_number !== undefined ? udyam_number.trim().toUpperCase() : enterpriseProfile.udyam_number?.value || currentStat.udyam_number || "",
+      epfo_esic_number: epfo_esic_number !== undefined ? epfo_esic_number.trim() : enterpriseProfile.epfo_esic_number?.value || currentStat.epfo_esic_number || "",
     };
+
+    // Auto-extract PAN from GSTIN if PAN is missing
+    if (!updatedStatutory.pan && updatedStatutory.gstin && updatedStatutory.gstin.length === 15) {
+      updatedStatutory.pan = updatedStatutory.gstin.substring(2, 12).toUpperCase();
+      if (!enterpriseProfile.pan?.value) {
+        enterpriseProfile.pan = {
+          value: updatedStatutory.pan,
+          source: "Derived from GSTIN",
+          source_doc_id: null,
+          source_doc_name: null,
+          confidence: 0.98,
+          extraction_status: "successful",
+          last_updated: nowIso,
+        };
+      }
+    }
 
     // Synchronize with AI Engine profile registry
     try {
@@ -156,6 +372,10 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
           gstin: updatedStatutory.gstin,
           pan: updatedStatutory.pan,
           epfo_esic_number: updatedStatutory.epfo_esic_number,
+          business_constitution: enterpriseProfile.business_constitution?.value || "",
+          registered_address: enterpriseProfile.registered_address?.value || "",
+          registration_date: enterpriseProfile.registration_date?.value || "",
+          enterprise_type: enterpriseProfile.enterprise_type?.value || "",
         }),
       });
     } catch (engineErr) {
@@ -169,6 +389,7 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
           company_name: updatedCompany,
           contact_person: updatedContact,
           phone: updatedPhone,
+          enterprise_profile: enterpriseProfile,
           statutory: updatedStatutory,
           updated_at: new Date(),
         },
@@ -177,8 +398,14 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
 
     return response.json({
       success: true,
-      message: "Bidder profile updated and synchronized with compliance engine.",
-      statutory: updatedStatutory,
+      message: "Enterprise profile and statutory identifiers successfully synchronized with compliance engine.",
+      profile: {
+        company_name: updatedCompany,
+        contact_person: updatedContact,
+        phone: updatedPhone,
+        enterprise_profile: enterpriseProfile,
+        statutory: updatedStatutory,
+      },
     });
   } catch (error) {
     return next(error);
@@ -250,71 +477,21 @@ router.post(
 
       let extractedData = null;
 
-      // If document is PDF, trigger AI Engine extraction
-      if (request.file.mimetype === "application/pdf" || request.file.originalname.endsWith(".pdf")) {
+      // If document is PDF or image, trigger AI Engine extraction
+      if (request.file.mimetype === "application/pdf" || request.file.originalname.toLowerCase().endsWith(".pdf")) {
         try {
           const fileBuffer = fs.readFileSync(request.file.path);
           const formData = new FormData();
           const blob = new Blob([fileBuffer], { type: "application/pdf" });
           formData.append("file", blob, request.file.originalname);
 
-          const extractRes = await fetch(`${ENGINE_URL}/extract-bidder-pdf`, {
+          const extractRes = await fetch(`${ENGINE_URL}/extract-bidder-pdf?document_type=${encodeURIComponent(docType)}`, {
             method: "POST",
             body: formData,
           });
 
           if (extractRes.ok) {
-            const extractJson = await extractRes.json();
-            extractedData = extractJson;
-
-            // If statutory numbers are extracted, auto-update bidder profile!
-            const user = await users.findOne({ _id: new ObjectId(request.user.id) });
-            const currentStat = user?.statutory || {};
-            let hasStatUpdate = false;
-
-            const ext = extractJson.extracted || extractJson;
-
-            if (ext.pan && !currentStat.pan) {
-              currentStat.pan = ext.pan.trim().toUpperCase();
-              hasStatUpdate = true;
-            }
-            if (ext.gstin && !currentStat.gstin) {
-              currentStat.gstin = ext.gstin.trim().toUpperCase();
-              hasStatUpdate = true;
-            }
-            if (ext.udyam_number && !currentStat.udyam_number) {
-              currentStat.udyam_number = ext.udyam_number.trim().toUpperCase();
-              hasStatUpdate = true;
-            }
-            if (ext.epfo_esic_number && !currentStat.epfo_esic_number) {
-              currentStat.epfo_esic_number = ext.epfo_esic_number.trim().toUpperCase();
-              hasStatUpdate = true;
-            }
-
-            if (hasStatUpdate) {
-              await users.updateOne(
-                { _id: new ObjectId(request.user.id) },
-                { $set: { statutory: currentStat, updated_at: new Date() } }
-              );
-
-              // Sync updated statutory data with AI engine
-              try {
-                await fetch(`${ENGINE_URL}/bidders`, {
-                  method: "POST",
-                  headers: { "content-type": "application/json" },
-                  body: JSON.stringify({
-                    bidder_id: request.user.bidder_id,
-                    company_name: user.company_name,
-                    udyam_number: currentStat.udyam_number || "",
-                    gstin: currentStat.gstin || "",
-                    pan: currentStat.pan || "",
-                    epfo_esic_number: currentStat.epfo_esic_number || "",
-                  }),
-                });
-              } catch (e) {
-                console.warn("AI Engine sync error:", e.message);
-              }
-            }
+            extractedData = await extractRes.json();
           }
         } catch (extractErr) {
           console.warn("Notice: Document extraction warning:", extractErr.message);
@@ -371,9 +548,85 @@ router.post(
         docId = insertRes.insertedId;
       }
 
+      // AUTOMATIC ENTERPRISE PROFILE EXTRACTION & STATUTORY SYNC (Part B, E, F, I, K)
+      if (extractedData && (extractedData.extracted || typeof extractedData === "object")) {
+        const ext = extractedData.extracted || extractedData;
+        const user = await users.findOne({ _id: new ObjectId(request.user.id) });
+        if (user) {
+          const conf = extractedData.confidence || 0.98;
+          let enterpriseProfile = user.enterprise_profile || buildDefaultEnterpriseProfile();
+
+          // Merge structured extracted fields with provenance
+          enterpriseProfile = mergeExtractedIntoProfile(
+            enterpriseProfile,
+            ext,
+            docType,
+            docId,
+            request.file.originalname,
+            conf
+          );
+
+          // Update statutory credentials with authoritative extracted values
+          const currentStat = user.statutory || {};
+
+          if (ext.pan && PAN_REGEX.test(ext.pan)) {
+            currentStat.pan = ext.pan.trim().toUpperCase();
+          }
+          if (ext.gstin && GSTIN_REGEX.test(ext.gstin)) {
+            currentStat.gstin = ext.gstin.trim().toUpperCase();
+            // Automatically derive PAN from GSTIN if PAN is missing or unverified
+            if (!currentStat.pan || !PAN_REGEX.test(currentStat.pan)) {
+              currentStat.pan = currentStat.gstin.substring(2, 12).toUpperCase();
+            }
+          }
+          if (ext.udyam_number && UDYAM_REGEX.test(ext.udyam_number)) {
+            currentStat.udyam_number = ext.udyam_number.trim().toUpperCase();
+          }
+          if (ext.epfo_esic_number && ext.epfo_esic_number.trim()) {
+            currentStat.epfo_esic_number = ext.epfo_esic_number.trim().toUpperCase();
+          }
+
+          const compName = enterpriseProfile.enterprise_name?.value || user.company_name;
+
+          await users.updateOne(
+            { _id: new ObjectId(request.user.id) },
+            {
+              $set: {
+                enterprise_profile: enterpriseProfile,
+                statutory: currentStat,
+                company_name: compName,
+                updated_at: new Date(),
+              },
+            }
+          );
+
+          // Sync updated statutory details with AI Engine
+          try {
+            await fetch(`${ENGINE_URL}/bidders`, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                bidder_id: request.user.bidder_id,
+                company_name: compName,
+                udyam_number: currentStat.udyam_number || "",
+                gstin: currentStat.gstin || "",
+                pan: currentStat.pan || "",
+                epfo_esic_number: currentStat.epfo_esic_number || "",
+                business_constitution: enterpriseProfile.business_constitution?.value || "",
+                registered_address: enterpriseProfile.registered_address?.value || "",
+                registration_date: enterpriseProfile.registration_date?.value || "",
+                enterprise_type: enterpriseProfile.enterprise_type?.value || "",
+              }),
+            });
+          } catch (e) {
+            console.warn("AI Engine sync error on upload:", e.message);
+          }
+        }
+      }
+
       return response.status(201).json({
         success: true,
-        message: `${DOC_TYPE_LABELS[docType] || docType} successfully uploaded and saved in vault.`,
+        message: `${DOC_TYPE_LABELS[docType] || docType} successfully uploaded, extracted, and synced with Enterprise Profile.`,
         document: {
           id: docId.toString(),
           document_type: docType,
@@ -599,50 +852,86 @@ export const applyForTender = async (request, response, next) => {
     const users = await getUsersCollection();
     const currentUser = await users.findOne({ _id: new ObjectId(request.user.id) });
     const currentStat = currentUser?.statutory || {};
+    let enterpriseProfile = currentUser?.enterprise_profile || buildDefaultEnterpriseProfile();
     let statUpdated = false;
 
-    // Check myDocs for any extracted credentials not yet on currentStat
+    // Inspect myDocs for authoritative extracted statutory credentials
     for (const d of myDocs) {
       const ext = d.extracted_data?.extracted || d.extracted_data;
-      if (ext) {
-        if (!currentStat.pan && ext.pan) {
-          currentStat.pan = ext.pan.trim().toUpperCase();
-          statUpdated = true;
+      if (ext && typeof ext === "object") {
+        const conf = d.extracted_data?.confidence || 0.98;
+        enterpriseProfile = mergeExtractedIntoProfile(
+          enterpriseProfile,
+          ext,
+          d.document_type,
+          d._id,
+          d.original_name || d.file_name,
+          conf
+        );
+
+        if (ext.pan && PAN_REGEX.test(ext.pan)) {
+          if (currentStat.pan !== ext.pan.trim().toUpperCase()) {
+            currentStat.pan = ext.pan.trim().toUpperCase();
+            statUpdated = true;
+          }
         }
-        if (!currentStat.gstin && ext.gstin) {
-          currentStat.gstin = ext.gstin.trim().toUpperCase();
-          statUpdated = true;
+        if (ext.gstin && GSTIN_REGEX.test(ext.gstin)) {
+          if (currentStat.gstin !== ext.gstin.trim().toUpperCase()) {
+            currentStat.gstin = ext.gstin.trim().toUpperCase();
+            statUpdated = true;
+          }
         }
-        if (!currentStat.udyam_number && ext.udyam_number) {
-          currentStat.udyam_number = ext.udyam_number.trim().toUpperCase();
-          statUpdated = true;
+        if (ext.udyam_number && UDYAM_REGEX.test(ext.udyam_number)) {
+          if (currentStat.udyam_number !== ext.udyam_number.trim().toUpperCase()) {
+            currentStat.udyam_number = ext.udyam_number.trim().toUpperCase();
+            statUpdated = true;
+          }
         }
-        if (!currentStat.epfo_esic_number && ext.epfo_esic_number) {
-          currentStat.epfo_esic_number = ext.epfo_esic_number.trim().toUpperCase();
-          statUpdated = true;
+        if (ext.epfo_esic_number && ext.epfo_esic_number.trim()) {
+          if (currentStat.epfo_esic_number !== ext.epfo_esic_number.trim().toUpperCase()) {
+            currentStat.epfo_esic_number = ext.epfo_esic_number.trim().toUpperCase();
+            statUpdated = true;
+          }
         }
       }
     }
 
-    if (statUpdated) {
+    // If PAN is missing or unverified, but GSTIN is valid, derive PAN from GSTIN
+    if ((!currentStat.pan || !PAN_REGEX.test(currentStat.pan)) && currentStat.gstin && GSTIN_REGEX.test(currentStat.gstin)) {
+      currentStat.pan = currentStat.gstin.substring(2, 12).toUpperCase();
+      statUpdated = true;
+    }
+
+    if (statUpdated || !currentUser?.enterprise_profile) {
       await users.updateOne(
         { _id: new ObjectId(request.user.id) },
-        { $set: { statutory: currentStat, updated_at: new Date() } }
+        {
+          $set: {
+            statutory: currentStat,
+            enterprise_profile: enterpriseProfile,
+            company_name: enterpriseProfile.enterprise_name?.value || currentUser?.company_name || request.user.company_name,
+            updated_at: new Date(),
+          },
+        }
       );
     }
 
-    // Always sync latest statutory credentials with AI Engine before running verification
+    // Always sync latest statutory credentials and profile details with AI Engine before running verification
     try {
       await fetch(`${ENGINE_URL}/bidders`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           bidder_id: request.user.bidder_id,
-          company_name: currentUser?.company_name || request.user.company_name,
+          company_name: enterpriseProfile.enterprise_name?.value || currentUser?.company_name || request.user.company_name,
           udyam_number: currentStat.udyam_number || "",
           gstin: currentStat.gstin || "",
           pan: currentStat.pan || "",
           epfo_esic_number: currentStat.epfo_esic_number || "",
+          business_constitution: enterpriseProfile.business_constitution?.value || "",
+          registered_address: enterpriseProfile.registered_address?.value || "",
+          registration_date: enterpriseProfile.registration_date?.value || "",
+          enterprise_type: enterpriseProfile.enterprise_type?.value || "",
         }),
       });
     } catch (e) {
@@ -726,6 +1015,7 @@ export const applyForTender = async (request, response, next) => {
         tender_title: newApplication.tender_title,
         compliance_score: newApplication.compliance_score,
         risk_level: newApplication.risk_level,
+        checks: newApplication.checks,
         status: newApplication.status,
         submitted_documents: newApplication.submitted_documents,
         applied_at: newApplication.applied_at,

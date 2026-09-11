@@ -46,6 +46,12 @@ app.get(/^\/api\/tenders\/(.+)\/applications$/, requireAuth, requireRole("office
   return getTenderApplicants(req, res, next);
 });
 app.get("/api/tenders/:id/applications", requireAuth, requireRole("officer"), getTenderApplicants);
+app.get(/^\/api\/(?:officer\/)?tenders\/(.+)\/applicants$/, requireAuth, requireRole("officer"), (req, res, next) => {
+  req.params.id = req.params[0];
+  return getTenderApplicants(req, res, next);
+});
+app.get("/api/tenders/:id/applicants", requireAuth, requireRole("officer"), getTenderApplicants);
+app.get("/api/officer/tenders/:id/applicants", requireAuth, requireRole("officer"), getTenderApplicants);
 app.get("/api/applications/:id", requireAuth, getApplicationDetail);
 app.post("/api/applications/:id/approve", requireAuth, requireRole("officer"), approveApplication);
 app.post("/api/applications/:id/reject", requireAuth, requireRole("officer"), rejectApplication);

@@ -770,41 +770,58 @@
     }
   },
   "BIDDER-RAHULI-H233": {
-    "display_name": "RAHUL_INC",
+    "display_name": "MH-12-0012345\nEnterprise Name\nABC Technologies Pvt Ltd",
     "scenario": "registered_bidder",
+    "business_constitution": "",
+    "registered_address": "",
+    "registration_date": "",
+    "enterprise_type": "",
     "udyam": {
-      "status": "not_found",
-      "last_updated": "2026-09-11T18:14:14.030931Z",
-      "confidence": 0.0,
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:35:17.153936Z",
+      "confidence": 0.98,
       "raw_fields": {
-        "bidder_id": "BIDDER-RAHULI-H233",
-        "registry_match": false,
-        "provided_value": "TXDH876"
+        "udyam_registration_number": "UDYAM-MH-12-0012345",
+        "enterprise_name": "MH-12-0012345\nEnterprise Name\nABC Technologies Pvt Ltd",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "",
+        "registered_address": "",
+        "business_constitution": "",
+        "registration_active": true
       }
     },
     "gstn": {
-      "status": "not_found",
-      "last_updated": "2026-09-11T18:14:14.030931Z",
-      "confidence": 0.0,
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:35:17.153936Z",
+      "confidence": 0.99,
       "raw_fields": {
-        "bidder_id": "BIDDER-RAHULI-H233",
-        "registry_match": false,
-        "provided_value": "254UDR855"
+        "gstin": "19AABCA1234A1Z5",
+        "legal_name": "MH-12-0012345\nEnterprise Name\nABC Technologies Pvt Ltd",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "",
+        "registered_address": "",
+        "registration_date": ""
       }
     },
     "pan_it": {
-      "status": "not_found",
-      "last_updated": "2026-09-11T18:14:14.030931Z",
-      "confidence": 0.0,
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:35:17.153936Z",
+      "confidence": 0.97,
       "raw_fields": {
-        "bidder_id": "BIDDER-RAHULI-H233",
-        "registry_match": false,
-        "provided_value": "HGF568TFFC"
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
       }
     },
     "epfo_esic": {
       "status": "not_found",
-      "last_updated": "2026-09-11T18:14:14.030931Z",
+      "last_updated": "2026-09-11T18:35:17.153936Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-RAHULI-H233",
@@ -813,23 +830,24 @@
       }
     },
     "digilocker": {
-      "status": "not_found",
-      "last_updated": "2026-09-11T18:14:14.030931Z",
-      "confidence": 0.0,
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:35:17.153936Z",
+      "confidence": 0.96,
       "raw_fields": {
-        "bidder_id": "BIDDER-RAHULI-H233",
-        "registry_match": false,
-        "reason": "No valid PAN or GSTIN to anchor document verification"
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:35:17.153936Z"
       }
     },
     "blacklist": {
-      "status": "not_found",
-      "last_updated": "2026-09-11T18:14:14.030931Z",
-      "confidence": 0.0,
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:35:17.153936Z",
+      "confidence": 0.93,
       "raw_fields": {
-        "bidder_id": "BIDDER-RAHULI-H233",
         "registry_match": false,
-        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-RAHULI-H233"
       }
     }
   },
@@ -2082,6 +2100,420 @@
         "bidder_id": "BIDDER-DEFECT-KYL5",
         "registry_match": false,
         "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
+  },
+  "BIDDER-AEROSH-2APD": {
+    "display_name": "AeroShield Technologies Private Limited",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "Plot 42 MIDC Industrial Area Pune Maharashtra 411018",
+    "registration_date": "15/04/2019",
+    "enterprise_type": "Small",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:39:17.934874Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0077889",
+        "enterprise_name": "AeroShield Technologies Private Limited",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "15/04/2019",
+        "registered_address": "Plot 42 MIDC Industrial Area Pune Maharashtra 411018",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:39:17.934874Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "07AABCA1234A1Z5",
+        "legal_name": "AeroShield Technologies Private Limited",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "Plot 42 MIDC Industrial Area Pune Maharashtra 411018",
+        "registration_date": "15/04/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:39:17.934874Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T18:39:17.934874Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROSH-2APD",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:39:17.934874Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:39:17.934874Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:39:17.934874Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-AEROSH-2APD"
+      }
+    }
+  },
+  "BIDDER-AEROSH-AV8Z": {
+    "display_name": "AeroShield Technologies Private Limited",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "Plot 42 MIDC Industrial Area Pune Maharashtra 411018",
+    "registration_date": "15/04/2019",
+    "enterprise_type": "Small Enterprise",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:42:07.135638Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0077889",
+        "enterprise_name": "AeroShield Technologies Private Limited",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small Enterprise",
+        "registration_date": "15/04/2019",
+        "registered_address": "Plot 42 MIDC Industrial Area Pune Maharashtra 411018",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:42:07.135638Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "07AABCA1234A1Z5",
+        "legal_name": "AeroShield Technologies Private Limited",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "Plot 42 MIDC Industrial Area Pune Maharashtra 411018",
+        "registration_date": "15/04/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:42:07.135638Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T18:42:07.135638Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROSH-AV8Z",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:42:07.135638Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:42:07.135638Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:42:07.135638Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-AEROSH-AV8Z"
+      }
+    }
+  },
+  "BIDDER-AEROSH-8D1M": {
+    "display_name": "AeroShield Technologies Private Limited",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "Plot 42 MIDC Industrial Area Pune Maharashtra 411018",
+    "registration_date": "15/04/2019",
+    "enterprise_type": "Small",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:43:22.486070Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0077889",
+        "enterprise_name": "AeroShield Technologies Private Limited",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "15/04/2019",
+        "registered_address": "Plot 42 MIDC Industrial Area Pune Maharashtra 411018",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:43:22.486070Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "07AABCA1234A1Z5",
+        "legal_name": "AeroShield Technologies Private Limited",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "Plot 42 MIDC Industrial Area Pune Maharashtra 411018",
+        "registration_date": "15/04/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:43:22.486070Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T18:43:22.486070Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROSH-8D1M",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:43:22.486070Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:43:22.486070Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:43:22.486070Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-AEROSH-8D1M"
+      }
+    }
+  },
+  "BIDDER-APEXCY-Y242": {
+    "display_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "14/08/2019",
+    "enterprise_type": "",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:29.647461Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0088776",
+        "enterprise_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "14/08/2019",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:29.647461Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCK9988G1Z3",
+        "legal_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "14/08/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:29.647461Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCK9988G",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:29.647461Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:29.647461Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:44:29.647461Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:29.647461Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXCY-Y242"
+      }
+    }
+  },
+  "BIDDER-ZENITH-6ACM": {
+    "display_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "14/08/2019",
+    "enterprise_type": "",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:32.040220Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0088776",
+        "enterprise_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "14/08/2019",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:32.040220Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCK9988G1Z3",
+        "legal_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "14/08/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:32.040220Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCK9988G",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:32.040220Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:32.040220Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:44:32.040220Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:44:32.040220Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ZENITH-6ACM"
       }
     }
   }

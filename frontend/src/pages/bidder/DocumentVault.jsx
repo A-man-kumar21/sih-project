@@ -158,16 +158,66 @@ export default function DocumentVault() {
 
       {/* Extracted Data Callout */}
       {extractedInfo && (
-        <div className="alert-box alert-info">
-          <strong>AI Document Extraction Notice:</strong>
-          <div style={{ marginTop: "0.4rem", fontSize: "0.85rem" }}>
-            The AI engine automatically parsed this certificate and updated your enterprise compliance credentials:
-            <ul style={{ margin: "0.3rem 0 0 1.2rem" }}>
-              {extractedInfo.pan && <li>PAN: <strong>{extractedInfo.pan}</strong></li>}
-              {extractedInfo.gstin && <li>GSTIN: <strong>{extractedInfo.gstin}</strong></li>}
-              {extractedInfo.udyam_number && <li>Udyam: <strong>{extractedInfo.udyam_number}</strong></li>}
-              {extractedInfo.epfo_esic_number && <li>EPFO/ESIC: <strong>{extractedInfo.epfo_esic_number}</strong></li>}
-            </ul>
+        <div className="alert-box alert-info" style={{ borderLeft: "4px solid #10b981" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <strong style={{ color: "#065f46", fontSize: "0.95rem" }}>✓ AI Extraction & Enterprise Profile Auto-Population:</strong>
+              <p style={{ margin: "0.2rem 0 0.5rem", fontSize: "0.85rem", color: "#334155" }}>
+                The certificate was successfully parsed. The following structured attributes were synchronized to your Enterprise Profile:
+              </p>
+            </div>
+            <Link
+              to="/bidder/profile"
+              className="btn-primary"
+              style={{ fontSize: "0.8rem", padding: "0.3rem 0.7rem", whiteSpace: "nowrap" }}
+            >
+              View Enterprise Profile →
+            </Link>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.5rem", marginTop: "0.4rem", fontSize: "0.85rem", background: "white", padding: "0.75rem", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+            {(extractedInfo.enterprise_name || extractedInfo.company_name) && (
+              <div>
+                <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>Enterprise Legal Name</span>
+                <strong>{extractedInfo.enterprise_name || extractedInfo.company_name}</strong>
+              </div>
+            )}
+            {extractedInfo.pan && (
+              <div>
+                <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>Permanent Account Number (PAN)</span>
+                <strong style={{ fontFamily: "monospace" }}>{extractedInfo.pan}</strong>
+              </div>
+            )}
+            {extractedInfo.gstin && (
+              <div>
+                <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>GSTIN</span>
+                <strong style={{ fontFamily: "monospace" }}>{extractedInfo.gstin}</strong>
+              </div>
+            )}
+            {extractedInfo.udyam_number && (
+              <div>
+                <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>Udyam / MSME Registration</span>
+                <strong style={{ fontFamily: "monospace" }}>{extractedInfo.udyam_number}</strong>
+              </div>
+            )}
+            {extractedInfo.business_constitution && (
+              <div>
+                <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>Business Constitution</span>
+                <strong>{extractedInfo.business_constitution}</strong>
+              </div>
+            )}
+            {extractedInfo.registration_date && (
+              <div>
+                <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>Registration Date</span>
+                <strong>{extractedInfo.registration_date}</strong>
+              </div>
+            )}
+            {extractedInfo.registered_address && (
+              <div style={{ gridColumn: "1 / -1" }}>
+                <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>Principal Place of Business</span>
+                <span>{extractedInfo.registered_address}</span>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -264,10 +314,14 @@ export default function DocumentVault() {
                     <td>{(doc.file_size / 1024).toFixed(1)} KB</td>
                     <td>{new Date(doc.uploaded_at).toLocaleDateString()}</td>
                     <td>
-                      {doc.extracted_data ? (
-                        <span className="badge status-approved">AI Extracted</span>
+                      {doc.extracted_data?.success === false ? (
+                        <span className="badge" style={{ backgroundColor: "#fef2f2", color: "#991b1b", border: "1px solid #fecaca" }}>
+                          Manual Verification
+                        </span>
+                      ) : doc.extracted_data ? (
+                        <span className="badge status-approved">✓ Extracted & Synced</span>
                       ) : (
-                        <span className="badge status-submitted">Verified</span>
+                        <span className="badge status-submitted">Stored in Vault</span>
                       )}
                     </td>
                     <td>
