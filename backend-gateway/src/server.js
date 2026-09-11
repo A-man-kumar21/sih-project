@@ -2,6 +2,8 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import multer from "multer";
+import path from "path";
+import { fileURLToPath } from "url";
 import { getAuditCollection, getApplicationsCollection, getTendersCollection } from "./db.js";
 import { optionalAuth, requireAuth, requireRole } from "./middleware/auth.js";
 
@@ -23,6 +25,12 @@ app.use(express.json());
 app.get("/health", (_request, response) => {
   response.json({ service: "backend-gateway", status: "ready" });
 });
+
+// In the unified Render deployment, Express serves the production React build.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const frontendDist = path.resolve(__dirname, "../../frontend/dist");
+app.use(express.static(frontendDist));
 
 const ENGINE_URL = process.env.AI_ENGINE_URL || "http://127.0.0.1:8000";
 const VALID_DECISIONS = new Set(["approve", "reject", "request_more_info"]);
@@ -156,7 +164,6 @@ app.get("/api/tenders", async (_request, response, next) => {
 
 app.post("/api/tenders", optionalAuth, async (request, response, next) => {
   try {
-    // If request is authenticated, enforce that user must be an officer
     if (request.user && request.user.role !== "officer") {
       return response.status(403).json({
         error: "Access denied. Only authenticated government officers can create tenders.",
@@ -229,11 +236,9 @@ app.get("/api/overview", async (request, response, next) => {
   try {
     const tenderId = request.query.tender_id || "TENDER-ALL-MANDATORY";
 
-    // 1. Fetch all active bidders
     const biddersRes = await fetch(`${ENGINE_URL}/bidders`);
     const biddersList = await biddersRes.json();
 
-    // 2. Fetch tender details
     const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
     const tendersList = await tendersRes.json();
     const activeTender = tendersList.find((t) => t.tender_id === tenderId) || tendersList[0];
@@ -241,7 +246,6 @@ app.get("/api/overview", async (request, response, next) => {
 
     const audit = await getAuditCollection();
 
-    // 3. Evaluate each bidder against the active tender and match with latest Mongo decision
     const bidderCards = await Promise.all(
       biddersList.map(async (b) => {
         try {
@@ -256,7 +260,6 @@ app.get("/api/overview", async (request, response, next) => {
           });
           const evalData = await evalRes.json();
 
-          // Query MongoDB for the latest decision for this bidder
           const latestAudit = await audit.findOne(
             { bidder_id: b.bidder_id },
             { sort: { timestamp: -1 } }
@@ -289,7 +292,6 @@ app.get("/api/overview", async (request, response, next) => {
       })
     );
 
-    // 4. Calculate aggregates
     const totalBidders = bidderCards.length;
     const lowRiskCount = bidderCards.filter((b) => b.risk_level === "Low").length;
     const mediumRiskCount = bidderCards.filter((b) => b.risk_level === "Medium").length;
@@ -320,9 +322,6 @@ app.get("/api/overview", async (request, response, next) => {
 // COMPLIANCE EVALUATION & AUDIT TRAIL (PRESERVED & SYNCHRONIZED)
 // =============================================================================
 
-/**
- * Proxies the AI engine unchanged. The assessment is persisted separately.
- */
 app.post("/api/compliance/verify", async (request, response, next) => {
   try {
     const engineResponse = await fetch(`${ENGINE_URL}/verify-compliance`, {
@@ -355,14 +354,9 @@ app.post("/api/compliance/verify", async (request, response, next) => {
   }
 });
 
-/**
- * Records a human officer decision without modifying AI assessment fields.
- * Derives officer_id from authenticated session when available, preserving audit sync.
- */
 app.post("/api/audit/decision", optionalAuth, async (request, response, next) => {
   try {
     const { bidder_id: bidderId, decision } = request.body;
-    // Derive officer_id from authenticated JWT session; fallback to body for legacy tests
     const officerId = request.user?.id || request.user?.full_name || request.body.officer_id;
 
     if (!bidderId || !officerId || !VALID_DECISIONS.has(decision)) {
@@ -384,7 +378,6 @@ app.post("/api/audit/decision", optionalAuth, async (request, response, next) =>
       });
     }
 
-    // Keep tender_applications synchronized if an application exists for this bidder
     try {
       const applications = await getApplicationsCollection();
       const mappedStatus = decision === "approve" ? "approved" : decision === "reject" ? "rejected" : "info_requested";
@@ -409,7 +402,6 @@ app.post("/api/audit/decision", optionalAuth, async (request, response, next) =>
   }
 });
 
-/** Returns every scoring run and its independently recorded human decision. */
 app.get("/api/audit/:bidderId", async (request, response, next) => {
   try {
     const audit = await getAuditCollection();
@@ -429,6 +421,11 @@ app.all(/^\/api\/.*/, (request, response) => {
     error: `API route not found: ${request.method} ${request.originalUrl}`,
     status: 404,
   });
+});
+
+// SPA fallback: let React Router handle browser refreshes/deep links.
+app.get(/^(?!\/api(?:\/|$)).*/, (_request, response) => {
+  response.sendFile(path.join(frontendDist, "index.html"));
 });
 
 app.use((error, _request, response, _next) => {
