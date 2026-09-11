@@ -1,0 +1,1340 @@
+import { useEffect, useMemo, useState } from "react";
+
+const ALL_SOURCES = ["udyam", "gstn", "pan_it", "epfo_esic", "digilocker", "blacklist"];
+
+const SOURCE_LABELS = {
+  udyam: "Udyam / MSME Registration",
+  gstn: "GSTN Registration & Tax Filing",
+  pan_it: "PAN & Income Tax Compliance",
+  epfo_esic: "EPFO & ESIC Labor Compliance",
+  digilocker: "DigiLocker Verified Credentials",
+  blacklist: "Debarment & Blacklist Clearance",
+};
+
+const DEFAULT_BIDDERS = [
+  { bidder_id: "BIDDER-ALPHA", display_name: "Aarohan Office Systems Private Limited" },
+  { bidder_id: "BIDDER-BRAVO", display_name: "Bharat Supplies and Services LLP" },
+  { bidder_id: "BIDDER-CHARLIE", display_name: "Crestline Engineering Works" },
+  { bidder_id: "BIDDER-DELTA", display_name: "Disha Digital Solutions Private Limited" },
+];
+
+const DEFAULT_TENDERS = [
+  {
+    tender_id: "TENDER-ALL-MANDATORY",
+    title: "Comprehensive High-Value Procurement",
+    category: "Works & Infrastructure",
+    mandatory_checks: ["udyam", "gstn", "pan_it", "epfo_esic", "digilocker", "blacklist"],
+    description: "All 6 statutory checks mandatory for scoring.",
+  },
+  {
+    tender_id: "TENDER-MSE-GOODS",
+    title: "MSE Reserved Goods Supply Tender",
+    category: "Goods",
+    mandatory_checks: ["udyam", "gstn", "pan_it", "blacklist"],
+    description: "Goods tender with MSE preference. Labor & DigiLocker excluded from score.",
+  },
+  {
+    tender_id: "TENDER-SERVICES-LABOR",
+    title: "Facility Management & Services",
+    category: "Services",
+    mandatory_checks: ["gstn", "pan_it", "epfo_esic", "blacklist"],
+    description: "Manpower tender with mandatory labor compliance. Udyam excluded from score.",
+  },
+  {
+    tender_id: "TENDER-STARTUP-TECH",
+    title: "GovTech Digital Innovation Software",
+    category: "IT & Telecom",
+    mandatory_checks: ["gstn", "pan_it", "digilocker", "blacklist"],
+    description: "Software supply tender. Udyam and EPFO are excluded from score.",
+  },
+];
+
+async function api(url, options) {
+  const response = await fetch(url, options);
+  const body = await response.json();
+  if (!response.ok) throw new Error(body.error || body.detail || "Request failed");
+  return body;
+}
+
+const Risk = ({ value }) => <span className={`badge risk-${value?.toLowerCase()}`}>{value}</span>;
+const Status = ({ value }) => <span className={`badge status-${value}`}>{value?.replaceAll("_", " ")}</span>;
+
+export default function App() {
+  const [currentView, setCurrentView] = useState("detail"); // "overview" | "detail"
+  const [bidders, setBidders] = useState(DEFAULT_BIDDERS);
+  const [tenders, setTenders] = useState(DEFAULT_TENDERS);
+  const [selectedBidderId, setSelectedBidderId] = useState("BIDDER-ALPHA");
+  const [selectedTenderId, setSelectedTenderId] = useState("TENDER-ALL-MANDATORY");
+  const [assessment, setAssessment] = useState(null);
+  const [trail, setTrail] = useState([]);
+  const [decision, setDecision] = useState();
+  const [decisionSuccessMsg, setDecisionSuccessMsg] = useState(null);
+  const [decisionErrorMsg, setDecisionErrorMsg] = useState(null);
+  const [error, setError] = useState();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [simulateFailure, setSimulateFailure] = useState(false);
+
+  // Overview dashboard data
+  const [overviewData, setOverviewData] = useState(null);
+  const [loadingOverview, setLoadingOverview] = useState(false);
+
+  // Modals state
+  const [showBidderModal, setShowBidderModal] = useState(false);
+  const [showTenderModal, setShowTenderModal] = useState(false);
+
+  // PDF extraction states
+  const [extractingBidder, setExtractingBidder] = useState(false);
+  const [bidderExtractMsg, setBidderExtractMsg] = useState(null);
+  const [bidderExtractStatus, setBidderExtractStatus] = useState(null);
+
+  const [extractingTender, setExtractingTender] = useState(false);
+  const [tenderExtractMsg, setTenderExtractMsg] = useState(null);
+  const [tenderExtractStatus, setTenderExtractStatus] = useState(null);
+
+  // Forms state
+  const [bidderForm, setBidderForm] = useState({
+    bidder_id: "",
+    company_name: "",
+    udyam_number: "",
+    gstin: "",
+    pan: "",
+    epfo_esic_number: "",
+  });
+
+  const [tenderForm, setTenderForm] = useState({
+    tender_id: "",
+    title: "",
+    category: "Goods",
+    description: "",
+    mandatory_checks: ["udyam", "gstn", "pan_it", "blacklist"],
+  });
+
+  const activeTender = useMemo(() => {
+    return tenders.find((t) => t.tender_id === selectedTenderId) || tenders[0];
+  }, [tenders, selectedTenderId]);
+
+  const activeBidder = useMemo(() => {
+    return bidders.find((b) => b.bidder_id === selectedBidderId) || bidders[0];
+  }, [bidders, selectedBidderId]);
+
+  // Load Overview Data from backend
+  async function loadOverview(tenderId = selectedTenderId) {
+    try {
+      setLoadingOverview(true);
+      const data = await api(`/api/overview?tender_id=${tenderId}`);
+      setOverviewData(data);
+    } catch (err) {
+      console.warn("Could not load overview:", err.message);
+    } finally {
+      setLoadingOverview(false);
+    }
+  }
+
+  // Execute verification for a specific bidder + tender combination
+  async function runVerification(bidderId, tenderId, tendersList = tenders, simFail = simulateFailure) {
+    if (!bidderId) {
+      setAssessment(null);
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      setError(null);
+      setDecision(null);
+      setDecisionSuccessMsg(null);
+      setDecisionErrorMsg(null);
+
+      const tender = tendersList.find((t) => t.tender_id === tenderId) || tendersList[0];
+      const requiredChecks = tender ? tender.mandatory_checks : ALL_SOURCES;
+
+      const result = await api("/api/compliance/verify", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          bidder_id: bidderId,
+          tender_id: tenderId,
+          required_checks: requiredChecks,
+          simulate_llm_failure: simFail,
+        }),
+      });
+
+      setAssessment(result);
+
+      // Load audit trail for this bidder
+      try {
+        const auditTrail = await api(`/api/audit/${bidderId}`);
+        setTrail(auditTrail);
+      } catch (auditErr) {
+        console.warn("Could not load audit trail:", auditErr.message);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Initial load
+  useEffect(() => {
+    async function init() {
+      try {
+        let loadedBidders = DEFAULT_BIDDERS;
+        let loadedTenders = DEFAULT_TENDERS;
+
+        try {
+          const remoteBidders = await api("/api/bidders");
+          if (Array.isArray(remoteBidders)) {
+            loadedBidders = remoteBidders;
+            setBidders(remoteBidders);
+          }
+        } catch (e) {
+          console.warn("Using fallback bidders:", e.message);
+        }
+
+        try {
+          const remoteTenders = await api("/api/tenders");
+          if (Array.isArray(remoteTenders)) {
+            loadedTenders = remoteTenders;
+            setTenders(remoteTenders);
+          }
+        } catch (e) {
+          console.warn("Using fallback tenders:", e.message);
+        }
+
+        const initialBidderId = loadedBidders[0]?.bidder_id || "";
+        const initialTenderId = loadedTenders[0]?.tender_id || "TENDER-ALL-MANDATORY";
+        setSelectedBidderId(initialBidderId);
+        setSelectedTenderId(initialTenderId);
+
+        if (initialBidderId) {
+          await runVerification(initialBidderId, initialTenderId, loadedTenders, false);
+        } else {
+          setLoading(false);
+        }
+        loadOverview(initialTenderId);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    }
+    init();
+  }, []);
+
+  function handleSelectBidder(bidderId) {
+    setSelectedBidderId(bidderId);
+    runVerification(bidderId, selectedTenderId, tenders, simulateFailure);
+  }
+
+  function handleSelectTender(tenderId) {
+    setSelectedTenderId(tenderId);
+    runVerification(selectedBidderId, tenderId, tenders, simulateFailure);
+    loadOverview(tenderId);
+  }
+
+  // FEATURE 1: Delete Bidder (Removes from active selectable list only, preserves MongoDB audit logs)
+  async function handleDeleteBidder(bidderId, e) {
+    e?.stopPropagation();
+    const confirmed = window.confirm(
+      `Are you sure you want to remove "${bidderId}" from the active bidders list?\n\n` +
+      `Past scoring evaluations and recorded officer decisions in MongoDB will remain fully intact and queryable.`
+    );
+    if (!confirmed) return;
+
+    try {
+      setError(null);
+      await api(`/api/bidders/${bidderId}`, { method: "DELETE" });
+
+      const updatedBidders = await api("/api/bidders");
+      setBidders(updatedBidders);
+
+      // If the deleted bidder was selected, fall back to first remaining bidder or empty state
+      if (selectedBidderId === bidderId) {
+        const nextId = updatedBidders[0]?.bidder_id || null;
+        setSelectedBidderId(nextId);
+        if (nextId) {
+          runVerification(nextId, selectedTenderId, tenders, simulateFailure);
+        } else {
+          setAssessment(null);
+        }
+      }
+      loadOverview(selectedTenderId);
+    } catch (err) {
+      alert(`Could not delete bidder: ${err.message}`);
+    }
+  }
+
+  // FEATURE 1: Delete Tender (Removes from active selectable list only, preserves MongoDB audit logs)
+  async function handleDeleteTender(tenderId, e) {
+    e?.stopPropagation();
+    const confirmed = window.confirm(
+      `Are you sure you want to remove tender "${tenderId}" from the active tenders list?\n\n` +
+      `Historical audit records referencing this tender will remain fully preserved.`
+    );
+    if (!confirmed) return;
+
+    try {
+      setError(null);
+      await api(`/api/tenders/${tenderId}`, { method: "DELETE" });
+
+      const updatedTenders = await api("/api/tenders");
+      setTenders(updatedTenders);
+
+      if (selectedTenderId === tenderId) {
+        const nextTenderId = updatedTenders[0]?.tender_id || null;
+        setSelectedTenderId(nextTenderId);
+        if (nextTenderId && selectedBidderId) {
+          runVerification(selectedBidderId, nextTenderId, updatedTenders, simulateFailure);
+          loadOverview(nextTenderId);
+        }
+      } else {
+        loadOverview(selectedTenderId);
+      }
+    } catch (err) {
+      alert(`Could not delete tender: ${err.message}`);
+    }
+  }
+
+  // Handle PDF upload for Bidder Registration
+  async function handleBidderPdfUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setExtractingBidder(true);
+    setBidderExtractMsg(null);
+    setBidderExtractStatus(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/extract/bidder-pdf", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (data.success && data.extracted) {
+        setBidderForm((prev) => ({
+          ...prev,
+          company_name: data.extracted.company_name || prev.company_name,
+          udyam_number: data.extracted.udyam_number || prev.udyam_number,
+          gstin: data.extracted.gstin || prev.gstin,
+          pan: data.extracted.pan || prev.pan,
+          epfo_esic_number: data.extracted.epfo_esic_number || prev.epfo_esic_number,
+          bidder_id: prev.bidder_id || (data.extracted.pan ? `BIDDER-${data.extracted.pan.slice(0, 5)}` : prev.bidder_id),
+        }));
+        const sourceLabel = data.source === "gemini_llm" ? "Gemini AI" : "Document Parser";
+        setBidderExtractMsg(`Auto-extracted candidate fields from "${file.name}" via ${sourceLabel}. Please review and edit before saving.`);
+        setBidderExtractStatus("success");
+      } else {
+        setBidderExtractMsg(data.message || "Couldn't auto-extract, please fill manually.");
+        setBidderExtractStatus("error");
+      }
+    } catch (err) {
+      setBidderExtractMsg("Couldn't auto-extract, please fill manually.");
+      setBidderExtractStatus("error");
+    } finally {
+      setExtractingBidder(false);
+      e.target.value = "";
+    }
+  }
+
+  // Handle PDF upload for Tender Creation
+  async function handleTenderPdfUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setExtractingTender(true);
+    setTenderExtractMsg(null);
+    setTenderExtractStatus(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/extract/tender-pdf", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (data.success && data.extracted) {
+        setTenderForm((prev) => ({
+          ...prev,
+          tender_id: data.extracted.tender_id || prev.tender_id,
+          title: data.extracted.title || prev.title,
+          category: data.extracted.category || prev.category,
+          mandatory_checks: data.extracted.mandatory_checks?.length ? data.extracted.mandatory_checks : prev.mandatory_checks,
+        }));
+        const sourceLabel = data.source === "gemini_llm" ? "Gemini AI" : "Document Parser";
+        setTenderExtractMsg(`Auto-extracted tender parameters from "${file.name}" via ${sourceLabel}. Please review and edit before creating.`);
+        setTenderExtractStatus("success");
+      } else {
+        setTenderExtractMsg(data.message || "Couldn't auto-extract, please fill manually.");
+        setTenderExtractStatus("error");
+      }
+    } catch (err) {
+      setTenderExtractMsg("Couldn't auto-extract, please fill manually.");
+      setTenderExtractStatus("error");
+    } finally {
+      setExtractingTender(false);
+      e.target.value = "";
+    }
+  }
+
+  // Handle Register Bidder form submission
+  async function handleRegisterBidderSubmit(e) {
+    e.preventDefault();
+    if (!bidderForm.bidder_id.trim() || !bidderForm.company_name.trim()) {
+      alert("Bidder ID and Company Name are required.");
+      return;
+    }
+    try {
+      setSaving(true);
+      setError(null);
+      const res = await api("/api/bidders", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(bidderForm),
+      });
+
+      const newId = res.bidder.bidder_id;
+      const updatedBidders = await api("/api/bidders");
+      setBidders(updatedBidders);
+      setSelectedBidderId(newId);
+      setShowBidderModal(false);
+
+      setBidderForm({
+        bidder_id: "",
+        company_name: "",
+        udyam_number: "",
+        gstin: "",
+        pan: "",
+        epfo_esic_number: "",
+      });
+      setBidderExtractMsg(null);
+      setBidderExtractStatus(null);
+
+      await runVerification(newId, selectedTenderId, tenders, simulateFailure);
+      loadOverview(selectedTenderId);
+    } catch (err) {
+      setError(`Failed to register bidder: ${err.message}`);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // Handle Register Tender form submission
+  async function handleRegisterTenderSubmit(e) {
+    e.preventDefault();
+    if (!tenderForm.tender_id.trim()) {
+      alert("Tender ID is required.");
+      return;
+    }
+    if (tenderForm.mandatory_checks.length === 0) {
+      alert("Please select at least one mandatory compliance check for this tender.");
+      return;
+    }
+    try {
+      setSaving(true);
+      setError(null);
+      const res = await api("/api/tenders", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          ...tenderForm,
+          title: tenderForm.title || `Tender ${tenderForm.tender_id}`,
+        }),
+      });
+
+      const newTenderId = res.tender.tender_id;
+      const updatedTenders = await api("/api/tenders");
+      setTenders(updatedTenders);
+      setSelectedTenderId(newTenderId);
+      setShowTenderModal(false);
+
+      setTenderForm({
+        tender_id: "",
+        title: "",
+        category: "Goods",
+        description: "",
+        mandatory_checks: ["udyam", "gstn", "pan_it", "blacklist"],
+      });
+      setTenderExtractMsg(null);
+      setTenderExtractStatus(null);
+
+      await runVerification(selectedBidderId, newTenderId, updatedTenders, simulateFailure);
+      loadOverview(newTenderId);
+    } catch (err) {
+      setError(`Failed to create tender: ${err.message}`);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // FEATURE 2: Make Approve / Reject / Request More Info functional & lockable
+  async function submitDecision(officer_decision) {
+    try {
+      setSaving(true);
+      setDecisionErrorMsg(null);
+      setDecisionSuccessMsg(null);
+
+      const saved = await api("/api/audit/decision", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          bidder_id: selectedBidderId,
+          tender_id: selectedTenderId,
+          decision: officer_decision,
+          officer_id: "OFFICER-DEMO-001",
+          timestamp: assessment?.audit_log_entry?.timestamp,
+        }),
+      });
+
+      setDecision(saved);
+      setDecisionSuccessMsg(`Decision '${officer_decision.replaceAll("_", " ")}' successfully recorded by OFFICER-DEMO-001 in MongoDB.`);
+
+      // Update audit trail immediately
+      const updatedTrail = await api(`/api/audit/${selectedBidderId}`);
+      setTrail(updatedTrail);
+
+      // Refresh overview data
+      loadOverview(selectedTenderId);
+    } catch (err) {
+      setDecisionErrorMsg(`Failed to record decision: ${err.message}`);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // Find recorded decision for current evaluation or latest run
+  const recorded = useMemo(() => {
+    if (decision && decision.bidder_id === selectedBidderId) {
+      return decision;
+    }
+    const matchingCurrentRun = trail.find((entry) => entry.timestamp === assessment?.audit_log_entry?.timestamp);
+    if (matchingCurrentRun?.officer_decision) {
+      return matchingCurrentRun;
+    }
+    const latestForBidder = trail.find((entry) => entry.officer_decision);
+    if (latestForBidder) {
+      return latestForBidder;
+    }
+    return null;
+  }, [decision, trail, selectedBidderId, assessment]);
+
+  const isDecisionLocked = Boolean(recorded?.officer_decision);
+
+  return (
+    <main className="app-shell">
+      <header>
+        <div>
+          <p className="eyebrow">SIH 2026 · GeM Procurement</p>
+          <h1>Bid Compliance Verification Platform</h1>
+        </div>
+        <div className="header-actions">
+          <button className="btn-accent" onClick={() => setShowBidderModal(true)}>
+            + Register New Bidder
+          </button>
+          <button className="btn-primary" onClick={() => setShowTenderModal(true)}>
+            + New Tender
+          </button>
+        </div>
+      </header>
+
+      {/* FEATURE 3: Top Navigation View Tabs */}
+      <nav className="view-nav">
+        <button
+          className={`nav-tab ${currentView === "overview" ? "active" : ""}`}
+          onClick={() => {
+            setCurrentView("overview");
+            loadOverview(selectedTenderId);
+          }}
+        >
+          📊 All Bidders Overview ({bidders.length})
+        </button>
+        <button
+          className={`nav-tab ${currentView === "detail" ? "active" : ""}`}
+          onClick={() => setCurrentView("detail")}
+        >
+          🔍 Detailed Evaluation {selectedBidderId ? `(${selectedBidderId})` : ""}
+        </button>
+      </nav>
+
+      {/* Active Tender Selector Bar */}
+      {/* Active Tender Selector Bar & Complete Tender Information Panel */}
+      <section className="tender-selector-card">
+        <div className="tender-selector-top">
+          <div className="tender-selector-group">
+            <label htmlFor="tender-select">Active Tender:</label>
+            <select
+              id="tender-select"
+              className="tender-select"
+              value={selectedTenderId || ""}
+              onChange={(e) => handleSelectTender(e.target.value)}
+            >
+              {tenders.map((t) => (
+                <option key={t.tender_id} value={t.tender_id}>
+                  {t.tender_id} — {t.title} ({t.category})
+                </option>
+              ))}
+            </select>
+            {activeTender && (
+              <button
+                className="btn-delete-tender"
+                title="Delete this tender from active list (preserves audit records)"
+                onClick={(e) => handleDeleteTender(activeTender.tender_id, e)}
+              >
+                🗑 Delete Tender
+              </button>
+            )}
+            <span className="tender-badge-pill">
+              {activeTender?.mandatory_checks?.length || 0} of {ALL_SOURCES.length} Checks Mandatory
+            </span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <label className="toggle-simulate" title="Simulate an LLM API failure to verify the deterministic template fallback">
+              <input
+                type="checkbox"
+                checked={simulateFailure}
+                onChange={(e) => {
+                  const newVal = e.target.checked;
+                  setSimulateFailure(newVal);
+                  runVerification(selectedBidderId, selectedTenderId, tenders, newVal);
+                }}
+              />
+              <span>Simulate LLM API Failure</span>
+            </label>
+            <button
+              className="btn-secondary"
+              onClick={() => {
+                runVerification(selectedBidderId, selectedTenderId, tenders, simulateFailure);
+                loadOverview(selectedTenderId);
+              }}
+              disabled={loading}
+            >
+              {loading ? "Evaluating…" : "Re-evaluate"}
+            </button>
+          </div>
+        </div>
+
+        {/* ISSUE 3: Full Tender Information Panel */}
+        {activeTender && (
+          <div className="tender-info-panel">
+            <div className="tender-info-header">
+              <div className="tender-meta-left">
+                <span className="tender-info-id">{activeTender.tender_id}</span>
+                <h3 className="tender-info-title">{activeTender.title}</h3>
+              </div>
+              <div className="tender-meta-right">
+                <span className="tender-info-category">📂 Procurement Category: <strong>{activeTender.category}</strong></span>
+                <span className="tender-info-counts">
+                  🎯 <strong>{activeTender.mandatory_checks?.length || 0}</strong> Mandatory · <strong>{ALL_SOURCES.length - (activeTender.mandatory_checks?.length || 0)}</strong> Informational
+                </span>
+              </div>
+            </div>
+
+            <p className="tender-info-description">
+              <strong>Tender Scope & Description:</strong> {activeTender.description || "Standard procurement compliance rules applied."}
+            </p>
+
+            <div className="tender-sources-grid">
+              <span className="tender-sources-heading">Compliance Sources Applicability (Mandatory vs Informational):</span>
+              <div className="sources-badges-container">
+                {ALL_SOURCES.map((sourceKey) => {
+                  const isMandatory = activeTender.mandatory_checks?.includes(sourceKey);
+                  return (
+                    <div
+                      key={sourceKey}
+                      className={`tender-source-pill ${isMandatory ? "is-mandatory" : "is-informational"}`}
+                    >
+                      <span className="source-pill-name">{SOURCE_LABELS[sourceKey] || sourceKey}</span>
+                      <span className={`badge ${isMandatory ? "tag-mandatory" : "tag-optional"}`}>
+                        {isMandatory ? "Mandatory (Scored)" : "Informational (Excluded)"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {error && <p className="error">{error}</p>}
+
+      {/* =========================================================================
+          VIEW 1: OVERVIEW DASHBOARD (FEATURE 3)
+         ========================================================================= */}
+      {currentView === "overview" && (
+        <section className="overview-card">
+          <div className="overview-header">
+            <div>
+              <p className="eyebrow">Executive Procurement Cockpit</p>
+              <h2>All Bidders Overview · {activeTender?.title || selectedTenderId}</h2>
+              <small style={{ color: "#64748b" }}>
+                Tender ID: {activeTender?.tender_id} · Category: {activeTender?.category} · Mandatory Checks:{" "}
+                {activeTender?.mandatory_checks?.length} of 6
+              </small>
+            </div>
+            <button
+              className="btn-secondary"
+              onClick={() => loadOverview(selectedTenderId)}
+              disabled={loadingOverview}
+            >
+              {loadingOverview ? "Refreshing…" : "Refresh Overview"}
+            </button>
+          </div>
+
+          {/* Aggregate Metric Cards */}
+          <div className="metrics-grid">
+            <div className="metric-box">
+              <span className="metric-label">Total Bidders</span>
+              <span className="metric-val">{overviewData?.aggregates?.total_bidders ?? bidders.length}</span>
+              <span className="metric-sub">Active in tender pool</span>
+            </div>
+            <div className="metric-box metric-low">
+              <span className="metric-label">Low Risk</span>
+              <span className="metric-val">{overviewData?.aggregates?.low_risk ?? 0}</span>
+              <span className="metric-sub">Eligible for fast-track</span>
+            </div>
+            <div className="metric-box metric-medium">
+              <span className="metric-label">Medium Risk</span>
+              <span className="metric-val">{overviewData?.aggregates?.medium_risk ?? 0}</span>
+              <span className="metric-sub">Manual review required</span>
+            </div>
+            <div className="metric-box metric-high">
+              <span className="metric-label">High Risk / Knock-out</span>
+              <span className="metric-val">{overviewData?.aggregates?.high_risk ?? 0}</span>
+              <span className="metric-sub">Defects / Blacklisted</span>
+            </div>
+            <div className="metric-box metric-pending">
+              <span className="metric-label">Awaiting Decision</span>
+              <span className="metric-val">{overviewData?.aggregates?.pending_decision ?? 0}</span>
+              <span className="metric-sub">Pending officer sign-off</span>
+            </div>
+          </div>
+
+          {/* Bidders Summary Table */}
+          <div className="overview-table-wrapper">
+            <table className="overview-table">
+              <thead>
+                <tr>
+                  <th>Bidder ID & Company Legal Name</th>
+                  <th>Mandatory Checks</th>
+                  <th>Compliance Score</th>
+                  <th>Risk Level</th>
+                  <th>Officer Decision</th>
+                  <th style={{ textAlign: "right" }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {overviewData?.bidders && overviewData.bidders.length > 0 ? (
+                  overviewData.bidders.map((b) => (
+                    <tr key={b.bidder_id}>
+                      <td>
+                        <strong>{b.bidder_id}</strong>
+                        <div style={{ fontSize: "0.78rem", color: "#64748b" }}>{b.display_name}</div>
+                      </td>
+                      <td>
+                        <span style={{ fontSize: "0.82rem", color: "#334155" }}>
+                          {b.checks_summary?.compliant_mandatory || 0} / {b.checks_summary?.mandatory || 0} passed
+                        </span>
+                      </td>
+                      <td>
+                        <strong style={{ fontSize: "1.1rem" }}>{b.compliance_score}</strong>
+                        <span style={{ fontSize: "0.75rem", color: "#64748b" }}> / 100</span>
+                      </td>
+                      <td>
+                        <Risk value={b.risk_level} />
+                      </td>
+                      <td>
+                        {b.officer_decision ? (
+                          <span
+                            className={`badge ${
+                              b.officer_decision === "approve"
+                                ? "status-pill-approved"
+                                : b.officer_decision === "reject"
+                                ? "status-pill-rejected"
+                                : "status-pill-request_more_info"
+                            }`}
+                          >
+                            {b.officer_decision.replaceAll("_", " ")}
+                          </span>
+                        ) : (
+                          <span className="badge status-pill-pending">Pending Review</span>
+                        )}
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <div style={{ display: "inline-flex", gap: "0.4rem" }}>
+                          <button
+                            className="table-btn-view"
+                            onClick={() => {
+                              setSelectedBidderId(b.bidder_id);
+                              setCurrentView("detail");
+                              runVerification(b.bidder_id, selectedTenderId, tenders, simulateFailure);
+                            }}
+                          >
+                            View Details →
+                          </button>
+                          <button
+                            className="btn-delete-item"
+                            title="Remove bidder from active list"
+                            onClick={(e) => handleDeleteBidder(b.bidder_id, e)}
+                          >
+                            🗑
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} style={{ textAlign: "center", padding: "2rem", color: "#64748b" }}>
+                      No active bidders registered. Use &ldquo;+ Register New Bidder&rdquo; above.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* =========================================================================
+          VIEW 2: DETAILED BID EVALUATION (EXISTING VIEW)
+         ========================================================================= */}
+      {currentView === "detail" && (
+        <div className="layout">
+          {/* Bidder Selection Sidebar with Delete Button (FEATURE 1) */}
+          <aside>
+            <h2>
+              <span>Bidders ({bidders.length})</span>
+            </h2>
+            {bidders.length === 0 && (
+              <p style={{ fontSize: "0.85rem", color: "#64748b" }}>No bidders. Register one above.</p>
+            )}
+            {bidders.map((item) => (
+              <div key={item.bidder_id} className="bidder-row">
+                <button
+                  className={`bidder ${selectedBidderId === item.bidder_id ? "selected" : ""}`}
+                  onClick={() => handleSelectBidder(item.bidder_id)}
+                >
+                  <span>
+                    <strong>{item.bidder_id}</strong>
+                  </span>
+                  <span className="bidder-company-sub">{item.display_name}</span>
+                </button>
+                <button
+                  className="btn-delete-item"
+                  title={`Delete ${item.bidder_id} from active list (preserves past audit trail)`}
+                  onClick={(e) => handleDeleteBidder(item.bidder_id, e)}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </aside>
+
+          {/* Verification Detail View */}
+          {assessment ? (
+            <section className="detail">
+              {/* Deterministic Scoring Header */}
+              <section className="title">
+                <div>
+                  <p className="eyebrow">
+                    Deterministic Compliance Engine · Tender: {assessment.tender_id || selectedTenderId}
+                  </p>
+                  <h2>{assessment.bidder_id}</h2>
+                  <small style={{ color: "#475569" }}>{activeBidder?.display_name}</small>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <strong className="score">{assessment.compliance_score}</strong>
+                  <Risk value={assessment.risk_level} />
+                  <p className="score-confidence-note">
+                    Score reflects verification confidence; not all checks report 100% certainty.
+                  </p>
+                </div>
+              </section>
+
+              {/* LLM-Generated Executive Briefing */}
+              {assessment.llm_briefing && (
+                <section
+                  className={`card briefing-card ${
+                    assessment.llm_briefing.is_fallback ? "briefing-fallback" : "briefing-ai"
+                  }`}
+                >
+                  <div className="briefing-header">
+                    <div>
+                      <p
+                        className="eyebrow"
+                        style={{ color: assessment.llm_briefing.is_fallback ? "#b45309" : "#4338ca" }}
+                      >
+                        AI-Generated Executive Summary · Decision Support
+                      </p>
+                      <h3 style={{ margin: 0 }}>Procurement Officer Briefing</h3>
+                    </div>
+                    <span className={`badge ${assessment.llm_briefing.is_fallback ? "badge-fallback" : "badge-ai"}`}>
+                      {assessment.llm_briefing.is_fallback
+                        ? "Deterministic Fallback Engine"
+                        : `AI: ${assessment.llm_briefing.model || "Gemini 1.5 Flash"}`}
+                    </span>
+                  </div>
+                  <p className="briefing-text">{assessment.llm_briefing.text}</p>
+                  {assessment.llm_briefing.notice && (
+                    <small className="briefing-notice">Notice: {assessment.llm_briefing.notice}</small>
+                  )}
+                  <div className="briefing-disclaimer">
+                    <small>
+                      <strong>Decision Authority:</strong> Advisory only. The AI summarizes findings and suggests
+                      verification next steps; the final award or rejection decision rests solely with the Procurement
+                      Officer via the action buttons below.
+                    </small>
+                  </div>
+                </section>
+              )}
+
+              {/* Verification Checks Grid */}
+              <section className="card">
+                <h3>
+                  Verification Checks ({assessment.checks.length})
+                  <small style={{ fontWeight: "normal", fontSize: "0.8rem", color: "#64748b", marginLeft: "0.5rem" }}>
+                    Only mandatory checks affect the score & risk level.
+                  </small>
+                </h3>
+                {assessment.checks.map((check) => (
+                  <details key={check.source} open={check.is_mandatory || check.status !== "compliant"}>
+                    <summary>
+                      <span>
+                        {SOURCE_LABELS[check.source] || check.source}{" "}
+                        <code style={{ fontSize: "0.78rem", color: "#64748b" }}>({check.source})</code>
+                      </span>
+                      <div className="summary-badges">
+                        {check.is_mandatory ? (
+                          <span className="badge tag-mandatory">Mandatory</span>
+                        ) : (
+                          <span className="badge tag-optional">Informational (Excluded)</span>
+                        )}
+                        <Status value={check.status} />
+                      </div>
+                    </summary>
+                    <dl>
+                      <div>
+                        <dt>Confidence</dt>
+                        <dd>{Math.round(check.confidence * 100)}%</dd>
+                      </div>
+                      <div>
+                        <dt>Weight Applied</dt>
+                        <dd>{check.weight_applied} pts</dd>
+                      </div>
+                      <div>
+                        <dt>Engine Evaluation Note</dt>
+                        <dd>{check.note}</dd>
+                      </div>
+                    </dl>
+                  </details>
+                ))}
+              </section>
+
+              {/* Pending Manual Review */}
+              <section className="card manual">
+                <h3>Pending Manual Review (Tender-Mandatory Checks)</h3>
+                {assessment.pending_manual_review?.length ? (
+                  <ul>
+                    {assessment.pending_manual_review.map((source) => (
+                      <li key={source}>
+                        <strong>{SOURCE_LABELS[source] || source}</strong> requires physical verification of certificate
+                        before award. Source registry returned <em>NOT_FOUND</em>.
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No mandatory checks require manual verification for this tender.</p>
+                )}
+              </section>
+
+              {/* AI Recommendations */}
+              <section className="card">
+                <h3>Automated Compliance Directives</h3>
+                <ul>
+                  {assessment.recommendations?.map((text, idx) => (
+                    <li key={idx}>{text}</li>
+                  ))}
+                </ul>
+              </section>
+
+              {/* FEATURE 2: Procurement Officer Decision Panel with Lockable State */}
+              <section className="card">
+                <p className="eyebrow">Human-in-the-Loop Sign-Off</p>
+                <h3>Record Procurement Officer Decision</h3>
+
+                {/* State Banner: Decision locked vs pending */}
+                {isDecisionLocked ? (
+                  <div className={`decision-locked-banner ${recorded.officer_decision}`}>
+                    <div>
+                      <span className="decision-badge">🔒 Decision Recorded: </span>
+                      <strong style={{ fontSize: "1.05rem", textTransform: "capitalize" }}>
+                        {recorded.officer_decision.replaceAll("_", " ")}
+                      </strong>
+                      <span style={{ marginLeft: "0.75rem", fontSize: "0.85rem", color: "#475569" }}>
+                        Officer: <strong>{recorded.officer_id || "OFFICER-DEMO-001"}</strong>
+                      </span>
+                    </div>
+                    <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
+                      Timestamp: {new Date(recorded.timestamp).toLocaleString()}
+                    </span>
+                  </div>
+                ) : (
+                  <p style={{ fontSize: "0.88rem", color: "#475569", margin: "0.4rem 0 1rem" }}>
+                    Select an official action below to record your formal decision in the tamper-evident MongoDB audit trail.
+                  </p>
+                )}
+
+                {decisionSuccessMsg && <p className="success" style={{ marginBottom: "1rem" }}>{decisionSuccessMsg}</p>}
+                {decisionErrorMsg && <p className="error" style={{ marginBottom: "1rem" }}>{decisionErrorMsg}</p>}
+
+                {/* Action Buttons: Disabled when decision is already recorded */}
+                <div className="actions">
+                  <button
+                    disabled={saving || isDecisionLocked}
+                    onClick={() => submitDecision("approve")}
+                    style={isDecisionLocked && recorded?.officer_decision === "approve" ? { outline: "2px solid #08724b" } : {}}
+                  >
+                    {isDecisionLocked && recorded?.officer_decision === "approve" ? "✓ Approved" : "Approve Bid"}
+                  </button>
+                  <button
+                    disabled={saving || isDecisionLocked}
+                    className="reject"
+                    onClick={() => submitDecision("reject")}
+                    style={isDecisionLocked && recorded?.officer_decision === "reject" ? { outline: "2px solid #ac3030" } : {}}
+                  >
+                    {isDecisionLocked && recorded?.officer_decision === "reject" ? "✕ Rejected" : "Reject Bid"}
+                  </button>
+                  <button
+                    disabled={saving || isDecisionLocked}
+                    className="more"
+                    onClick={() => submitDecision("request_more_info")}
+                    style={isDecisionLocked && recorded?.officer_decision === "request_more_info" ? { outline: "2px solid #986900" } : {}}
+                  >
+                    {isDecisionLocked && recorded?.officer_decision === "request_more_info" ? "ℹ Clarification Requested" : "Request Rule 173(iv) Clarification"}
+                  </button>
+                </div>
+
+                <div className="comparison">
+                  <div>
+                    <span>Deterministic Score (Unchanged)</span>
+                    <strong>
+                      {assessment.compliance_score}/100 · <Risk value={assessment.risk_level} />
+                    </strong>
+                    <span className="score-confidence-note" style={{ display: "block", fontSize: "0.72rem" }}>
+                      Score reflects verification confidence; not all checks report 100% certainty.
+                    </span>
+                  </div>
+                  <div>
+                    <span>Officer Decision Status</span>
+                    <strong>
+                      {recorded?.officer_decision
+                        ? `${recorded.officer_decision.replaceAll("_", " ")} (${recorded.officer_id || "Officer"})`
+                        : "Pending Officer Action"}
+                    </strong>
+                  </div>
+                </div>
+              </section>
+
+              {/* Immutable Audit Trail */}
+              <section className="card">
+                <h3>Immutable Audit Trail (MongoDB)</h3>
+                <p>Chronological record of automated evaluations and officer decisions for {selectedBidderId}:</p>
+                <ol>
+                  {trail.map((entry) => (
+                    <li key={entry._id || entry.timestamp}>
+                      <time>{new Date(entry.timestamp).toLocaleString()}</time>
+                      <span>
+                        Tender: <strong>{entry.tender_id || "Standard"}</strong> · Score:{" "}
+                        <strong>{entry.compliance_score}/100</strong> · <Risk value={entry.risk_level} />
+                      </span>
+                      {entry.llm_briefing && (
+                        <span style={{ fontSize: "0.8rem", color: "#475569", fontStyle: "italic" }}>
+                          Briefing: &ldquo;{entry.llm_briefing.slice(0, 110)}…&rdquo;
+                        </span>
+                      )}
+                      <span>
+                        Officer Decision:{" "}
+                        <strong>
+                          {entry.officer_decision
+                            ? `${entry.officer_decision.replaceAll("_", " ")} (${entry.officer_id || "Officer"})`
+                            : "Pending Officer Action"}
+                        </strong>
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            </section>
+          ) : (
+            <section className="detail" style={{ padding: "3rem", textAlign: "center", color: "#64748b" }}>
+              <h3>No bidder selected</h3>
+              <p>Please register a bidder or select one from the sidebar.</p>
+            </section>
+          )}
+        </div>
+      )}
+
+      {/* MODAL: Register New Bidder with PDF Upload */}
+      {showBidderModal && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <div className="modal-header">
+              <div>
+                <h2>Register New Bidder</h2>
+                <p className="eyebrow">Auto-extract from PDF or fill manually. Review before submitting.</p>
+              </div>
+              <button className="btn-close" onClick={() => setShowBidderModal(false)}>
+                &times;
+              </button>
+            </div>
+
+            <div className="file-upload-card" style={{ marginBottom: "1.25rem" }}>
+              <label className="file-upload-label">
+                <span style={{ fontSize: "1.6rem" }}>📄</span>
+                <span>Auto-fill from Bidder Certificate / Document (PDF)</span>
+                <small style={{ color: "#64748b" }}>
+                  Uploads and parses Company Name, Udyam, GSTIN, PAN, EPFO with AI
+                </small>
+                <input
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  className="file-upload-input"
+                  onChange={handleBidderPdfUpload}
+                  disabled={extractingBidder}
+                />
+              </label>
+              {extractingBidder && (
+                <div className="extract-alert extract-alert-loading">
+                  Reading PDF text and auto-extracting candidate fields with AI…
+                </div>
+              )}
+              {bidderExtractMsg && (
+                <div
+                  className={`extract-alert ${
+                    bidderExtractStatus === "success" ? "extract-alert-success" : "extract-alert-error"
+                  }`}
+                >
+                  {bidderExtractMsg}
+                </div>
+              )}
+            </div>
+
+            <form onSubmit={handleRegisterBidderSubmit} className="form-grid">
+              <div className="form-field">
+                <label>Bidder ID *</label>
+                <input
+                  type="text"
+                  placeholder="e.g. BIDDER-ECHO"
+                  value={bidderForm.bidder_id}
+                  onChange={(e) => setBidderForm({ ...bidderForm, bidder_id: e.target.value.toUpperCase() })}
+                  required
+                />
+                <small>Unique identifier used for GeM verification contract.</small>
+              </div>
+
+              <div className="form-field">
+                <label>Company Legal Name *</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Zen Power Systems Private Limited"
+                  value={bidderForm.company_name}
+                  onChange={(e) => setBidderForm({ ...bidderForm, company_name: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="form-field">
+                <label>Udyam / MSME Registration Number</label>
+                <input
+                  type="text"
+                  placeholder="e.g. UDYAM-MH-01-0098765"
+                  value={bidderForm.udyam_number}
+                  onChange={(e) => setBidderForm({ ...bidderForm, udyam_number: e.target.value })}
+                />
+                <small>Leave blank to simulate an unregistered / NOT_FOUND entity.</small>
+              </div>
+
+              <div className="form-field">
+                <label>GSTIN (15-character GST Number)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 27AABCP1234E1Z9"
+                  value={bidderForm.gstin}
+                  onChange={(e) => setBidderForm({ ...bidderForm, gstin: e.target.value.toUpperCase() })}
+                />
+                <small>Leave blank to test missing GST filing.</small>
+              </div>
+
+              <div className="form-field">
+                <label>Permanent Account Number (PAN)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. AABCP1234E"
+                  value={bidderForm.pan}
+                  onChange={(e) => setBidderForm({ ...bidderForm, pan: e.target.value.toUpperCase() })}
+                />
+              </div>
+
+              <div className="form-field">
+                <label>EPFO / ESIC Establishment Number</label>
+                <input
+                  type="text"
+                  placeholder="e.g. MH/BAN/0098765/000"
+                  value={bidderForm.epfo_esic_number}
+                  onChange={(e) => setBidderForm({ ...bidderForm, epfo_esic_number: e.target.value })}
+                />
+                <small>Leave blank to test statutory labor exemption / unverified status.</small>
+              </div>
+
+              <div className="modal-actions">
+                <button type="button" className="btn-secondary" onClick={() => setShowBidderModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn-accent" disabled={saving || extractingBidder}>
+                  {saving ? "Saving…" : "Register Bidder"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Configure New Tender with PDF Upload */}
+      {showTenderModal && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <div className="modal-header">
+              <div>
+                <h2>Configure New Tender</h2>
+                <p className="eyebrow">Auto-extract from Tender Notice PDF or configure manually.</p>
+              </div>
+              <button className="btn-close" onClick={() => setShowTenderModal(false)}>
+                &times;
+              </button>
+            </div>
+
+            <div className="file-upload-card" style={{ marginBottom: "1.25rem" }}>
+              <label className="file-upload-label">
+                <span style={{ fontSize: "1.6rem" }}>📄</span>
+                <span>Auto-fill from Tender Notice (PDF)</span>
+                <small style={{ color: "#64748b" }}>
+                  Uploads and parses Tender ID, Category, and Mandatory Statutory Checks with AI
+                </small>
+                <input
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  className="file-upload-input"
+                  onChange={handleTenderPdfUpload}
+                  disabled={extractingTender}
+                />
+              </label>
+              {extractingTender && (
+                <div className="extract-alert extract-alert-loading">
+                  Reading tender notice and auto-extracting compliance parameters with AI…
+                </div>
+              )}
+              {tenderExtractMsg && (
+                <div
+                  className={`extract-alert ${
+                    tenderExtractStatus === "success" ? "extract-alert-success" : "extract-alert-error"
+                  }`}
+                >
+                  {tenderExtractMsg}
+                </div>
+              )}
+            </div>
+
+            <form onSubmit={handleRegisterTenderSubmit} className="form-grid">
+              <div className="form-field">
+                <label>Tender ID *</label>
+                <input
+                  type="text"
+                  placeholder="e.g. GEM/2026/B/90412"
+                  value={tenderForm.tender_id}
+                  onChange={(e) => setTenderForm({ ...tenderForm, tender_id: e.target.value.toUpperCase() })}
+                  required
+                />
+              </div>
+
+              <div className="form-field">
+                <label>Tender Title</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Supply of Solar Inverters & Batteries"
+                  value={tenderForm.title}
+                  onChange={(e) => setTenderForm({ ...tenderForm, title: e.target.value })}
+                />
+              </div>
+
+              <div className="form-field">
+                <label>Procurement Category *</label>
+                <select
+                  value={tenderForm.category}
+                  onChange={(e) => setTenderForm({ ...tenderForm, category: e.target.value })}
+                >
+                  <option value="Goods">Goods</option>
+                  <option value="Services">Services</option>
+                  <option value="Works">Works & Infrastructure</option>
+                  <option value="IT & Telecom">IT & Telecom</option>
+                </select>
+              </div>
+
+              <div className="form-field">
+                <label>Mandatory Statutory Compliance Checks *</label>
+                <small style={{ marginBottom: "0.5rem" }}>
+                  Only checked sources will affect the score & risk calculation. Unchecked sources will still display
+                  for informational completeness.
+                </small>
+                <div className="checkbox-group">
+                  {ALL_SOURCES.map((source) => {
+                    const isChecked = tenderForm.mandatory_checks.includes(source);
+                    return (
+                      <label key={source} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setTenderForm({
+                                ...tenderForm,
+                                mandatory_checks: [...tenderForm.mandatory_checks, source],
+                              });
+                            } else {
+                              setTenderForm({
+                                ...tenderForm,
+                                mandatory_checks: tenderForm.mandatory_checks.filter((c) => c !== source),
+                              });
+                            }
+                          }}
+                        />
+                        <span>
+                          <strong>{SOURCE_LABELS[source] || source}</strong>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <button type="button" className="btn-secondary" onClick={() => setShowTenderModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary" disabled={saving || extractingTender}>
+                  {saving ? "Creating…" : "Create Tender"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </main>
+  );
+}

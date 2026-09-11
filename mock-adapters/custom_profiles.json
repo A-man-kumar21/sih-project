@@ -1,0 +1,348 @@
+{
+  "BIDDER-ECHO": {
+    "display_name": "Zenith Smart Technologies Private Limited",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T19:17:37.442009Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-DL-03-0099881",
+        "enterprise_name": "Zenith Smart Technologies Private Limited",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T19:17:37.442009Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "07AABCZ9876E1Z4",
+        "legal_name": "Zenith Smart Technologies Private Limited",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T19:17:37.442009Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCZ9876E",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T19:17:37.442009Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "DLCPM0099881000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "DLCPM0099881000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T19:17:37.442009Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-06T19:17:37.442009Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T19:17:37.442009Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ECHO"
+      }
+    }
+  },
+  "ABS": {
+    "display_name": "google",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-06T20:13:45.508093Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "ABS",
+        "registry_match": false,
+        "provided_value": "hfvbpeur"
+      }
+    },
+    "gstn": {
+      "status": "not_found",
+      "last_updated": "2026-09-06T20:13:45.508093Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "ABS",
+        "registry_match": false,
+        "provided_value": "EQRLQBVH"
+      }
+    },
+    "pan_it": {
+      "status": "not_found",
+      "last_updated": "2026-09-06T20:13:45.508093Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "ABS",
+        "registry_match": false,
+        "provided_value": "QELRHV"
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-06T20:13:45.508093Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "ABS",
+        "registry_match": false,
+        "provided_value": "eqrlh v"
+      }
+    },
+    "digilocker": {
+      "status": "not_found",
+      "last_updated": "2026-09-06T20:13:45.508093Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "ABS",
+        "registry_match": false,
+        "reason": "No valid PAN or GSTIN to anchor document verification"
+      }
+    },
+    "blacklist": {
+      "status": "not_found",
+      "last_updated": "2026-09-06T20:13:45.508093Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "ABS",
+        "registry_match": false,
+        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
+  },
+  "BIDDER-GARBAGE": {
+    "display_name": "Acme Garbage Trading Corp",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T14:17:06.548904Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-GARBAGE",
+        "registry_match": false,
+        "provided_value": "fake_udyam_12345"
+      }
+    },
+    "gstn": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T14:17:06.548904Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-GARBAGE",
+        "registry_match": false,
+        "provided_value": "INVALID_GSTIN_XYZ"
+      }
+    },
+    "pan_it": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T14:17:06.548904Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-GARBAGE",
+        "registry_match": false,
+        "provided_value": "NOT_A_PAN"
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T14:17:06.548904Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-GARBAGE",
+        "registry_match": false,
+        "provided_value": "gibberish_epfo"
+      }
+    },
+    "digilocker": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T14:17:06.548904Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-GARBAGE",
+        "registry_match": false,
+        "reason": "No valid PAN or GSTIN to anchor document verification"
+      }
+    },
+    "blacklist": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T14:17:06.548904Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-GARBAGE",
+        "registry_match": false,
+        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
+  },
+  "BIDDER-ABCDE": {
+    "display_name": "ABCDE Technologies Private Limited",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-06T21:01:43.897839Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-ABCDE",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T21:01:43.897839Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCZ9876E1Z4",
+        "legal_name": "ABCDE Technologies Private Limited",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T21:01:43.897839Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCZ9876E",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T21:01:43.897839Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "DLCPM0099881000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "DLCPM0099881000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T21:01:43.897839Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-06T21:01:43.897839Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T21:01:43.897839Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ABCDE"
+      }
+    }
+  },
+  "BIDDER-XYZ": {
+    "display_name": "ABC Technologies Pvt Ltd",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T20:48:32.780405Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0012345",
+        "enterprise_name": "ABC Technologies Pvt Ltd",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T20:48:32.780405Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27ABCDE1234F1Z5",
+        "legal_name": "ABC Technologies Pvt Ltd",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T20:48:32.780405Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "ABCDE1234F",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-06T20:48:32.780405Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-XYZ",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T20:48:32.780405Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-06T20:48:32.780405Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-06T20:48:32.780405Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-XYZ"
+      }
+    }
+  }
+}

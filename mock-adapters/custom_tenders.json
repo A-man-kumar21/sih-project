@@ -1,0 +1,29 @@
+{
+  "TENDER-2026-MED-EQUIP": {
+    "tender_id": "TENDER-2026-MED-EQUIP",
+    "title": "Advanced Diagnostic Medical Equipment Supply",
+    "category": "Medical Devices",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it"
+    ],
+    "description": "Specialized diagnostic devices. Only Udyam, GSTN, and PAN are mandatory; labor, digilocker, blacklist excluded from score.",
+    "created_at": "2026-09-06T19:17:37.468360Z"
+  },
+  "GEM/2026/B/100001": {
+    "tender_id": "GEM/2026/B/100001",
+    "title": "Industrial Water Pump",
+    "category": "Goods",
+    "mandatory_checks": [
+      "gstn",
+      "pan_it",
+      "blacklist",
+      "udyam",
+      "digilocker",
+      "epfo_esic"
+    ],
+    "description": "Custom tender requiring: gstn, pan_it, blacklist, udyam, digilocker, epfo_esic",
+    "created_at": "2026-09-06T20:20:23.682002Z"
+  }
+}

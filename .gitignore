@@ -1,0 +1,186 @@
+# ==============================================================================
+# Git Ignore Configuration - AI-Powered GeM Bid Compliance Platform
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Secrets, Environment Variables & Credentials (CRITICAL - NEVER COMMIT)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+*.env
+*.env.*
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.example.*
+
+# Private keys, certificates & credentials
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+.secrets
+.secrets/
+.secrets.*
+**/.secrets
+**/.secrets.*
+
+# ------------------------------------------------------------------------------
+# Dependencies & Package Managers
+# ------------------------------------------------------------------------------
+node_modules/
+**/node_modules/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# ------------------------------------------------------------------------------
+# Python & Virtual Environments
+# ------------------------------------------------------------------------------
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+**/.venv/
+**/venv/
+**/env/
+
+# Python packaging & builds
+build/
+**/build/
+dist/
+**/dist/
+
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+wheels/
+share/python-wheels/
+
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ------------------------------------------------------------------------------
+# Testing, Coverage & Type Checkers
+# ------------------------------------------------------------------------------
+.coverage
+.coverage.*
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+nosetests.xml
+coverage.xml
+htmlcov/
+
+*.cover
+*.py,cover
+
+# ------------------------------------------------------------------------------
+# Frontend & Bundler Build Outputs
+# ------------------------------------------------------------------------------
+out/
+**/out/
+.vite/
+**/.vite/
+.parcel-cache/
+.next/
+storybook-static/
+
+# TypeScript
+*.tsbuildinfo
+
+# Test reports
+playwright-report/
+test-results/
+
+# ------------------------------------------------------------------------------
+# Databases, Local Storage & Temporary Files
+# ------------------------------------------------------------------------------
+*.sqlite
+*.sqlite3
+*.db
+
+scratch/
+temp/
+tmp/
+*.tmp
+
+logs/
+*.log
+
+# ------------------------------------------------------------------------------
+# Operating System Artifacts
+# ------------------------------------------------------------------------------
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# ------------------------------------------------------------------------------
+# IDEs & Code Editors
+# ------------------------------------------------------------------------------
+.idea/
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+*.sublime-workspace
+*.sublime-project
+
+*.swp
+*.swo
+
+# ------------------------------------------------------------------------------
+# Miscellaneous
+# ------------------------------------------------------------------------------
+*.orig
