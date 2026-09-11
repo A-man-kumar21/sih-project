@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -14,6 +14,7 @@ export default function AvailableTenders() {
   // Apply Modal state
   const [activeTender, setActiveTender] = useState(null);
   const [applying, setApplying] = useState(false);
+  const submittingRef = useRef(false);
   const [applyError, setApplyError] = useState(null);
   const [applySuccess, setApplySuccess] = useState(null);
 
@@ -93,26 +94,47 @@ export default function AvailableTenders() {
   };
 
   const handleConfirmApply = async () => {
-    if (!activeTender) return;
+    if (!activeTender || submittingRef.current || applying) return;
+    submittingRef.current = true;
     setApplying(true);
     setApplyError(null);
+    setApplySuccess(null);
     try {
-      const res = await authFetch(`/api/tenders/${activeTender.tender_id}/apply`, {
+      const encodedId = encodeURIComponent(activeTender.tender_id);
+      const res = await authFetch(`/api/tenders/${encodedId}/apply`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tender_id: activeTender.tender_id }),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to submit application.");
+
+      const contentType = res.headers.get("content-type") || "";
+      let data = null;
+      if (contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        const preMatch = text.match(/<pre>(.*?)<\/pre>/s);
+        const errMsg = preMatch ? preMatch[1].trim() : (text.slice(0, 200) || `Server error (${res.status})`);
+        throw new Error(errMsg);
       }
-      setApplySuccess(data.message || "Application successfully submitted!");
+
+      if (!res.ok) {
+        throw new Error(data?.error || `Failed to submit application (${res.status}).`);
+      }
+
+      const scoreInfo = data.application
+        ? ` · Compliance Score: ${data.application.compliance_score}/100 · Risk: ${data.application.risk_level} · Status: ${data.application.status}`
+        : "";
+      setApplySuccess((data.message || "Application successfully submitted!") + scoreInfo);
       await loadTenders();
       setTimeout(() => {
         setActiveTender(null);
         navigate("/bidder/applications");
-      }, 1500);
+      }, 2000);
     } catch (err) {
       setApplyError(err.message);
     } finally {
+      submittingRef.current = false;
       setApplying(false);
     }
   };

@@ -177,7 +177,7 @@ export default function OfficerDashboard() {
                       </td>
                       <td>
                         <button
-                          onClick={() => navigate(`/officer/tenders/${tender.tender_id}`)}
+                          onClick={() => navigate(`/officer/tenders/${encodeURIComponent(tender.tender_id)}`)}
                           className="btn-action-view"
                         >
                           View Applicants ({summary.total}) &rarr;

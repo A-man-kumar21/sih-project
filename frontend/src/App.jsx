@@ -103,6 +103,14 @@ export default function App() {
                 }
               />
               <Route
+                path="/officer/tenders/*"
+                element={
+                  <ProtectedRoute allowedRoles={["officer"]}>
+                    <TenderApplicants />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/officer/applications/:id"
                 element={
                   <ProtectedRoute allowedRoles={["officer"]}>

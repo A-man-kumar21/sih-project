@@ -2,6 +2,17 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext(null);
 
+export async function safeJson(response) {
+  const contentType = response.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) {
+    return await response.json();
+  }
+  const text = await response.text();
+  const preMatch = text.match(/<pre>(.*?)<\/pre>/s);
+  const errMsg = preMatch ? preMatch[1].trim() : (text.slice(0, 200) || `Server responded with status ${response.status}`);
+  throw new Error(errMsg);
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("gem_token") || null);
@@ -45,7 +56,7 @@ export function AuthProvider({ children }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    const data = await response.json();
+    const data = await safeJson(response);
     if (!response.ok) {
       throw new Error(data.error || "Login failed.");
     }
@@ -61,7 +72,7 @@ export function AuthProvider({ children }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(officerData),
     });
-    const data = await response.json();
+    const data = await safeJson(response);
     if (!response.ok) {
       throw new Error(data.error || "Officer registration failed.");
     }
@@ -77,7 +88,7 @@ export function AuthProvider({ children }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(bidderData),
     });
-    const data = await response.json();
+    const data = await safeJson(response);
     if (!response.ok) {
       throw new Error(data.error || "Bidder registration failed.");
     }

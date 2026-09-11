@@ -85,5 +85,17 @@
     ],
     "description": "HEAVY MISSLE",
     "created_at": "2026-09-11T16:11:19.882020Z"
+  },
+  "TENDER-TEST-1789145778178": {
+    "tender_id": "TENDER-TEST-1789145778178",
+    "title": "Advanced Perimeter Defense & Cybersecurity Hardware",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "High-integrity procurement requiring verified PAN, GSTN, and Udyam MSME certification.",
+    "created_at": "2026-09-11T16:56:18.815412Z"
   }
 }

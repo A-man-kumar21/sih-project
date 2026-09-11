@@ -104,7 +104,7 @@ export default function OfficerTenders() {
                     <strong>{summary.total}</strong> Applicant{summary.total === 1 ? "" : "s"}
                   </div>
                   <button
-                    onClick={() => navigate(`/officer/tenders/${tender.tender_id}`)}
+                    onClick={() => navigate(`/officer/tenders/${encodeURIComponent(tender.tender_id)}`)}
                     className="btn-primary"
                     style={{ fontSize: "0.85rem", padding: "0.45rem 0.85rem" }}
                   >

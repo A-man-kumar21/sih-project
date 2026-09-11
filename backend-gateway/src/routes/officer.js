@@ -166,7 +166,12 @@ router.post("/tenders", requireAuth, requireRole("officer"), async (request, res
  */
 export const getTenderApplicants = async (request, response, next) => {
   try {
-    const tenderId = request.params.id;
+    const rawId = request.params.id || request.params[0] || request.query?.tender_id;
+    const tenderId = rawId ? decodeURIComponent(rawId).trim() : null;
+
+    if (!tenderId) {
+      return response.status(400).json({ error: "Missing required tender_id parameter." });
+    }
 
     // Fetch tender details
     const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
@@ -209,6 +214,10 @@ export const getTenderApplicants = async (request, response, next) => {
     return next(error);
   }
 };
+router.get(/^\/tenders\/(.+)\/applications$/, requireAuth, requireRole("officer"), (req, res, next) => {
+  req.params.id = req.params[0];
+  return getTenderApplicants(req, res, next);
+});
 router.get("/tenders/:id/applications", requireAuth, requireRole("officer"), getTenderApplicants);
 
 /**

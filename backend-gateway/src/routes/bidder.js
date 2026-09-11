@@ -516,7 +516,12 @@ router.get("/tenders", requireAuth, requireRole("bidder"), async (request, respo
  */
 export const applyForTender = async (request, response, next) => {
   try {
-    const tenderId = request.params.id;
+    const rawId = request.params.id || request.params[0] || request.body?.tender_id;
+    const tenderId = rawId ? decodeURIComponent(rawId).trim() : null;
+
+    if (!tenderId) {
+      return response.status(400).json({ error: "Missing required tender_id parameter." });
+    }
 
     // 1. Fetch tender details
     const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
@@ -644,8 +649,17 @@ export const applyForTender = async (request, response, next) => {
       officer_comment: null,
     };
 
-    const insertResult = await applications.insertOne(newApplication);
-    newApplication._id = insertResult.insertedId;
+    try {
+      const insertResult = await applications.insertOne(newApplication);
+      newApplication._id = insertResult.insertedId;
+    } catch (insertErr) {
+      if (insertErr.code === 11000) {
+        return response.status(409).json({
+          error: `You have already applied for tender '${tender.tender_id}'. Duplicate application prevented.`,
+        });
+      }
+      throw insertErr;
+    }
 
     return response.status(201).json({
       success: true,
@@ -665,6 +679,11 @@ export const applyForTender = async (request, response, next) => {
     return next(error);
   }
 };
+router.post(/^\/tenders\/(.+)\/apply$/, requireAuth, requireRole("bidder"), (req, res, next) => {
+  req.params.id = req.params[0];
+  return applyForTender(req, res, next);
+});
+router.post("/tenders/apply", requireAuth, requireRole("bidder"), applyForTender);
 router.post("/tenders/:id/apply", requireAuth, requireRole("bidder"), applyForTender);
 
 /**

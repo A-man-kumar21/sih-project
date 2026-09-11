@@ -3,7 +3,9 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function TenderApplicants() {
-  const { id: tenderId } = useParams();
+  const params = useParams();
+  const rawId = params["*"] || params.id || "";
+  const tenderId = rawId ? decodeURIComponent(rawId) : "";
   const { authFetch } = useAuth();
   const navigate = useNavigate();
 
@@ -13,12 +15,23 @@ export default function TenderApplicants() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!tenderId) return;
     async function loadApplicants() {
       setLoading(true);
       setError(null);
       try {
-        const res = await authFetch(`/api/tenders/${tenderId}/applications`);
-        const data = await res.json();
+        const res = await authFetch(`/api/tenders/${encodeURIComponent(tenderId)}/applications`);
+        const contentType = res.headers.get("content-type") || "";
+        let data;
+        if (contentType.includes("application/json")) {
+          data = await res.json();
+        } else {
+          const text = await res.text();
+          const preMatch = text.match(/<pre>(.*?)<\/pre>/s);
+          const errMsg = preMatch ? preMatch[1].trim() : (text.slice(0, 200) || `Server error (${res.status})`);
+          throw new Error(errMsg);
+        }
+
         if (res.ok) {
           setTender(data.tender);
           // Backend guarantees descending compliance score order

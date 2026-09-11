@@ -52,9 +52,24 @@ export async function getApplicationsCollection() {
   if (applicationsCollection) return applicationsCollection;
   const db = await getDatabase();
   applicationsCollection = db.collection("tender_applications");
-  await applicationsCollection.createIndex({ tender_id: 1, compliance_score: -1 });
-  await applicationsCollection.createIndex({ bidder_user_id: 1 });
-  await applicationsCollection.createIndex({ bidder_id: 1, tender_id: 1 });
+  try {
+    await applicationsCollection.createIndex({ tender_id: 1, compliance_score: -1 });
+    try {
+      await applicationsCollection.dropIndex("bidder_id_1_tender_id_1");
+    } catch {
+      // Ignore if index doesn't exist
+    }
+    await applicationsCollection.createIndex(
+      { bidder_id: 1, tender_id: 1 },
+      { name: "uniq_bidder_tender", unique: true }
+    );
+    await applicationsCollection.createIndex(
+      { bidder_user_id: 1, tender_id: 1 },
+      { name: "uniq_bidder_user_tender", unique: true }
+    );
+  } catch (err) {
+    console.warn("Notice: index creation:", err.message);
+  }
   return applicationsCollection;
 }
 

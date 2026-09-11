@@ -34,7 +34,17 @@ app.use("/api/officer", officerRouter);
 app.use("/api/documents", documentsRouter);
 
 // Direct top-level application & tender endpoints
+app.post(/^\/api\/tenders\/(.+)\/apply$/, requireAuth, requireRole("bidder"), (req, res, next) => {
+  req.params.id = req.params[0];
+  return applyForTender(req, res, next);
+});
+app.post("/api/tenders/apply", requireAuth, requireRole("bidder"), applyForTender);
 app.post("/api/tenders/:id/apply", requireAuth, requireRole("bidder"), applyForTender);
+
+app.get(/^\/api\/tenders\/(.+)\/applications$/, requireAuth, requireRole("officer"), (req, res, next) => {
+  req.params.id = req.params[0];
+  return getTenderApplicants(req, res, next);
+});
 app.get("/api/tenders/:id/applications", requireAuth, requireRole("officer"), getTenderApplicants);
 app.get("/api/applications/:id", requireAuth, getApplicationDetail);
 app.post("/api/applications/:id/approve", requireAuth, requireRole("officer"), approveApplication);
@@ -411,6 +421,14 @@ app.get("/api/audit/:bidderId", async (request, response, next) => {
   } catch (error) {
     return next(error);
   }
+});
+
+// Guarantee JSON 404 response for any unhandled /api requests
+app.all(/^\/api\/.*/, (request, response) => {
+  response.status(404).json({
+    error: `API route not found: ${request.method} ${request.originalUrl}`,
+    status: 404,
+  });
 });
 
 app.use((error, _request, response, _next) => {

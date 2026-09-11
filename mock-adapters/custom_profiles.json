@@ -832,5 +832,527 @@
         "reason": "Cannot query debarment registry for unanchored/unregistered entity"
       }
     }
+  },
+  "BIDDER-AEROTE-FGN0": {
+    "display_name": "AeroTech Defense Systems Pvt Ltd",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:53:48.682659Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-FGN0",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "gstn": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:53:48.682659Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-FGN0",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "pan_it": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:53:48.682659Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-FGN0",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:53:48.682659Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-FGN0",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:53:48.682659Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-FGN0",
+        "registry_match": false,
+        "reason": "No valid PAN or GSTIN to anchor document verification"
+      }
+    },
+    "blacklist": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:53:48.682659Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-FGN0",
+        "registry_match": false,
+        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
+  },
+  "BIDDER-AEROTE-SS87": {
+    "display_name": "AeroTech Defense Systems Pvt Ltd",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:54:26.089906Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-SS87",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "gstn": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:54:26.089906Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-SS87",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "pan_it": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:54:26.089906Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-SS87",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:54:26.089906Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-SS87",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:54:26.089906Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-SS87",
+        "registry_match": false,
+        "reason": "No valid PAN or GSTIN to anchor document verification"
+      }
+    },
+    "blacklist": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:54:26.089906Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-SS87",
+        "registry_match": false,
+        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
+  },
+  "BIDDER-AEROTE-7CLI": {
+    "display_name": "AeroTech Defense Systems Pvt Ltd",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-7CLI",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "gstn": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-7CLI",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "pan_it": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-7CLI",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-7CLI",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-7CLI",
+        "registry_match": false,
+        "reason": "No valid PAN or GSTIN to anchor document verification"
+      }
+    },
+    "blacklist": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-7CLI",
+        "registry_match": false,
+        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
+  },
+  "BIDDER-AEROTE-ER2G": {
+    "display_name": "AeroTech Two Pvt Ltd",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-ER2G",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "gstn": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-ER2G",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "pan_it": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-ER2G",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-ER2G",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-ER2G",
+        "registry_match": false,
+        "reason": "No valid PAN or GSTIN to anchor document verification"
+      }
+    },
+    "blacklist": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-ER2G",
+        "registry_match": false,
+        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
+  },
+  "BIDDER-AEROTE-812C": {
+    "display_name": "AeroTech Defense Systems Pvt Ltd",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-812C",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "gstn": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-812C",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "pan_it": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-812C",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-812C",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-812C",
+        "registry_match": false,
+        "reason": "No valid PAN or GSTIN to anchor document verification"
+      }
+    },
+    "blacklist": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-812C",
+        "registry_match": false,
+        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
+  },
+  "BIDDER-AEROTE-J4GS": {
+    "display_name": "AeroTech Two Pvt Ltd",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-J4GS",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "gstn": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-J4GS",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "pan_it": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-J4GS",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-J4GS",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-J4GS",
+        "registry_match": false,
+        "reason": "No valid PAN or GSTIN to anchor document verification"
+      }
+    },
+    "blacklist": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-AEROTE-J4GS",
+        "registry_match": false,
+        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
+  },
+  "BIDDER-KAVACH-E764": {
+    "display_name": "Kavach Cyber Solutions LLP",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T16:56:18.679157Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-DL-05-0012345",
+        "enterprise_name": "Kavach Cyber Solutions LLP",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T16:56:18.679157Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "07AABCA1234A1Z5",
+        "legal_name": "Kavach Cyber Solutions LLP",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T16:56:18.679157Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T16:56:18.679157Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "DLCPM1234567000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "DLCPM1234567000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T16:56:18.679157Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T16:56:18.679157Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T16:56:18.679157Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-KAVACH-E764"
+      }
+    }
+  },
+  "BIDDER-DEFECT-X77B": {
+    "display_name": "Defective Supply Corp",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:21.942928Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-X77B",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "gstn": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:21.942928Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-X77B",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "pan_it": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:21.942928Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-X77B",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:21.942928Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-X77B",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:21.942928Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-X77B",
+        "registry_match": false,
+        "reason": "No valid PAN or GSTIN to anchor document verification"
+      }
+    },
+    "blacklist": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T16:56:21.942928Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-X77B",
+        "registry_match": false,
+        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
   }
 }

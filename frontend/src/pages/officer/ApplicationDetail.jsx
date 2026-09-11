@@ -139,7 +139,7 @@ export default function ApplicationDetail() {
       <div className="breadcrumb-nav">
         <Link to="/officer/dashboard">&larr; Officer Cockpit</Link>
         <span className="breadcrumb-separator">/</span>
-        <Link to={`/officer/tenders/${app.tender_id}`}>Tender {app.tender_id}</Link>
+        <Link to={`/officer/tenders/${encodeURIComponent(app.tender_id)}`}>Tender {app.tender_id}</Link>
         <span className="breadcrumb-separator">/</span>
         <span>Application Detail</span>
       </div>
