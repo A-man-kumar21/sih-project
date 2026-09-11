@@ -778,7 +778,7 @@
     "enterprise_type": "Small",
     "udyam": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:04:56.733791Z",
+      "last_updated": "2026-09-11T22:49:21.380598Z",
       "confidence": 0.98,
       "raw_fields": {
         "udyam_registration_number": "UDYAM-MH-00-0000001",
@@ -793,7 +793,7 @@
     },
     "gstn": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:04:56.733791Z",
+      "last_updated": "2026-09-11T22:49:21.380598Z",
       "confidence": 0.99,
       "raw_fields": {
         "gstin": "24AABCS1003C1Z7",
@@ -809,7 +809,7 @@
     },
     "pan_it": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:04:56.733791Z",
+      "last_updated": "2026-09-11T22:49:21.380598Z",
       "confidence": 0.97,
       "raw_fields": {
         "pan": "MCKAA0001A",
@@ -821,7 +821,7 @@
     },
     "epfo_esic": {
       "status": "not_found",
-      "last_updated": "2026-09-11T21:04:56.733791Z",
+      "last_updated": "2026-09-11T22:49:21.380598Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-RAHULI-H233",
@@ -831,18 +831,18 @@
     },
     "digilocker": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:04:56.733791Z",
+      "last_updated": "2026-09-11T22:49:21.380598Z",
       "confidence": 0.96,
       "raw_fields": {
         "consent_status": "Granted",
         "identity_document_verified": true,
         "authorized_signatory_verified": true,
-        "credential_issued_at": "2026-09-11T21:04:56.733791Z"
+        "credential_issued_at": "2026-09-11T22:49:21.380598Z"
       }
     },
     "blacklist": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:04:56.733791Z",
+      "last_updated": "2026-09-11T22:49:21.380598Z",
       "confidence": 0.93,
       "raw_fields": {
         "registry_match": false,
@@ -982,9 +982,13 @@
   "BIDDER-AEROTE-7CLI": {
     "display_name": "AeroTech Defense Systems Pvt Ltd",
     "scenario": "registered_bidder",
+    "business_constitution": "",
+    "registered_address": "",
+    "registration_date": "",
+    "enterprise_type": "",
     "udyam": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "last_updated": "2026-09-11T22:49:20.841794Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-7CLI",
@@ -994,7 +998,7 @@
     },
     "gstn": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "last_updated": "2026-09-11T22:49:20.841794Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-7CLI",
@@ -1004,7 +1008,7 @@
     },
     "pan_it": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "last_updated": "2026-09-11T22:49:20.841794Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-7CLI",
@@ -1014,7 +1018,7 @@
     },
     "epfo_esic": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "last_updated": "2026-09-11T22:49:20.841794Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-7CLI",
@@ -1024,7 +1028,7 @@
     },
     "digilocker": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "last_updated": "2026-09-11T22:49:20.841794Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-7CLI",
@@ -1034,7 +1038,7 @@
     },
     "blacklist": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:37.291736Z",
+      "last_updated": "2026-09-11T22:49:20.841794Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-7CLI",
@@ -1046,9 +1050,13 @@
   "BIDDER-AEROTE-ER2G": {
     "display_name": "AeroTech Two Pvt Ltd",
     "scenario": "registered_bidder",
+    "business_constitution": "",
+    "registered_address": "",
+    "registration_date": "",
+    "enterprise_type": "",
     "udyam": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "last_updated": "2026-09-11T22:49:20.939145Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-ER2G",
@@ -1058,7 +1066,7 @@
     },
     "gstn": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "last_updated": "2026-09-11T22:49:20.939145Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-ER2G",
@@ -1068,7 +1076,7 @@
     },
     "pan_it": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "last_updated": "2026-09-11T22:49:20.939145Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-ER2G",
@@ -1078,7 +1086,7 @@
     },
     "epfo_esic": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "last_updated": "2026-09-11T22:49:20.939145Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-ER2G",
@@ -1088,7 +1096,7 @@
     },
     "digilocker": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "last_updated": "2026-09-11T22:49:20.939145Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-ER2G",
@@ -1098,7 +1106,7 @@
     },
     "blacklist": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:55:40.461754Z",
+      "last_updated": "2026-09-11T22:49:20.939145Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-ER2G",
@@ -1110,9 +1118,13 @@
   "BIDDER-AEROTE-812C": {
     "display_name": "AeroTech Defense Systems Pvt Ltd",
     "scenario": "registered_bidder",
+    "business_constitution": "",
+    "registered_address": "",
+    "registration_date": "",
+    "enterprise_type": "",
     "udyam": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "last_updated": "2026-09-11T22:49:21.032407Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-812C",
@@ -1122,7 +1134,7 @@
     },
     "gstn": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "last_updated": "2026-09-11T22:49:21.032407Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-812C",
@@ -1132,7 +1144,7 @@
     },
     "pan_it": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "last_updated": "2026-09-11T22:49:21.032407Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-812C",
@@ -1142,7 +1154,7 @@
     },
     "epfo_esic": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "last_updated": "2026-09-11T22:49:21.032407Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-812C",
@@ -1152,7 +1164,7 @@
     },
     "digilocker": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "last_updated": "2026-09-11T22:49:21.032407Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-812C",
@@ -1162,7 +1174,7 @@
     },
     "blacklist": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:03.255593Z",
+      "last_updated": "2026-09-11T22:49:21.032407Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-812C",
@@ -1174,9 +1186,13 @@
   "BIDDER-AEROTE-J4GS": {
     "display_name": "AeroTech Two Pvt Ltd",
     "scenario": "registered_bidder",
+    "business_constitution": "",
+    "registered_address": "",
+    "registration_date": "",
+    "enterprise_type": "",
     "udyam": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "last_updated": "2026-09-11T22:49:21.135424Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-J4GS",
@@ -1186,7 +1202,7 @@
     },
     "gstn": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "last_updated": "2026-09-11T22:49:21.135424Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-J4GS",
@@ -1196,7 +1212,7 @@
     },
     "pan_it": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "last_updated": "2026-09-11T22:49:21.135424Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-J4GS",
@@ -1206,7 +1222,7 @@
     },
     "epfo_esic": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "last_updated": "2026-09-11T22:49:21.135424Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-J4GS",
@@ -1216,7 +1232,7 @@
     },
     "digilocker": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "last_updated": "2026-09-11T22:49:21.135424Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-J4GS",
@@ -1226,7 +1242,7 @@
     },
     "blacklist": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:56:06.557675Z",
+      "last_updated": "2026-09-11T22:49:21.135424Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-AEROTE-J4GS",
@@ -5111,7 +5127,7 @@
     "enterprise_type": "Small",
     "udyam": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:40:05.507247Z",
+      "last_updated": "2026-09-11T22:48:48.385048Z",
       "confidence": 0.98,
       "raw_fields": {
         "udyam_registration_number": "UDYAM-GJ-00-0000003",
@@ -5126,7 +5142,7 @@
     },
     "gstn": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:40:05.507247Z",
+      "last_updated": "2026-09-11T22:48:48.385048Z",
       "confidence": 0.99,
       "raw_fields": {
         "gstin": "24AABCS1003C1Z7",
@@ -5142,7 +5158,7 @@
     },
     "pan_it": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:40:05.507247Z",
+      "last_updated": "2026-09-11T22:48:48.385048Z",
       "confidence": 0.97,
       "raw_fields": {
         "pan": "AABCS1003C",
@@ -5154,7 +5170,7 @@
     },
     "epfo_esic": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:40:05.507247Z",
+      "last_updated": "2026-09-11T22:48:48.385048Z",
       "confidence": 0.95,
       "raw_fields": {
         "epfo_establishment_id": "GJ/EPF/TEST/000003",
@@ -5166,18 +5182,18 @@
     },
     "digilocker": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:40:05.507247Z",
+      "last_updated": "2026-09-11T22:48:48.385048Z",
       "confidence": 0.96,
       "raw_fields": {
         "consent_status": "Granted",
         "identity_document_verified": true,
         "authorized_signatory_verified": true,
-        "credential_issued_at": "2026-09-11T21:40:05.507247Z"
+        "credential_issued_at": "2026-09-11T22:48:48.385048Z"
       }
     },
     "blacklist": {
       "status": "compliant",
-      "last_updated": "2026-09-11T21:40:05.507247Z",
+      "last_updated": "2026-09-11T22:48:48.385048Z",
       "confidence": 0.93,
       "raw_fields": {
         "registry_match": false,
@@ -6089,6 +6105,1182 @@
         "bidder_id": "BIDDER-UNREAD-KAXE",
         "registry_match": false,
         "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
+  },
+  "BIDDER-APEXCY-KFQL": {
+    "display_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "14/08/2019",
+    "enterprise_type": "",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:53.658937Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0088776",
+        "enterprise_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "14/08/2019",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:53.658937Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCK9988G1Z3",
+        "legal_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "14/08/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:53.658937Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCK9988G",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:53.658937Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:53.658937Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:49:53.658937Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:53.658937Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXCY-KFQL"
+      }
+    }
+  },
+  "BIDDER-ZENITH-4X2I": {
+    "display_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "14/08/2019",
+    "enterprise_type": "",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:54.043466Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0088776",
+        "enterprise_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "14/08/2019",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:54.043466Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCK9988G1Z3",
+        "legal_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "14/08/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:54.043466Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCK9988G",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:54.043466Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:54.043466Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:49:54.043466Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:49:54.043466Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ZENITH-4X2I"
+      }
+    }
+  },
+  "BIDDER-APEXHY-UGCH": {
+    "display_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "PRIVATE LIMITED COMPANY",
+    "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+    "registration_date": "15/08/2021",
+    "enterprise_type": "Micro",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:08.321083Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0077889",
+        "enterprise_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Micro",
+        "registration_date": "15/08/2021",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:08.321083Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCA1234A1Z5",
+        "legal_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "registration_date": "15/08/2021"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:08.321083Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:08.321083Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0012345/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0012345/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:08.321083Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:50:08.321083Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:08.321083Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXHY-UGCH"
+      }
+    }
+  },
+  "BIDDER-SOLARI-PY6M": {
+    "display_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "12/05/2018",
+    "enterprise_type": "Small",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:56.765150Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0054321",
+        "enterprise_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "12/05/2018",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:56.765150Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "24AABCS1003C1Z7",
+        "legal_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "12/05/2018"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:56.765150Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCS1003C",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:56.765150Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "GJ/EPF/TEST/000003",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "GJ/EPF/TEST/000003",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:56.765150Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:50:56.765150Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:50:56.765150Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-SOLARI-PY6M"
+      }
+    }
+  },
+  "BIDDER-SOLARI-HUQ4": {
+    "display_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "12/05/2018",
+    "enterprise_type": "Small",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:51:22.821640Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0054321",
+        "enterprise_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "12/05/2018",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:51:22.821640Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "24AABCS1003C1Z7",
+        "legal_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "12/05/2018"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:51:22.821640Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCS1003C",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:51:22.821640Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "GJ/EPF/TEST/000003",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "GJ/EPF/TEST/000003",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:51:22.821640Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:51:22.821640Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:51:22.821640Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-SOLARI-HUQ4"
+      }
+    }
+  },
+  "BIDDER-SOLARI-LJX3": {
+    "display_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "12/05/2018",
+    "enterprise_type": "Small",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:02.841014Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0054321",
+        "enterprise_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "12/05/2018",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:02.841014Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "24AABCS1003C1Z7",
+        "legal_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "12/05/2018"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:02.841014Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCS1003C",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:02.841014Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "GJ/EPF/TEST/000003",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "GJ/EPF/TEST/000003",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:02.841014Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:52:02.841014Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:02.841014Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-SOLARI-LJX3"
+      }
+    }
+  },
+  "BIDDER-SOLARI-IBFJ": {
+    "display_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "12/05/2018",
+    "enterprise_type": "Small",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:21.191616Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0054321",
+        "enterprise_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "12/05/2018",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:21.191616Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "24AABCS1003C1Z7",
+        "legal_name": "KAVACH TECH SOLUTIONS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "12/05/2018"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:21.191616Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCS1003C",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:21.191616Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "GJ/EPF/TEST/000003",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "GJ/EPF/TEST/000003",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:21.191616Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T21:52:21.191616Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T21:52:21.191616Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-SOLARI-IBFJ"
+      }
+    }
+  },
+  "BIDDER-APEXCY-8IIO": {
+    "display_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "14/08/2019",
+    "enterprise_type": "",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.556345Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0088776",
+        "enterprise_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "14/08/2019",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.556345Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCK9988G1Z3",
+        "legal_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "14/08/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.556345Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCK9988G",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.556345Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.556345Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T22:25:52.556345Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.556345Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXCY-8IIO"
+      }
+    }
+  },
+  "BIDDER-ZENITH-RPI6": {
+    "display_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "14/08/2019",
+    "enterprise_type": "",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.946583Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0088776",
+        "enterprise_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "14/08/2019",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.946583Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCK9988G1Z3",
+        "legal_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "14/08/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.946583Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCK9988G",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.946583Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.946583Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T22:25:52.946583Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:25:52.946583Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ZENITH-RPI6"
+      }
+    }
+  },
+  "BIDDER-APEXHY-Y4JD": {
+    "display_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "PRIVATE LIMITED COMPANY",
+    "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+    "registration_date": "15/08/2021",
+    "enterprise_type": "Micro",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:26:04.708252Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0077889",
+        "enterprise_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Micro",
+        "registration_date": "15/08/2021",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:26:04.708252Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCA1234A1Z5",
+        "legal_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "registration_date": "15/08/2021"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:26:04.708252Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:26:04.708252Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0012345/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0012345/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:26:04.708252Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T22:26:04.708252Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:26:04.708252Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXHY-Y4JD"
+      }
+    }
+  },
+  "BIDDER-APEXCY-EQDC": {
+    "display_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "14/08/2019",
+    "enterprise_type": "",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.365015Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0088776",
+        "enterprise_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "14/08/2019",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.365015Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCK9988G1Z3",
+        "legal_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "14/08/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.365015Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCK9988G",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.365015Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.365015Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T22:36:56.365015Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.365015Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXCY-EQDC"
+      }
+    }
+  },
+  "BIDDER-ZENITH-RW5O": {
+    "display_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "Private Limited Company",
+    "registered_address": "",
+    "registration_date": "14/08/2019",
+    "enterprise_type": "",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.735720Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0088776",
+        "enterprise_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_date": "14/08/2019",
+        "registered_address": "",
+        "business_constitution": "Private Limited Company",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.735720Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCK9988G1Z3",
+        "legal_name": "KAVACH SECURITY SYSTEMS PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "Private Limited Company",
+        "registered_address": "",
+        "registration_date": "14/08/2019"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.735720Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCK9988G",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.735720Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.735720Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T22:36:56.735720Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:36:56.735720Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ZENITH-RW5O"
+      }
+    }
+  },
+  "BIDDER-APEXHY-E2HH": {
+    "display_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "PRIVATE LIMITED COMPANY",
+    "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+    "registration_date": "15/08/2021",
+    "enterprise_type": "Micro",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:37:09.185200Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0077889",
+        "enterprise_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Micro",
+        "registration_date": "15/08/2021",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:37:09.185200Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCA1234A1Z5",
+        "legal_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "registration_date": "15/08/2021"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:37:09.185200Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:37:09.185200Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0012345/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0012345/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:37:09.185200Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T22:37:09.185200Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:37:09.185200Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXHY-E2HH"
+      }
+    }
+  },
+  "BIDDER-APEXHY-O7IZ": {
+    "display_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+    "scenario": "registered_bidder",
+    "business_constitution": "PRIVATE LIMITED COMPANY",
+    "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+    "registration_date": "15/08/2021",
+    "enterprise_type": "Micro",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:46:01.126088Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-12-0077889",
+        "enterprise_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Micro",
+        "registration_date": "15/08/2021",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:46:01.126088Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AABCA1234A1Z5",
+        "legal_name": "ACME SOLAR TECHNOLOGIES PRIVATE LIMITED",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular",
+        "business_constitution": "PRIVATE LIMITED COMPANY",
+        "registered_address": "PLOT 45 INDUSTRIAL AREA ANDHERI EAST MUMBAI MAHARASHTRA 4",
+        "registration_date": "15/08/2021"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:46:01.126088Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:46:01.126088Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0012345/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0012345/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:46:01.126088Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T22:46:01.126088Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T22:46:01.126088Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXHY-O7IZ"
       }
     }
   }

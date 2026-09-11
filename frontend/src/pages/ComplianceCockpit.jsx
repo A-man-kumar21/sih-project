@@ -52,7 +52,7 @@ const DEFAULT_TENDERS = [
 ];
 
 async function api(url, options = {}) {
-  const token = localStorage.getItem("gem_auth_token");
+  const token = localStorage.getItem("gem_token") || localStorage.getItem("gem_auth_token");
   const headers = { ...(options.headers || {}) };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;

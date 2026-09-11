@@ -32,15 +32,15 @@ export default function OfficerDashboard() {
 
       if (metricsRes.ok) {
         const data = await metricsRes.json();
-        setMetrics(data.metrics);
+        setMetrics(data.metrics || {});
       }
 
       if (tendersRes.ok) {
         const data = await tendersRes.json();
-        setTenders(data.tenders);
+        setTenders(data.tenders || []);
       }
     } catch (err) {
-      setError(err.message || "Failed to load dashboard metrics.");
+      setError(err.message || "Failed to load procurement dashboard metrics.");
     } finally {
       setLoading(false);
     }
@@ -50,20 +50,37 @@ export default function OfficerDashboard() {
     loadDashboardData();
   }, []);
 
+  // Time-aware greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  };
+
+  const officerName = user?.full_name?.split(" ")[0] || user?.full_name || "Officer";
+
+  // Application Pipeline calculations
+  const totalApps = metrics.total_applications || 0;
+  const underReviewPct = totalApps > 0 ? ((metrics.under_review / totalApps) * 100).toFixed(0) : 0;
+  const approvedPct = totalApps > 0 ? ((metrics.approved / totalApps) * 100).toFixed(0) : 0;
+  const rejectedPct = totalApps > 0 ? ((metrics.rejected / totalApps) * 100).toFixed(0) : 0;
+  const infoPct = totalApps > 0 ? ((metrics.info_requested / totalApps) * 100).toFixed(0) : 0;
+
   return (
     <div className="dashboard-container">
-      {/* Officer Welcome Header */}
+      {/* Officer Header */}
       <div className="dashboard-header">
         <div>
-          <div className="eyebrow">Procurement Operations Division</div>
-          <h1>Officer Procurement Cockpit</h1>
+          <div className="eyebrow">PROCUREMENT OPERATIONS</div>
+          <h1>{getGreeting()}, {officerName}.</h1>
           <p className="dashboard-subtitle">
-            Welcome, <strong>{user?.full_name}</strong> ({user?.designation}, {user?.department})
+            Your tenders, applications and compliance decisions — in one place.
           </p>
         </div>
         <div className="header-actions">
           <button onClick={() => setShowCreateModal(true)} className="btn-primary">
-            + Create New Tender
+            + Create Tender
           </button>
           <Link to="/compliance-cockpit" className="btn-secondary">
             AI Evaluation Cockpit
@@ -73,56 +90,62 @@ export default function OfficerDashboard() {
 
       {error && <div className="alert-box alert-error">{error}</div>}
 
-      {/* Metrics Cards Grid */}
+      {/* Primary KPI Metrics Cards (Using REAL backend values) */}
       <div className="metrics-grid">
-        <div className="metric-card">
-          <div className="metric-value">{metrics.total_tenders}</div>
+        <div className="metric-card highlight-blue">
+          <div className="metric-value">{metrics.total_tenders || 0}</div>
           <div className="metric-label">Active Tenders</div>
         </div>
 
-        <div className="metric-card highlight-blue">
-          <div className="metric-value">{metrics.total_applications}</div>
-          <div className="metric-label">Total Applications</div>
+        <div className="metric-card">
+          <div className="metric-value">{metrics.total_applications || 0}</div>
+          <div className="metric-label">Applications</div>
         </div>
 
         <div className="metric-card highlight-amber">
-          <div className="metric-value">{metrics.under_review}</div>
+          <div className="metric-value">{metrics.under_review || 0}</div>
           <div className="metric-label">Under Review</div>
         </div>
 
         <div className="metric-card highlight-green">
-          <div className="metric-value">{metrics.approved}</div>
+          <div className="metric-value">{metrics.approved || 0}</div>
           <div className="metric-label">Approved</div>
         </div>
 
         <div className="metric-card highlight-red">
-          <div className="metric-value">{metrics.rejected}</div>
+          <div className="metric-value">{metrics.rejected || 0}</div>
           <div className="metric-label">Rejected</div>
         </div>
 
         <div className="metric-card highlight-purple">
-          <div className="metric-value">{metrics.info_requested}</div>
+          <div className="metric-value">{metrics.info_requested || 0}</div>
           <div className="metric-label">Info Requested</div>
         </div>
       </div>
 
-      {/* Tenders Overview Section */}
+      {/* Recent Tenders Section */}
       <div className="dashboard-section">
         <div className="section-header">
           <div>
-            <h2>Tenders & Application Pipeline</h2>
+            <h2>Recent Tenders</h2>
             <p className="section-subtext">
-              Select a tender below to review submitted bidder applications ranked by compliance score.
+              Active procurement tenders managed by your division.
             </p>
           </div>
+          {tenders.length > 0 && (
+            <Link to="/officer/tenders" className="btn-secondary" style={{ fontSize: "0.82rem", padding: "0.4rem 0.8rem" }}>
+              View All Tenders ({tenders.length}) &rarr;
+            </Link>
+          )}
         </div>
 
         {loading ? (
           <div className="loading-state">Loading tenders pipeline...</div>
         ) : tenders.length === 0 ? (
+          /* Official Empty State for New Officers */
           <div className="empty-state-card">
-            <h3>No Tenders Created Yet</h3>
-            <p>Publish your first procurement tender to start receiving compliant bids.</p>
+            <h3>Your procurement workspace is ready.</h3>
+            <p>Create your first tender to begin managing procurement.</p>
             <button onClick={() => setShowCreateModal(true)} className="btn-primary" style={{ marginTop: "1rem" }}>
               + Create Tender
             </button>
@@ -135,45 +158,46 @@ export default function OfficerDashboard() {
                   <th>Tender Reference</th>
                   <th>Title & Scope</th>
                   <th>Category</th>
-                  <th>Mandatory Checks</th>
-                  <th>Applicants</th>
-                  <th>Status Breakdown</th>
-                  <th>Actions</th>
+                  <th>Applications</th>
+                  <th>Status</th>
+                  <th>Deadline</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {tenders.map((tender) => {
+                {tenders.slice(0, 8).map((tender) => {
                   const summary = tender.applications_summary || { total: 0, under_review: 0, approved: 0, rejected: 0, info_requested: 0 };
+                  const isDeadlinePassed = tender.deadline && new Date(tender.deadline) < new Date();
+                  const statusLabel = isDeadlinePassed ? "Closed" : "Active";
+                  const statusClass = isDeadlinePassed ? "status-rejected" : "status-approved";
+
                   return (
                     <tr key={tender.tender_id}>
                       <td>
                         <strong className="tender-id-badge">{tender.tender_id}</strong>
                       </td>
                       <td>
-                        <div style={{ fontWeight: 600 }}>{tender.title}</div>
-                        <div style={{ fontSize: "0.8rem", color: "#64748b" }}>{tender.description?.slice(0, 70)}...</div>
-                      </td>
-                      <td>
-                        <span className="category-pill">{tender.category}</span>
-                      </td>
-                      <td>
-                        <div className="checks-tags-group">
-                          {tender.mandatory_checks?.map((chk) => (
-                            <span key={chk} className="check-tag">{chk}</span>
-                          ))}
+                        <div style={{ fontWeight: 600, color: "#0f172a" }}>{tender.title}</div>
+                        <div style={{ fontSize: "0.8rem", color: "#64748b", marginTop: "0.15rem" }}>
+                          {tender.description ? (tender.description.length > 65 ? `${tender.description.slice(0, 65)}...` : tender.description) : "No description provided"}
                         </div>
                       </td>
                       <td>
-                        <strong style={{ fontSize: "1.05rem" }}>{summary.total}</strong>
+                        <span className="category-pill">{tender.category || "Goods"}</span>
                       </td>
                       <td>
-                        <div className="status-mini-breakdown">
-                          {summary.under_review > 0 && <span className="badge status-submitted">{summary.under_review} Review</span>}
-                          {summary.approved > 0 && <span className="badge status-approved">{summary.approved} Apprv</span>}
-                          {summary.rejected > 0 && <span className="badge status-rejected">{summary.rejected} Rej</span>}
-                          {summary.info_requested > 0 && <span className="badge status-info_requested">{summary.info_requested} Info</span>}
-                          {summary.total === 0 && <span style={{ color: "#94a3b8", fontSize: "0.85rem" }}>No bids yet</span>}
-                        </div>
+                        <strong style={{ fontSize: "1rem", color: "#0f172a" }}>{summary.total}</strong>
+                        <span style={{ fontSize: "0.75rem", color: "#64748b", marginLeft: "0.3rem" }}>bids</span>
+                      </td>
+                      <td>
+                        <span className={`badge ${statusClass}`}>
+                          {statusLabel}
+                        </span>
+                      </td>
+                      <td>
+                        <span style={{ fontSize: "0.82rem", color: "#475569" }}>
+                          {tender.deadline ? new Date(tender.deadline).toLocaleDateString() : "Open"}
+                        </span>
                       </td>
                       <td>
                         <button
@@ -192,6 +216,64 @@ export default function OfficerDashboard() {
         )}
       </div>
 
+      {/* Application Pipeline Visual Summary (Real Backend Data) */}
+      {totalApps > 0 && (
+        <div className="dashboard-section">
+          <div className="section-header">
+            <div>
+              <h2>Application Pipeline</h2>
+              <p className="section-subtext">
+                Live compliance status distribution across {totalApps} total submitted bidder application{totalApps === 1 ? "" : "s"}.
+              </p>
+            </div>
+          </div>
+
+          {/* Segmented Pipeline Bar */}
+          <div style={{ width: "100%", height: "10px", backgroundColor: "#e2e8f0", borderRadius: "99px", display: "flex", overflow: "hidden", marginBottom: "1.25rem" }}>
+            {metrics.approved > 0 && (
+              <div style={{ width: `${approvedPct}%`, backgroundColor: "#059669" }} title={`Approved: ${metrics.approved}`} />
+            )}
+            {metrics.under_review > 0 && (
+              <div style={{ width: `${underReviewPct}%`, backgroundColor: "#d97706" }} title={`Under Review: ${metrics.under_review}`} />
+            )}
+            {metrics.info_requested > 0 && (
+              <div style={{ width: `${infoPct}%`, backgroundColor: "#7c3aed" }} title={`Info Requested: ${metrics.info_requested}`} />
+            )}
+            {metrics.rejected > 0 && (
+              <div style={{ width: `${rejectedPct}%`, backgroundColor: "#dc2626" }} title={`Rejected: ${metrics.rejected}`} />
+            )}
+          </div>
+
+          {/* Pipeline Stage Cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
+            <div style={{ padding: "0.85rem 1rem", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "8px" }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#166534", textTransform: "uppercase" }}>Approved</div>
+              <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "#15803d", marginTop: "0.2rem" }}>{metrics.approved}</div>
+              <div style={{ fontSize: "0.75rem", color: "#166534" }}>{approvedPct}% of total bids</div>
+            </div>
+
+            <div style={{ padding: "0.85rem 1rem", backgroundColor: "#fffbeb", border: "1px solid #fde68a", borderRadius: "8px" }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#92400e", textTransform: "uppercase" }}>Under Review</div>
+              <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "#b45309", marginTop: "0.2rem" }}>{metrics.under_review}</div>
+              <div style={{ fontSize: "0.75rem", color: "#92400e" }}>{underReviewPct}% awaiting decision</div>
+            </div>
+
+            <div style={{ padding: "0.85rem 1rem", backgroundColor: "#f5f3ff", border: "1px solid #ddd6fe", borderRadius: "8px" }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#5b21b6", textTransform: "uppercase" }}>Clarifications</div>
+              <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "#6d28d9", marginTop: "0.2rem" }}>{metrics.info_requested}</div>
+              <div style={{ fontSize: "0.75rem", color: "#5b21b6" }}>{infoPct}% info requested</div>
+            </div>
+
+            <div style={{ padding: "0.85rem 1rem", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px" }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#991b1b", textTransform: "uppercase" }}>Rejected</div>
+              <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "#b91c1c", marginTop: "0.2rem" }}>{metrics.rejected}</div>
+              <div style={{ fontSize: "0.75rem", color: "#991b1b" }}>{rejectedPct}% non-compliant</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Dialog for Tender Creation */}
       <CreateTenderModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}

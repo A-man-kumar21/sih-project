@@ -171,6 +171,10 @@ export default function App() {
                 }
               />
               <Route
+                path="/bidder/vault"
+                element={<Navigate to="/bidder/documents" replace />}
+              />
+              <Route
                 path="/bidder/profile"
                 element={
                   <ProtectedRoute allowedRoles={["bidder"]}>

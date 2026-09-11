@@ -614,5 +614,277 @@
     ],
     "description": "Procurement of high efficiency solar PV modules for government buildings",
     "created_at": "2026-09-11T21:37:21.104946Z"
+  },
+  "TENDER-A-1789163390501": {
+    "tender_id": "TENDER-A-1789163390501",
+    "title": "Secure Server Infrastructure Tender A",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T21:49:51.180324Z"
+  },
+  "TENDER-B-1789163390501": {
+    "tender_id": "TENDER-B-1789163390501",
+    "title": "Office Stationery Supplies Tender B",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T21:49:51.265393Z"
+  },
+  "TENDER-A1-1789163397843": {
+    "tender_id": "TENDER-A1-1789163397843",
+    "title": "Officer A High-Performance Computing Cluster",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Procurement of specialized supercomputing GPU cluster nodes",
+    "created_at": "2026-09-11T21:49:58.327177Z"
+  },
+  "TENDER-B1-1789163397843": {
+    "tender_id": "TENDER-B1-1789163397843",
+    "title": "Officer B Drone Surveillance Equipment",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "blacklist"
+    ],
+    "description": "Procurement of aerial UAV surveillance equipment for border defense",
+    "created_at": "2026-09-11T21:49:58.419051Z"
+  },
+  "TENDER-C1-1789163397843": {
+    "tender_id": "TENDER-C1-1789163397843",
+    "title": "Officer C Clean Energy Solar Grid",
+    "category": "Works",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn"
+    ],
+    "description": "Installation and verification of solar PV grid infrastructure",
+    "created_at": "2026-09-11T21:50:00.172704Z"
+  },
+  "TENDER-SOLAR-1789163455284": {
+    "tender_id": "TENDER-SOLAR-1789163455284",
+    "title": "Grid Interactive Solar Inverters Procurement",
+    "category": "Goods",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it",
+      "epfo_esic",
+      "digilocker",
+      "blacklist"
+    ],
+    "description": "Custom tender requiring: udyam, gstn, pan_it, epfo_esic, digilocker, blacklist",
+    "created_at": "2026-09-11T21:50:55.777427Z"
+  },
+  "TENDER-SOLAR-1789163481286": {
+    "tender_id": "TENDER-SOLAR-1789163481286",
+    "title": "Grid Interactive Solar Inverters Procurement",
+    "category": "Goods",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it",
+      "epfo_esic",
+      "digilocker",
+      "blacklist"
+    ],
+    "description": "Custom tender requiring: udyam, gstn, pan_it, epfo_esic, digilocker, blacklist",
+    "created_at": "2026-09-11T21:51:21.730377Z"
+  },
+  "TENDER-SOLAR-1789163521367": {
+    "tender_id": "TENDER-SOLAR-1789163521367",
+    "title": "Grid Interactive Solar Inverters Procurement",
+    "category": "Goods",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it",
+      "epfo_esic",
+      "digilocker",
+      "blacklist"
+    ],
+    "description": "Custom tender requiring: udyam, gstn, pan_it, epfo_esic, digilocker, blacklist",
+    "created_at": "2026-09-11T21:52:01.867388Z"
+  },
+  "TENDER-SOLAR-1789163538372": {
+    "tender_id": "TENDER-SOLAR-1789163538372",
+    "title": "Grid Interactive Solar Inverters Procurement",
+    "category": "Goods",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it",
+      "epfo_esic",
+      "digilocker",
+      "blacklist"
+    ],
+    "description": "Custom tender requiring: udyam, gstn, pan_it, epfo_esic, digilocker, blacklist",
+    "created_at": "2026-09-11T21:52:18.805975Z"
+  },
+  "TENDER-A-1789165549585": {
+    "tender_id": "TENDER-A-1789165549585",
+    "title": "Secure Server Infrastructure Tender A",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T22:25:50.139409Z"
+  },
+  "TENDER-B-1789165549585": {
+    "tender_id": "TENDER-B-1789165549585",
+    "title": "Office Stationery Supplies Tender B",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T22:25:50.233173Z"
+  },
+  "TENDER-A1-1789165555788": {
+    "tender_id": "TENDER-A1-1789165555788",
+    "title": "Officer A High-Performance Computing Cluster",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Procurement of specialized supercomputing GPU cluster nodes",
+    "created_at": "2026-09-11T22:25:56.224765Z"
+  },
+  "TENDER-B1-1789165555788": {
+    "tender_id": "TENDER-B1-1789165555788",
+    "title": "Officer B Drone Surveillance Equipment",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "blacklist"
+    ],
+    "description": "Procurement of aerial UAV surveillance equipment for border defense",
+    "created_at": "2026-09-11T22:25:56.310576Z"
+  },
+  "TENDER-C1-1789165555788": {
+    "tender_id": "TENDER-C1-1789165555788",
+    "title": "Officer C Clean Energy Solar Grid",
+    "category": "Works",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn"
+    ],
+    "description": "Installation and verification of solar PV grid infrastructure",
+    "created_at": "2026-09-11T22:25:58.041254Z"
+  },
+  "TENDER-A-1789166213435": {
+    "tender_id": "TENDER-A-1789166213435",
+    "title": "Secure Server Infrastructure Tender A",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T22:36:53.983430Z"
+  },
+  "TENDER-B-1789166213435": {
+    "tender_id": "TENDER-B-1789166213435",
+    "title": "Office Stationery Supplies Tender B",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T22:36:54.065202Z"
+  },
+  "TENDER-A1-1789166220881": {
+    "tender_id": "TENDER-A1-1789166220881",
+    "title": "Officer A High-Performance Computing Cluster",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Procurement of specialized supercomputing GPU cluster nodes",
+    "created_at": "2026-09-11T22:37:01.254118Z"
+  },
+  "TENDER-B1-1789166220881": {
+    "tender_id": "TENDER-B1-1789166220881",
+    "title": "Officer B Drone Surveillance Equipment",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "blacklist"
+    ],
+    "description": "Procurement of aerial UAV surveillance equipment for border defense",
+    "created_at": "2026-09-11T22:37:01.337756Z"
+  },
+  "TENDER-C1-1789166220881": {
+    "tender_id": "TENDER-C1-1789166220881",
+    "title": "Officer C Clean Energy Solar Grid",
+    "category": "Works",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn"
+    ],
+    "description": "Installation and verification of solar PV grid infrastructure",
+    "created_at": "2026-09-11T22:37:02.991914Z"
+  },
+  "TENDER-A1-1789166752731": {
+    "tender_id": "TENDER-A1-1789166752731",
+    "title": "Officer A High-Performance Computing Cluster",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Procurement of specialized supercomputing GPU cluster nodes",
+    "created_at": "2026-09-11T22:45:53.116405Z"
+  },
+  "TENDER-B1-1789166752731": {
+    "tender_id": "TENDER-B1-1789166752731",
+    "title": "Officer B Drone Surveillance Equipment",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "blacklist"
+    ],
+    "description": "Procurement of aerial UAV surveillance equipment for border defense",
+    "created_at": "2026-09-11T22:45:53.197475Z"
+  },
+  "TENDER-C1-1789166752731": {
+    "tender_id": "TENDER-C1-1789166752731",
+    "title": "Officer C Clean Energy Solar Grid",
+    "category": "Works",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn"
+    ],
+    "description": "Installation and verification of solar PV grid infrastructure",
+    "created_at": "2026-09-11T22:45:54.849414Z"
   }
 }
