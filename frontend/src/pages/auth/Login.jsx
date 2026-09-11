@@ -40,10 +40,10 @@ export default function Login() {
     <div className="auth-page-container">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-emblem">GeM</div>
-          <h2>Sign In to GeM Compliance Portal</h2>
+          <div className="auth-emblem">BidSetu</div>
+          <h2>Sign In to BidSetu</h2>
           <p className="auth-subtext">
-            Integrated Bid Compliance Verification & Governance System
+            AI-Powered Bid Compliance Verification & Governance System
           </p>
         </div>
 

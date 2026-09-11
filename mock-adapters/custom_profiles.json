@@ -774,47 +774,47 @@
     "scenario": "registered_bidder",
     "udyam": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:14:18.197660Z",
+      "last_updated": "2026-09-11T18:14:14.030931Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-RAHULI-H233",
         "registry_match": false,
-        "provided_value": ""
+        "provided_value": "TXDH876"
       }
     },
     "gstn": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:14:18.197660Z",
+      "last_updated": "2026-09-11T18:14:14.030931Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-RAHULI-H233",
         "registry_match": false,
-        "provided_value": ""
+        "provided_value": "254UDR855"
       }
     },
     "pan_it": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:14:18.197660Z",
+      "last_updated": "2026-09-11T18:14:14.030931Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-RAHULI-H233",
         "registry_match": false,
-        "provided_value": ""
+        "provided_value": "HGF568TFFC"
       }
     },
     "epfo_esic": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:14:18.197660Z",
+      "last_updated": "2026-09-11T18:14:14.030931Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-RAHULI-H233",
         "registry_match": false,
-        "provided_value": ""
+        "provided_value": "fht876"
       }
     },
     "digilocker": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:14:18.197660Z",
+      "last_updated": "2026-09-11T18:14:14.030931Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-RAHULI-H233",
@@ -824,7 +824,7 @@
     },
     "blacklist": {
       "status": "not_found",
-      "last_updated": "2026-09-11T16:14:18.197660Z",
+      "last_updated": "2026-09-11T18:14:14.030931Z",
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-RAHULI-H233",
@@ -1350,6 +1350,736 @@
       "confidence": 0.0,
       "raw_fields": {
         "bidder_id": "BIDDER-DEFECT-X77B",
+        "registry_match": false,
+        "reason": "Cannot query debarment registry for unanchored/unregistered entity"
+      }
+    }
+  },
+  "BIDDER-APEXCY-0FI8": {
+    "display_name": "Apex Cyber Security Pvt Ltd",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:43.600014Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-DL-05-0012345",
+        "enterprise_name": "Apex Cyber Security Pvt Ltd",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:43.600014Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "07AABCA1234A1Z5",
+        "legal_name": "Apex Cyber Security Pvt Ltd",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:43.600014Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:43.600014Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "DLCPM1234567000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "DLCPM1234567000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:43.600014Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:02:43.600014Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:43.600014Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXCY-0FI8"
+      }
+    }
+  },
+  "BIDDER-ZENITH-MUEO": {
+    "display_name": "Zenith Supplies LLP",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:45.575215Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-19-0087654",
+        "enterprise_name": "Zenith Supplies LLP",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:45.575215Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AACFB5678K1Z2",
+        "legal_name": "Zenith Supplies LLP",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:45.575215Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AACFB5678K",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:45.575215Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:45.575215Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:02:45.575215Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:02:45.575215Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ZENITH-MUEO"
+      }
+    }
+  },
+  "BIDDER-APEXCY-H5L3": {
+    "display_name": "Apex Cyber Security Pvt Ltd",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:04:47.509071Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-DL-05-0012345",
+        "enterprise_name": "Apex Cyber Security Pvt Ltd",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:04:47.509071Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "07AABCA1234A1Z5",
+        "legal_name": "Apex Cyber Security Pvt Ltd",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:04:47.509071Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:04:47.509071Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "DLCPM1234567000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "DLCPM1234567000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:04:47.509071Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:04:47.509071Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:04:47.509071Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXCY-H5L3"
+      }
+    }
+  },
+  "BIDDER-ZENITH-GS2J": {
+    "display_name": "Zenith Supplies LLP",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:05:03.890509Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-19-0087654",
+        "enterprise_name": "Zenith Supplies LLP",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:05:03.890509Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AACFB5678K1Z2",
+        "legal_name": "Zenith Supplies LLP",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:05:03.890509Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AACFB5678K",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:05:03.890509Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:05:03.890509Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:05:03.890509Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:05:03.890509Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ZENITH-GS2J"
+      }
+    }
+  },
+  "BIDDER-APEXCY-QGFL": {
+    "display_name": "Apex Cyber Security Pvt Ltd",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:31.735462Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-DL-05-0012345",
+        "enterprise_name": "Apex Cyber Security Pvt Ltd",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:31.735462Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "07AABCA1234A1Z5",
+        "legal_name": "Apex Cyber Security Pvt Ltd",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:31.735462Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:31.735462Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "DLCPM1234567000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "DLCPM1234567000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:31.735462Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:07:31.735462Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:31.735462Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXCY-QGFL"
+      }
+    }
+  },
+  "BIDDER-ZENITH-1P83": {
+    "display_name": "Zenith Supplies LLP",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:34.755220Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-19-0087654",
+        "enterprise_name": "Zenith Supplies LLP",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:34.755220Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AACFB5678K1Z2",
+        "legal_name": "Zenith Supplies LLP",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:34.755220Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AACFB5678K",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:34.755220Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:34.755220Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:07:34.755220Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:07:34.755220Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ZENITH-1P83"
+      }
+    }
+  },
+  "BIDDER-APEXCY-WO66": {
+    "display_name": "Apex Cyber Security Pvt Ltd",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:08:59.761547Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-DL-05-0012345",
+        "enterprise_name": "Apex Cyber Security Pvt Ltd",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:08:59.761547Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "07AABCA1234A1Z5",
+        "legal_name": "Apex Cyber Security Pvt Ltd",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:08:59.761547Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:08:59.761547Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "DLCPM1234567000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "DLCPM1234567000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:08:59.761547Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:08:59.761547Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:08:59.761547Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-APEXCY-WO66"
+      }
+    }
+  },
+  "BIDDER-ZENITH-9ZFE": {
+    "display_name": "Zenith Supplies LLP",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:02.384398Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-MH-19-0087654",
+        "enterprise_name": "Zenith Supplies LLP",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:02.384398Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "27AACFB5678K1Z2",
+        "legal_name": "Zenith Supplies LLP",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:02.384398Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AACFB5678K",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:02.384398Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "MH/BAN/0088776/000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "MH/BAN/0088776/000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:02.384398Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:09:02.384398Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:02.384398Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-ZENITH-9ZFE"
+      }
+    }
+  },
+  "BIDDER-KAVACH-RVU3": {
+    "display_name": "Kavach Cyber Solutions LLP",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:53.145024Z",
+      "confidence": 0.98,
+      "raw_fields": {
+        "udyam_registration_number": "UDYAM-DL-05-0012345",
+        "enterprise_name": "Kavach Cyber Solutions LLP",
+        "registration_valid_until": "2029-03-31",
+        "enterprise_category": "Small",
+        "registration_active": true
+      }
+    },
+    "gstn": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:53.145024Z",
+      "confidence": 0.99,
+      "raw_fields": {
+        "gstin": "07AABCA1234A1Z5",
+        "legal_name": "Kavach Cyber Solutions LLP",
+        "registration_status": "Active",
+        "latest_return_period": "2026-07",
+        "latest_return_filed": true,
+        "filing_status": "Regular"
+      }
+    },
+    "pan_it": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:53.145024Z",
+      "confidence": 0.97,
+      "raw_fields": {
+        "pan": "AABCA1234A",
+        "pan_status": "Active",
+        "name_match": true,
+        "income_tax_return_assessment_year": "2025-26",
+        "income_tax_return_filed": true
+      }
+    },
+    "epfo_esic": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:53.145024Z",
+      "confidence": 0.95,
+      "raw_fields": {
+        "epfo_establishment_id": "DLCPM1234567000",
+        "epfo_contribution_status": "Paid",
+        "esic_employer_code": "DLCPM1234567000",
+        "esic_contribution_status": "Paid",
+        "latest_contribution_period": "2026-07"
+      }
+    },
+    "digilocker": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:53.145024Z",
+      "confidence": 0.96,
+      "raw_fields": {
+        "consent_status": "Granted",
+        "identity_document_verified": true,
+        "authorized_signatory_verified": true,
+        "credential_issued_at": "2026-09-11T18:09:53.145024Z"
+      }
+    },
+    "blacklist": {
+      "status": "compliant",
+      "last_updated": "2026-09-11T18:09:53.145024Z",
+      "confidence": 0.93,
+      "raw_fields": {
+        "registry_match": false,
+        "debarment_status": "Not listed",
+        "registry_search_reference": "BLR-REG-BIDDER-KAVACH-RVU3"
+      }
+    }
+  },
+  "BIDDER-DEFECT-KYL5": {
+    "display_name": "Defective Supply Corp",
+    "scenario": "registered_bidder",
+    "udyam": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T18:09:56.022322Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-KYL5",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "gstn": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T18:09:56.022322Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-KYL5",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "pan_it": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T18:09:56.022322Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-KYL5",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "epfo_esic": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T18:09:56.022322Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-KYL5",
+        "registry_match": false,
+        "provided_value": ""
+      }
+    },
+    "digilocker": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T18:09:56.022322Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-KYL5",
+        "registry_match": false,
+        "reason": "No valid PAN or GSTIN to anchor document verification"
+      }
+    },
+    "blacklist": {
+      "status": "not_found",
+      "last_updated": "2026-09-11T18:09:56.022322Z",
+      "confidence": 0.0,
+      "raw_fields": {
+        "bidder_id": "BIDDER-DEFECT-KYL5",
         "registry_match": false,
         "reason": "Cannot query debarment registry for unanchored/unregistered entity"
       }

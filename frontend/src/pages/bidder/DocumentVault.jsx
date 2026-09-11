@@ -74,7 +74,7 @@ export default function DocumentVault() {
 
       setSuccess(data.message || "Document uploaded successfully to your vault.");
       if (data.document?.extracted_data) {
-        setExtractedInfo(data.document.extracted_data);
+        setExtractedInfo(data.document.extracted_data.extracted || data.document.extracted_data);
       }
       setSelectedFile(null);
       // Reset file input
@@ -86,6 +86,43 @@ export default function DocumentVault() {
       setError(err.message);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleView = async (doc) => {
+    try {
+      const res = await authFetch(`/api/documents/${doc.id}/view`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to view document.");
+      }
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      window.open(objectUrl, "_blank");
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleDownload = async (doc) => {
+    try {
+      const res = await authFetch(`/api/documents/${doc.id}/download`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to download document.");
+      }
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = doc.original_name || doc.file_name || "document.pdf";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -235,16 +272,23 @@ export default function DocumentVault() {
                     </td>
                     <td>
                       <div style={{ display: "flex", gap: "0.5rem" }}>
-                        <a
-                          href={`/api/documents/${doc.id}/view`}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          type="button"
+                          onClick={() => handleView(doc)}
                           className="btn-action-view"
-                          style={{ textDecoration: "none" }}
                         >
                           View
-                        </a>
+                        </button>
                         <button
+                          type="button"
+                          onClick={() => handleDownload(doc)}
+                          className="btn-secondary"
+                          style={{ padding: "0.3rem 0.6rem", fontSize: "0.8rem" }}
+                        >
+                          Download
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => handleDelete(doc.id, doc.document_label)}
                           className="btn-reject"
                           style={{ padding: "0.3rem 0.6rem", fontSize: "0.8rem" }}

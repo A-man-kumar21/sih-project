@@ -227,69 +227,57 @@ app.delete("/api/tenders/:tenderId", async (request, response, next) => {
 
 app.get("/api/overview", async (request, response, next) => {
   try {
-    const tenderId = request.query.tender_id || "TENDER-ALL-MANDATORY";
+    const rawId = request.query.tender_id || "TENDER-ALL-MANDATORY";
+    const tenderId = decodeURIComponent(rawId).trim();
 
-    // 1. Fetch all active bidders
-    const biddersRes = await fetch(`${ENGINE_URL}/bidders`);
-    const biddersList = await biddersRes.json();
-
-    // 2. Fetch tender details
+    // 1. Fetch tender details
     const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
     const tendersList = await tendersRes.json();
-    const activeTender = tendersList.find((t) => t.tender_id === tenderId) || tendersList[0];
-    const requiredChecks = activeTender ? activeTender.mandatory_checks : ["udyam", "gstn", "pan_it", "epfo_esic", "digilocker", "blacklist"];
+    const activeTender = tendersList.find((t) => t.tender_id === tenderId);
+    const targetTenderId = tenderId;
 
-    const audit = await getAuditCollection();
+    // 2. Fetch ONLY actual applications submitted for this specific tender
+    const applications = await getApplicationsCollection();
+    const apps = await applications
+      .find({ tender_id: targetTenderId })
+      .sort({ compliance_score: -1, applied_at: 1 })
+      .toArray();
 
-    // 3. Evaluate each bidder against the active tender and match with latest Mongo decision
-    const bidderCards = await Promise.all(
-      biddersList.map(async (b) => {
-        try {
-          const evalRes = await fetch(`${ENGINE_URL}/verify-compliance`, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              bidder_id: b.bidder_id,
-              tender_id: activeTender?.tender_id,
-              required_checks: requiredChecks,
-            }),
-          });
-          const evalData = await evalRes.json();
+    // 3. Map each application to an applicant overview card
+    const bidderCards = apps.map((app) => ({
+      bidder_id: app.bidder_id,
+      display_name: app.company_name || app.bidder_id,
+      company_name: app.company_name,
+      contact_person: app.contact_person,
+      email: app.email,
+      phone: app.phone,
+      compliance_score: app.compliance_score ?? 0,
+      risk_level: app.risk_level ?? "Unknown",
+      officer_decision:
+        app.status === "approved"
+          ? "approve"
+          : app.status === "rejected"
+          ? "reject"
+          : app.status === "info_requested"
+          ? "request_more_info"
+          : null,
+      officer_id: app.officer_id || null,
+      last_evaluated: app.decided_at || app.applied_at,
+      application_id: app._id.toString(),
+      status: app.status,
+      applied_at: app.applied_at,
+      checks: app.checks || [],
+      submitted_documents: app.submitted_documents || [],
+      llm_briefing: app.llm_briefing || null,
+      checks_summary: {
+        total: app.checks?.length || 0,
+        mandatory: app.checks?.filter((c) => c.is_mandatory).length || 0,
+        compliant_mandatory:
+          app.checks?.filter((c) => c.is_mandatory && c.status === "compliant").length || 0,
+      },
+    }));
 
-          // Query MongoDB for the latest decision for this bidder
-          const latestAudit = await audit.findOne(
-            { bidder_id: b.bidder_id },
-            { sort: { timestamp: -1 } }
-          );
-
-          return {
-            bidder_id: b.bidder_id,
-            display_name: b.display_name,
-            compliance_score: evalData.compliance_score ?? 0,
-            risk_level: evalData.risk_level ?? "Unknown",
-            officer_decision: latestAudit?.officer_decision || null,
-            officer_id: latestAudit?.officer_id || null,
-            last_evaluated: latestAudit?.timestamp || evalData.audit_log_entry?.timestamp,
-            checks_summary: {
-              total: evalData.checks?.length || 6,
-              mandatory: evalData.checks?.filter((c) => c.is_mandatory).length || 0,
-              compliant_mandatory: evalData.checks?.filter((c) => c.is_mandatory && c.status === "compliant").length || 0,
-            },
-          };
-        } catch (e) {
-          return {
-            bidder_id: b.bidder_id,
-            display_name: b.display_name,
-            compliance_score: 0,
-            risk_level: "Error",
-            officer_decision: null,
-            officer_id: null,
-          };
-        }
-      })
-    );
-
-    // 4. Calculate aggregates
+    // 4. Calculate aggregates strictly for this tender's applicants
     const totalBidders = bidderCards.length;
     const lowRiskCount = bidderCards.filter((b) => b.risk_level === "Low").length;
     const mediumRiskCount = bidderCards.filter((b) => b.risk_level === "Medium").length;
@@ -298,9 +286,9 @@ app.get("/api/overview", async (request, response, next) => {
     const decidedCount = bidderCards.filter((b) => Boolean(b.officer_decision)).length;
 
     return response.json({
-      tender_id: activeTender?.tender_id,
-      tender_title: activeTender?.title,
-      tender_category: activeTender?.category,
+      tender_id: targetTenderId,
+      tender_title: activeTender?.title || targetTenderId,
+      tender_category: activeTender?.category || "General",
       aggregates: {
         total_bidders: totalBidders,
         low_risk: lowRiskCount,

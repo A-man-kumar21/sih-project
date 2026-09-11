@@ -272,20 +272,22 @@ router.post(
             const currentStat = user?.statutory || {};
             let hasStatUpdate = false;
 
-            if (extractJson.pan && !currentStat.pan) {
-              currentStat.pan = extractJson.pan;
+            const ext = extractJson.extracted || extractJson;
+
+            if (ext.pan && !currentStat.pan) {
+              currentStat.pan = ext.pan.trim().toUpperCase();
               hasStatUpdate = true;
             }
-            if (extractJson.gstin && !currentStat.gstin) {
-              currentStat.gstin = extractJson.gstin;
+            if (ext.gstin && !currentStat.gstin) {
+              currentStat.gstin = ext.gstin.trim().toUpperCase();
               hasStatUpdate = true;
             }
-            if (extractJson.udyam_number && !currentStat.udyam_number) {
-              currentStat.udyam_number = extractJson.udyam_number;
+            if (ext.udyam_number && !currentStat.udyam_number) {
+              currentStat.udyam_number = ext.udyam_number.trim().toUpperCase();
               hasStatUpdate = true;
             }
-            if (extractJson.epfo_esic_number && !currentStat.epfo_esic_number) {
-              currentStat.epfo_esic_number = extractJson.epfo_esic_number;
+            if (ext.epfo_esic_number && !currentStat.epfo_esic_number) {
+              currentStat.epfo_esic_number = ext.epfo_esic_number.trim().toUpperCase();
               hasStatUpdate = true;
             }
 
@@ -591,6 +593,60 @@ export const applyForTender = async (request, response, next) => {
         error: "Application blocked: Missing mandatory compliance document(s).",
         missing_documents: missingDocs,
       });
+    }
+
+    // Ensure bidder's statutory credentials from profile and vault documents are synchronized to AI Engine
+    const users = await getUsersCollection();
+    const currentUser = await users.findOne({ _id: new ObjectId(request.user.id) });
+    const currentStat = currentUser?.statutory || {};
+    let statUpdated = false;
+
+    // Check myDocs for any extracted credentials not yet on currentStat
+    for (const d of myDocs) {
+      const ext = d.extracted_data?.extracted || d.extracted_data;
+      if (ext) {
+        if (!currentStat.pan && ext.pan) {
+          currentStat.pan = ext.pan.trim().toUpperCase();
+          statUpdated = true;
+        }
+        if (!currentStat.gstin && ext.gstin) {
+          currentStat.gstin = ext.gstin.trim().toUpperCase();
+          statUpdated = true;
+        }
+        if (!currentStat.udyam_number && ext.udyam_number) {
+          currentStat.udyam_number = ext.udyam_number.trim().toUpperCase();
+          statUpdated = true;
+        }
+        if (!currentStat.epfo_esic_number && ext.epfo_esic_number) {
+          currentStat.epfo_esic_number = ext.epfo_esic_number.trim().toUpperCase();
+          statUpdated = true;
+        }
+      }
+    }
+
+    if (statUpdated) {
+      await users.updateOne(
+        { _id: new ObjectId(request.user.id) },
+        { $set: { statutory: currentStat, updated_at: new Date() } }
+      );
+    }
+
+    // Always sync latest statutory credentials with AI Engine before running verification
+    try {
+      await fetch(`${ENGINE_URL}/bidders`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          bidder_id: request.user.bidder_id,
+          company_name: currentUser?.company_name || request.user.company_name,
+          udyam_number: currentStat.udyam_number || "",
+          gstin: currentStat.gstin || "",
+          pan: currentStat.pan || "",
+          epfo_esic_number: currentStat.epfo_esic_number || "",
+        }),
+      });
+    } catch (e) {
+      console.warn("Notice: AI Engine profile sync before verification:", e.message);
     }
 
     // 4. Trigger AI Engine deterministic compliance verification for THIS tender

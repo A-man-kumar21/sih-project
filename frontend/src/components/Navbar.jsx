@@ -23,10 +23,10 @@ export default function Navbar() {
       <nav className="gem-main-nav">
         <div className="nav-brand-section">
           <Link to="/" className="brand-link">
-            <div className="gem-logo-badge">GeM</div>
+            <div className="gem-logo-badge">BidSetu</div>
             <div className="brand-text-block">
-              <span className="brand-title">GeM Compliance Platform</span>
-              <span className="brand-subtitle">Government e-Marketplace | SIH 2026</span>
+              <span className="brand-title">BidSetu</span>
+              <span className="brand-subtitle">AI-Powered Bid Compliance Verification Platform</span>
             </div>
           </Link>
         </div>
@@ -130,11 +130,7 @@ export default function Navbar() {
                 Sign Out
               </button>
             </div>
-          ) : (
-            <Link to="/login" className="btn-login-cta">
-              Sign In
-            </Link>
-          )}
+          ) : null}
         </div>
       </nav>
     </header>

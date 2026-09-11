@@ -32,7 +32,7 @@ function RootRedirect() {
     return (
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "60vh" }}>
         <div style={{ textAlign: "center", color: "#5d6e86", fontWeight: 600 }}>
-          Initializing GeM Platform...
+          Initializing BidSetu Platform...
         </div>
       </div>
     );

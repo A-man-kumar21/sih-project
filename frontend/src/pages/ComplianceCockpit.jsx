@@ -61,9 +61,9 @@ const Status = ({ value }) => <span className={`badge status-${value}`}>{value?.
 
 export default function ComplianceCockpit() {
   const [currentView, setCurrentView] = useState("detail"); // "overview" | "detail"
-  const [bidders, setBidders] = useState(DEFAULT_BIDDERS);
+  const [bidders, setBidders] = useState([]);
   const [tenders, setTenders] = useState(DEFAULT_TENDERS);
-  const [selectedBidderId, setSelectedBidderId] = useState("BIDDER-ALPHA");
+  const [selectedBidderId, setSelectedBidderId] = useState("");
   const [selectedTenderId, setSelectedTenderId] = useState("TENDER-ALL-MANDATORY");
   const [assessment, setAssessment] = useState(null);
   const [trail, setTrail] = useState([]);
@@ -118,14 +118,18 @@ export default function ComplianceCockpit() {
     return bidders.find((b) => b.bidder_id === selectedBidderId) || bidders[0];
   }, [bidders, selectedBidderId]);
 
-  // Load Overview Data from backend
+  // Load Overview Data from backend and update applicants for the active tender
   async function loadOverview(tenderId = selectedTenderId) {
     try {
       setLoadingOverview(true);
-      const data = await api(`/api/overview?tender_id=${tenderId}`);
+      const data = await api(`/api/overview?tender_id=${encodeURIComponent(tenderId)}`);
       setOverviewData(data);
+      const tenderApplicants = data.bidders || [];
+      setBidders(tenderApplicants);
+      return tenderApplicants;
     } catch (err) {
       console.warn("Could not load overview:", err.message);
+      return [];
     } finally {
       setLoadingOverview(false);
     }
@@ -179,22 +183,11 @@ export default function ComplianceCockpit() {
   useEffect(() => {
     async function init() {
       try {
-        let loadedBidders = DEFAULT_BIDDERS;
         let loadedTenders = DEFAULT_TENDERS;
 
         try {
-          const remoteBidders = await api("/api/bidders");
-          if (Array.isArray(remoteBidders)) {
-            loadedBidders = remoteBidders;
-            setBidders(remoteBidders);
-          }
-        } catch (e) {
-          console.warn("Using fallback bidders:", e.message);
-        }
-
-        try {
           const remoteTenders = await api("/api/tenders");
-          if (Array.isArray(remoteTenders)) {
+          if (Array.isArray(remoteTenders) && remoteTenders.length > 0) {
             loadedTenders = remoteTenders;
             setTenders(remoteTenders);
           }
@@ -202,17 +195,19 @@ export default function ComplianceCockpit() {
           console.warn("Using fallback tenders:", e.message);
         }
 
-        const initialBidderId = loadedBidders[0]?.bidder_id || "";
         const initialTenderId = loadedTenders[0]?.tender_id || "TENDER-ALL-MANDATORY";
-        setSelectedBidderId(initialBidderId);
         setSelectedTenderId(initialTenderId);
 
-        if (initialBidderId) {
+        const applicants = await loadOverview(initialTenderId);
+        if (applicants && applicants.length > 0) {
+          const initialBidderId = applicants[0].bidder_id;
+          setSelectedBidderId(initialBidderId);
           await runVerification(initialBidderId, initialTenderId, loadedTenders, false);
         } else {
+          setSelectedBidderId("");
+          setAssessment(null);
           setLoading(false);
         }
-        loadOverview(initialTenderId);
       } catch (err) {
         setError(err.message);
         setLoading(false);
@@ -226,10 +221,18 @@ export default function ComplianceCockpit() {
     runVerification(bidderId, selectedTenderId, tenders, simulateFailure);
   }
 
-  function handleSelectTender(tenderId) {
+  async function handleSelectTender(tenderId) {
     setSelectedTenderId(tenderId);
-    runVerification(selectedBidderId, tenderId, tenders, simulateFailure);
-    loadOverview(tenderId);
+    const applicants = await loadOverview(tenderId);
+    if (applicants && applicants.length > 0) {
+      const nextBidderId = applicants[0].bidder_id;
+      setSelectedBidderId(nextBidderId);
+      runVerification(nextBidderId, tenderId, tenders, simulateFailure);
+    } else {
+      setSelectedBidderId("");
+      setAssessment(null);
+      setTrail([]);
+    }
   }
 
   // FEATURE 1: Delete Bidder (Removes from active selectable list only, preserves MongoDB audit logs)
@@ -530,16 +533,8 @@ export default function ComplianceCockpit() {
     <main className="app-shell">
       <header>
         <div>
-          <p className="eyebrow">SIH 2026 · GeM Procurement</p>
-          <h1>Bid Compliance Verification Platform</h1>
-        </div>
-        <div className="header-actions">
-          <button className="btn-accent" onClick={() => setShowBidderModal(true)}>
-            + Register New Bidder
-          </button>
-          <button className="btn-primary" onClick={() => setShowTenderModal(true)}>
-            + New Tender
-          </button>
+          <p className="eyebrow">Public Procurement Governance · GeM Operations</p>
+          <h1>BidSetu — Compliance Verification Cockpit</h1>
         </div>
       </header>
 
@@ -552,7 +547,7 @@ export default function ComplianceCockpit() {
             loadOverview(selectedTenderId);
           }}
         >
-          📊 All Bidders Overview ({bidders.length})
+          📊 Applicants Overview ({bidders.length})
         </button>
         <button
           className={`nav-tab ${currentView === "detail" ? "active" : ""}`}
@@ -672,7 +667,7 @@ export default function ComplianceCockpit() {
           <div className="overview-header">
             <div>
               <p className="eyebrow">Executive Procurement Cockpit</p>
-              <h2>All Bidders Overview · {activeTender?.title || selectedTenderId}</h2>
+              <h2>Applicants Overview · {activeTender?.title || selectedTenderId}</h2>
               <small style={{ color: "#64748b" }}>
                 Tender ID: {activeTender?.tender_id} · Category: {activeTender?.category} · Mandatory Checks:{" "}
                 {activeTender?.mandatory_checks?.length} of 6
@@ -690,9 +685,9 @@ export default function ComplianceCockpit() {
           {/* Aggregate Metric Cards */}
           <div className="metrics-grid">
             <div className="metric-box">
-              <span className="metric-label">Total Bidders</span>
+              <span className="metric-label">Total Applicants</span>
               <span className="metric-val">{overviewData?.aggregates?.total_bidders ?? bidders.length}</span>
-              <span className="metric-sub">Active in tender pool</span>
+              <span className="metric-sub">Submitted for this tender</span>
             </div>
             <div className="metric-box metric-low">
               <span className="metric-label">Low Risk</span>
@@ -792,7 +787,7 @@ export default function ComplianceCockpit() {
                 ) : (
                   <tr>
                     <td colSpan={6} style={{ textAlign: "center", padding: "2rem", color: "#64748b" }}>
-                      No active bidders registered. Use &ldquo;+ Register New Bidder&rdquo; above.
+                      No applications received yet.
                     </td>
                   </tr>
                 )}
@@ -810,10 +805,10 @@ export default function ComplianceCockpit() {
           {/* Bidder Selection Sidebar with Delete Button (FEATURE 1) */}
           <aside>
             <h2>
-              <span>Bidders ({bidders.length})</span>
+              <span>Applicants ({bidders.length})</span>
             </h2>
             {bidders.length === 0 && (
-              <p style={{ fontSize: "0.85rem", color: "#64748b" }}>No bidders. Register one above.</p>
+              <p style={{ fontSize: "0.85rem", color: "#64748b" }}>No applications received yet.</p>
             )}
             {bidders.map((item) => (
               <div key={item.bidder_id} className="bidder-row">
@@ -1074,8 +1069,8 @@ export default function ComplianceCockpit() {
             </section>
           ) : (
             <section className="detail" style={{ padding: "3rem", textAlign: "center", color: "#64748b" }}>
-              <h3>No bidder selected</h3>
-              <p>Please register a bidder or select one from the sidebar.</p>
+              <h3>No applications received yet</h3>
+              <p>No enterprise bidders have submitted an application for this tender yet.</p>
             </section>
           )}
         </div>

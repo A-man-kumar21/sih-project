@@ -114,6 +114,10 @@ router.post("/register/bidder", async (request, response, next) => {
       phone,
       password,
       confirm_password,
+      pan = "",
+      gstin = "",
+      udyam_number = "",
+      epfo_esic_number = "",
     } = request.body;
 
     if (!company_name || !contact_person || !email || !password) {
@@ -147,6 +151,11 @@ router.post("/register/bidder", async (request, response, next) => {
     const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
     const bidderId = `BIDDER-${cleanPrefix}-${randomSuffix}`;
 
+    const cleanPan = (pan || "").trim().toUpperCase();
+    const cleanGstin = (gstin || "").trim().toUpperCase();
+    const cleanUdyam = (udyam_number || "").trim().toUpperCase();
+    const cleanEpfo = (epfo_esic_number || "").trim().toUpperCase();
+
     // Synchronize with AI Engine profile registry
     try {
       await fetch(`${ENGINE_URL}/bidders`, {
@@ -155,10 +164,10 @@ router.post("/register/bidder", async (request, response, next) => {
         body: JSON.stringify({
           bidder_id: bidderId,
           company_name: company_name.trim(),
-          udyam_number: "",
-          gstin: "",
-          pan: "",
-          epfo_esic_number: "",
+          udyam_number: cleanUdyam,
+          gstin: cleanGstin,
+          pan: cleanPan,
+          epfo_esic_number: cleanEpfo,
         }),
       });
     } catch (engineErr) {
@@ -177,10 +186,10 @@ router.post("/register/bidder", async (request, response, next) => {
       phone: (phone || "").trim(),
       bidder_id: bidderId,
       statutory: {
-        pan: "",
-        gstin: "",
-        udyam_number: "",
-        epfo_esic_number: "",
+        pan: cleanPan,
+        gstin: cleanGstin,
+        udyam_number: cleanUdyam,
+        epfo_esic_number: cleanEpfo,
       },
       created_at: now,
       updated_at: now,

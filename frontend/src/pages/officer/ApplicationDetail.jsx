@@ -119,6 +119,43 @@ export default function ApplicationDetail() {
     }
   };
 
+  const handleViewDoc = async (url) => {
+    try {
+      const res = await authFetch(url);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to view document.");
+      }
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      window.open(objectUrl, "_blank");
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleDownloadDoc = async (url, fileName) => {
+    try {
+      const res = await authFetch(url);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to download document.");
+      }
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = fileName || "document.pdf";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   if (loading) {
     return <div className="loading-state">Loading application evaluation...</div>;
   }
@@ -274,20 +311,20 @@ export default function ApplicationDetail() {
                   </div>
                 </div>
                 <div className="doc-actions">
-                  <a
-                    href={doc.view_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => handleViewDoc(doc.view_url)}
                     className="btn-doc-link"
                   >
                     View
-                  </a>
-                  <a
-                    href={doc.download_url}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadDoc(doc.download_url, doc.file_name)}
                     className="btn-doc-link download"
                   >
                     Download
-                  </a>
+                  </button>
                 </div>
               </div>
             ))}

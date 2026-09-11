@@ -51,10 +51,10 @@ export default function RegisterBidder() {
     <div className="auth-page-container">
       <div className="auth-card" style={{ maxWidth: "600px" }}>
         <div className="auth-header">
-          <div className="auth-emblem">GeM</div>
+          <div className="auth-emblem">BidSetu</div>
           <h2>Enterprise Bidder Registration</h2>
           <p className="auth-subtext">
-            Register your enterprise to participate in GeM public procurement tenders
+            Register your enterprise to participate in public procurement tenders on BidSetu
           </p>
         </div>
 
