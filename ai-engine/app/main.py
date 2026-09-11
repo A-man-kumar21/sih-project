@@ -111,13 +111,19 @@ def remove_tender(tender_id: str) -> dict:
 
 
 @app.post("/extract-bidder-pdf")
+@app.post("/extract-document")
 async def extract_bidder_pdf(
     file: UploadFile = File(...),
     document_type: str | None = Query(None),
     simulate_failure: bool = Query(False),
 ) -> dict:
     content = await file.read()
-    return extract_bidder_from_pdf(content, document_type=document_type, simulate_failure=simulate_failure)
+    return extract_bidder_from_pdf(
+        content,
+        filename=file.filename or "",
+        document_type=document_type,
+        simulate_failure=simulate_failure,
+    )
 
 
 @app.post("/extract-tender-pdf")

@@ -86,6 +86,7 @@ export function buildDefaultEnterpriseProfile() {
     source_doc_id: null,
     source_doc_name: null,
     confidence: null,
+    extraction_method: null,
     extraction_status: "empty",
     last_updated: null,
   });
@@ -96,14 +97,17 @@ export function buildDefaultEnterpriseProfile() {
     enterprise_type: emptyField(),
     gstin: emptyField(),
     pan: emptyField(),
+    cin: emptyField(),
     business_constitution: emptyField(),
     registered_address: emptyField(),
     registration_date: emptyField(),
+    epfo_number: emptyField(),
+    esic_number: emptyField(),
     epfo_esic_number: emptyField(),
   };
 }
 
-export function mergeExtractedIntoProfile(existingProfile, extracted, docType, docId, docName, confidence = 0.98) {
+export function mergeExtractedIntoProfile(existingProfile, extracted, docType, docId, docName, confidence = 0.98, extractionMethod = "pymupdf") {
   const profile = existingProfile || buildDefaultEnterpriseProfile();
   const nowIso = new Date().toISOString();
   const sourceLabel = DOC_TYPE_LABELS[docType] || docType || "Uploaded Document";
@@ -115,43 +119,61 @@ export function mergeExtractedIntoProfile(existingProfile, extracted, docType, d
         source: sourceLabel,
         source_doc_id: docId ? docId.toString() : null,
         source_doc_name: docName || null,
-        confidence: confidence || 0.98,
+        confidence: confidence != null ? confidence : 0.98,
+        extraction_method: extractionMethod || "pymupdf",
         extraction_status: "successful",
         last_updated: nowIso,
       };
     }
   };
 
-  if (extracted.enterprise_name || extracted.company_name || extracted.legal_name) {
-    updateField("enterprise_name", extracted.enterprise_name || extracted.company_name || extracted.legal_name);
+  const fields = extracted?.fields || extracted || {};
+
+  if (fields.enterprise_name || fields.company_name || fields.legal_name) {
+    updateField("enterprise_name", fields.enterprise_name || fields.company_name || fields.legal_name);
   }
-  if (extracted.udyam_number) {
-    updateField("udyam_number", extracted.udyam_number.toUpperCase());
+  if (fields.udyam_number) {
+    updateField("udyam_number", fields.udyam_number.toUpperCase());
   }
-  if (extracted.enterprise_type) {
-    updateField("enterprise_type", extracted.enterprise_type);
+  if (fields.enterprise_type) {
+    updateField("enterprise_type", fields.enterprise_type);
   }
-  if (extracted.gstin) {
-    updateField("gstin", extracted.gstin.toUpperCase());
+  if (fields.gstin) {
+    updateField("gstin", fields.gstin.toUpperCase());
     // Auto-derive PAN if not separately provided
-    if (!extracted.pan && extracted.gstin.length === 15) {
-      updateField("pan", extracted.gstin.substring(2, 12).toUpperCase());
+    if (!fields.pan && fields.gstin.length === 15) {
+      updateField("pan", fields.gstin.substring(2, 12).toUpperCase());
     }
   }
-  if (extracted.pan) {
-    updateField("pan", extracted.pan.toUpperCase());
+  if (fields.pan) {
+    updateField("pan", fields.pan.toUpperCase());
   }
-  if (extracted.business_constitution) {
-    updateField("business_constitution", extracted.business_constitution);
+  if (fields.cin) {
+    updateField("cin", fields.cin.toUpperCase());
   }
-  if (extracted.registered_address) {
-    updateField("registered_address", extracted.registered_address);
+  if (fields.business_constitution) {
+    updateField("business_constitution", fields.business_constitution);
   }
-  if (extracted.registration_date) {
-    updateField("registration_date", extracted.registration_date);
+  if (fields.registered_address) {
+    updateField("registered_address", fields.registered_address);
   }
-  if (extracted.epfo_esic_number) {
-    updateField("epfo_esic_number", extracted.epfo_esic_number);
+  if (fields.registration_date) {
+    updateField("registration_date", fields.registration_date);
+  }
+  if (fields.epfo_number) {
+    updateField("epfo_number", fields.epfo_number.toUpperCase());
+    if (!fields.epfo_esic_number) {
+      updateField("epfo_esic_number", fields.epfo_number.toUpperCase());
+    }
+  }
+  if (fields.esic_number) {
+    updateField("esic_number", fields.esic_number.toUpperCase());
+    if (!fields.epfo_esic_number && !fields.epfo_number) {
+      updateField("epfo_esic_number", fields.esic_number.toUpperCase());
+    }
+  }
+  if (fields.epfo_esic_number) {
+    updateField("epfo_esic_number", fields.epfo_esic_number.toUpperCase());
   }
 
   return profile;
@@ -183,16 +205,18 @@ router.get("/profile", requireAuth, requireRole("bidder"), async (request, respo
       .toArray();
 
     for (const doc of myDocs) {
-      const ext = doc.extracted_data?.extracted || doc.extracted_data;
+      const ext = doc.extracted_data?.fields || doc.extracted_data?.extracted || doc.extracted_data;
       if (ext && typeof ext === "object") {
-        const conf = doc.extracted_data?.confidence || 0.98;
+        const conf = doc.extracted_data?.confidence != null ? doc.extracted_data.confidence : 0.98;
+        const method = doc.extracted_data?.extractionMethod || doc.extracted_data?.extraction_method || "pymupdf";
         enterpriseProfile = mergeExtractedIntoProfile(
           enterpriseProfile,
           ext,
           doc.document_type,
           doc._id,
           doc.original_name || doc.file_name,
-          conf
+          conf,
+          method
         );
 
         // Update statutory credentials if document has verified statutory values
@@ -212,8 +236,20 @@ router.get("/profile", requireAuth, requireRole("bidder"), async (request, respo
           currentStat.udyam_number = ext.udyam_number.trim().toUpperCase();
           hasBackfillUpdates = true;
         }
-        if (ext.epfo_esic_number && (!currentStat.epfo_esic_number || currentStat.epfo_esic_number.length < 5)) {
-          currentStat.epfo_esic_number = ext.epfo_esic_number.trim().toUpperCase();
+        if (ext.cin && (!currentStat.cin || currentStat.cin.length < 5)) {
+          currentStat.cin = ext.cin.trim().toUpperCase();
+          hasBackfillUpdates = true;
+        }
+        if (ext.epfo_number && (!currentStat.epfo_number || currentStat.epfo_number.length < 5)) {
+          currentStat.epfo_number = ext.epfo_number.trim().toUpperCase();
+          hasBackfillUpdates = true;
+        }
+        if (ext.esic_number && (!currentStat.esic_number || currentStat.esic_number.length < 5)) {
+          currentStat.esic_number = ext.esic_number.trim().toUpperCase();
+          hasBackfillUpdates = true;
+        }
+        if ((ext.epfo_esic_number || ext.epfo_number) && (!currentStat.epfo_esic_number || currentStat.epfo_esic_number.length < 5)) {
+          currentStat.epfo_esic_number = (ext.epfo_esic_number || ext.epfo_number).trim().toUpperCase();
           hasBackfillUpdates = true;
         }
       }
@@ -242,6 +278,9 @@ router.get("/profile", requireAuth, requireRole("bidder"), async (request, respo
             udyam_number: currentStat.udyam_number || "",
             gstin: currentStat.gstin || "",
             pan: currentStat.pan || "",
+            cin: currentStat.cin || "",
+            epfo_number: currentStat.epfo_number || "",
+            esic_number: currentStat.esic_number || "",
             epfo_esic_number: currentStat.epfo_esic_number || "",
             business_constitution: enterpriseProfile.business_constitution?.value || "",
             registered_address: enterpriseProfile.registered_address?.value || "",
@@ -289,6 +328,9 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
       pan,
       gstin,
       udyam_number,
+      cin,
+      epfo_number,
+      esic_number,
       epfo_esic_number,
       business_constitution,
       registered_address,
@@ -318,6 +360,7 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
           source_doc_id: null,
           source_doc_name: null,
           confidence: cleanVal ? 1.0 : null,
+          extraction_method: "manual",
           extraction_status: cleanVal ? "manual" : "empty",
           last_updated: nowIso,
         };
@@ -330,6 +373,9 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
     if (pan !== undefined) applyManualField("pan", pan.toUpperCase());
     if (gstin !== undefined) applyManualField("gstin", gstin.toUpperCase());
     if (udyam_number !== undefined) applyManualField("udyam_number", udyam_number.toUpperCase());
+    if (cin !== undefined) applyManualField("cin", cin.toUpperCase());
+    if (epfo_number !== undefined) applyManualField("epfo_number", epfo_number.toUpperCase());
+    if (esic_number !== undefined) applyManualField("esic_number", esic_number.toUpperCase());
     if (epfo_esic_number !== undefined) applyManualField("epfo_esic_number", epfo_esic_number);
     if (business_constitution !== undefined) applyManualField("business_constitution", business_constitution);
     if (registered_address !== undefined) applyManualField("registered_address", registered_address);
@@ -341,6 +387,9 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
       pan: pan !== undefined ? pan.trim().toUpperCase() : enterpriseProfile.pan?.value || currentStat.pan || "",
       gstin: gstin !== undefined ? gstin.trim().toUpperCase() : enterpriseProfile.gstin?.value || currentStat.gstin || "",
       udyam_number: udyam_number !== undefined ? udyam_number.trim().toUpperCase() : enterpriseProfile.udyam_number?.value || currentStat.udyam_number || "",
+      cin: cin !== undefined ? cin.trim().toUpperCase() : enterpriseProfile.cin?.value || currentStat.cin || "",
+      epfo_number: epfo_number !== undefined ? epfo_number.trim().toUpperCase() : enterpriseProfile.epfo_number?.value || currentStat.epfo_number || "",
+      esic_number: esic_number !== undefined ? esic_number.trim().toUpperCase() : enterpriseProfile.esic_number?.value || currentStat.esic_number || "",
       epfo_esic_number: epfo_esic_number !== undefined ? epfo_esic_number.trim() : enterpriseProfile.epfo_esic_number?.value || currentStat.epfo_esic_number || "",
     };
 
@@ -354,6 +403,7 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
           source_doc_id: null,
           source_doc_name: null,
           confidence: 0.98,
+          extraction_method: "derived",
           extraction_status: "successful",
           last_updated: nowIso,
         };
@@ -371,6 +421,9 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
           udyam_number: updatedStatutory.udyam_number,
           gstin: updatedStatutory.gstin,
           pan: updatedStatutory.pan,
+          cin: updatedStatutory.cin,
+          epfo_number: updatedStatutory.epfo_number,
+          esic_number: updatedStatutory.esic_number,
           epfo_esic_number: updatedStatutory.epfo_esic_number,
           business_constitution: enterpriseProfile.business_constitution?.value || "",
           registered_address: enterpriseProfile.registered_address?.value || "",
@@ -477,12 +530,18 @@ router.post(
 
       let extractedData = null;
 
-      // If document is PDF or image, trigger AI Engine extraction
-      if (request.file.mimetype === "application/pdf" || request.file.originalname.toLowerCase().endsWith(".pdf")) {
+      // If document is PDF or image, trigger deterministic extraction
+      const extName = path.extname(request.file.originalname).toLowerCase();
+      const isPdfOrImage =
+        [".pdf", ".png", ".jpg", ".jpeg"].includes(extName) ||
+        (request.file.mimetype && (request.file.mimetype.startsWith("image/") || request.file.mimetype === "application/pdf"));
+
+      if (isPdfOrImage) {
         try {
           const fileBuffer = fs.readFileSync(request.file.path);
           const formData = new FormData();
-          const blob = new Blob([fileBuffer], { type: "application/pdf" });
+          const mimeType = request.file.mimetype || (extName === ".pdf" ? "application/pdf" : "image/png");
+          const blob = new Blob([fileBuffer], { type: mimeType });
           formData.append("file", blob, request.file.originalname);
 
           const extractRes = await fetch(`${ENGINE_URL}/extract-bidder-pdf?document_type=${encodeURIComponent(docType)}`, {
@@ -549,11 +608,12 @@ router.post(
       }
 
       // AUTOMATIC ENTERPRISE PROFILE EXTRACTION & STATUTORY SYNC (Part B, E, F, I, K)
-      if (extractedData && (extractedData.extracted || typeof extractedData === "object")) {
-        const ext = extractedData.extracted || extractedData;
+      if (extractedData && (extractedData.fields || extractedData.extracted || typeof extractedData === "object")) {
+        const ext = extractedData.fields || extractedData.extracted || extractedData;
         const user = await users.findOne({ _id: new ObjectId(request.user.id) });
         if (user) {
-          const conf = extractedData.confidence || 0.98;
+          const conf = extractedData.confidence != null ? extractedData.confidence : 0.98;
+          const method = extractedData.extractionMethod || extractedData.extraction_method || "pymupdf";
           let enterpriseProfile = user.enterprise_profile || buildDefaultEnterpriseProfile();
 
           // Merge structured extracted fields with provenance
@@ -563,7 +623,8 @@ router.post(
             docType,
             docId,
             request.file.originalname,
-            conf
+            conf,
+            method
           );
 
           // Update statutory credentials with authoritative extracted values
@@ -582,8 +643,19 @@ router.post(
           if (ext.udyam_number && UDYAM_REGEX.test(ext.udyam_number)) {
             currentStat.udyam_number = ext.udyam_number.trim().toUpperCase();
           }
+          if (ext.cin && ext.cin.trim()) {
+            currentStat.cin = ext.cin.trim().toUpperCase();
+          }
+          if (ext.epfo_number && ext.epfo_number.trim()) {
+            currentStat.epfo_number = ext.epfo_number.trim().toUpperCase();
+          }
+          if (ext.esic_number && ext.esic_number.trim()) {
+            currentStat.esic_number = ext.esic_number.trim().toUpperCase();
+          }
           if (ext.epfo_esic_number && ext.epfo_esic_number.trim()) {
             currentStat.epfo_esic_number = ext.epfo_esic_number.trim().toUpperCase();
+          } else if (ext.epfo_number && ext.epfo_number.trim()) {
+            currentStat.epfo_esic_number = ext.epfo_number.trim().toUpperCase();
           }
 
           const compName = enterpriseProfile.enterprise_name?.value || user.company_name;
@@ -611,6 +683,9 @@ router.post(
                 udyam_number: currentStat.udyam_number || "",
                 gstin: currentStat.gstin || "",
                 pan: currentStat.pan || "",
+                cin: currentStat.cin || "",
+                epfo_number: currentStat.epfo_number || "",
+                esic_number: currentStat.esic_number || "",
                 epfo_esic_number: currentStat.epfo_esic_number || "",
                 business_constitution: enterpriseProfile.business_constitution?.value || "",
                 registered_address: enterpriseProfile.registered_address?.value || "",

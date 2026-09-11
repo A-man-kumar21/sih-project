@@ -1,5 +1,7 @@
 fastapi
 uvicorn[standard]
 pypdf
+pymupdf
+rapidocr-onnxruntime
 requests
 python-multipart

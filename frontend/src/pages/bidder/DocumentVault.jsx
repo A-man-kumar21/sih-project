@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const DOCUMENT_TYPES = [
@@ -67,14 +68,19 @@ export default function DocumentVault() {
         body: formData,
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error || "Upload failed.");
+        throw new Error(data.error || data.message || `Upload failed with HTTP status ${res.status}.`);
       }
 
       setSuccess(data.message || "Document uploaded successfully to your vault.");
       if (data.document?.extracted_data) {
-        setExtractedInfo(data.document.extracted_data.extracted || data.document.extracted_data);
+        const extData = data.document.extracted_data;
+        setExtractedInfo({
+          ...(extData.fields || extData.extracted || extData),
+          _method: extData.extractionMethod || extData.extraction_method || "pymupdf",
+          _confidence: extData.confidence,
+        });
       }
       setSelectedFile(null);
       // Reset file input
@@ -83,7 +89,7 @@ export default function DocumentVault() {
 
       await loadDocuments();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "An unexpected error occurred during document upload.");
     } finally {
       setUploading(false);
     }
@@ -161,9 +167,27 @@ export default function DocumentVault() {
         <div className="alert-box alert-info" style={{ borderLeft: "4px solid #10b981" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <strong style={{ color: "#065f46", fontSize: "0.95rem" }}>✓ AI Extraction & Enterprise Profile Auto-Population:</strong>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <strong style={{ color: "#065f46", fontSize: "0.95rem" }}>
+                  ✓ Local Deterministic Extraction & Profile Auto-Population
+                </strong>
+                <span
+                  style={{
+                    fontSize: "0.72rem",
+                    backgroundColor: "#ecfdf5",
+                    color: "#065f46",
+                    padding: "0.15rem 0.5rem",
+                    borderRadius: "4px",
+                    border: "1px solid #a7f3d0",
+                    fontWeight: 600,
+                  }}
+                >
+                  {extractedInfo._method?.toLowerCase().includes("ocr") ? "PaddleOCR" : "PyMuPDF"}
+                  {extractedInfo._confidence != null ? ` (${extractedInfo._confidence > 1 ? extractedInfo._confidence.toFixed(0) : (extractedInfo._confidence * 100).toFixed(0)}% conf)` : ""}
+                </span>
+              </div>
               <p style={{ margin: "0.2rem 0 0.5rem", fontSize: "0.85rem", color: "#334155" }}>
-                The certificate was successfully parsed. The following structured attributes were synchronized to your Enterprise Profile:
+                Certificate parsed locally with zero external LLM/API calls. The following structured attributes were synchronized to your Enterprise Profile:
               </p>
             </div>
             <Link
@@ -176,10 +200,10 @@ export default function DocumentVault() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.5rem", marginTop: "0.4rem", fontSize: "0.85rem", background: "white", padding: "0.75rem", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-            {(extractedInfo.enterprise_name || extractedInfo.company_name) && (
+            {(extractedInfo.enterprise_name || extractedInfo.company_name || extractedInfo.companyName) && (
               <div>
                 <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>Enterprise Legal Name</span>
-                <strong>{extractedInfo.enterprise_name || extractedInfo.company_name}</strong>
+                <strong>{extractedInfo.enterprise_name || extractedInfo.company_name || extractedInfo.companyName}</strong>
               </div>
             )}
             {extractedInfo.pan && (
@@ -194,10 +218,28 @@ export default function DocumentVault() {
                 <strong style={{ fontFamily: "monospace" }}>{extractedInfo.gstin}</strong>
               </div>
             )}
-            {extractedInfo.udyam_number && (
+            {(extractedInfo.udyam_number || extractedInfo.udyam) && (
               <div>
                 <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>Udyam / MSME Registration</span>
-                <strong style={{ fontFamily: "monospace" }}>{extractedInfo.udyam_number}</strong>
+                <strong style={{ fontFamily: "monospace" }}>{extractedInfo.udyam_number || extractedInfo.udyam}</strong>
+              </div>
+            )}
+            {extractedInfo.cin && (
+              <div>
+                <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>Corporate Identity Number (CIN)</span>
+                <strong style={{ fontFamily: "monospace" }}>{extractedInfo.cin}</strong>
+              </div>
+            )}
+            {(extractedInfo.epfo_number || extractedInfo.epfo) && (
+              <div>
+                <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>EPFO Registration Code</span>
+                <strong style={{ fontFamily: "monospace" }}>{extractedInfo.epfo_number || extractedInfo.epfo}</strong>
+              </div>
+            )}
+            {(extractedInfo.esic_number || extractedInfo.esic) && (
+              <div>
+                <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>ESIC Employer Code</span>
+                <strong style={{ fontFamily: "monospace" }}>{extractedInfo.esic_number || extractedInfo.esic}</strong>
               </div>
             )}
             {extractedInfo.business_constitution && (
@@ -212,10 +254,10 @@ export default function DocumentVault() {
                 <strong>{extractedInfo.registration_date}</strong>
               </div>
             )}
-            {extractedInfo.registered_address && (
+            {(extractedInfo.registered_address || extractedInfo.address) && (
               <div style={{ gridColumn: "1 / -1" }}>
                 <span style={{ color: "#64748b", fontSize: "0.75rem", display: "block" }}>Principal Place of Business</span>
-                <span>{extractedInfo.registered_address}</span>
+                <span>{extractedInfo.registered_address || extractedInfo.address}</span>
               </div>
             )}
           </div>
@@ -319,7 +361,23 @@ export default function DocumentVault() {
                           Manual Verification
                         </span>
                       ) : doc.extracted_data ? (
-                        <span className="badge status-approved">✓ Extracted & Synced</span>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", alignItems: "flex-start" }}>
+                          <span className="badge status-approved">✓ Extracted & Synced</span>
+                          <span
+                            style={{
+                              fontSize: "0.7rem",
+                              backgroundColor: "#f1f5f9",
+                              color: "#334155",
+                              padding: "0.1rem 0.4rem",
+                              borderRadius: "3px",
+                              fontWeight: 600,
+                              border: "1px solid #cbd5e1",
+                            }}
+                          >
+                            {(doc.extracted_data.extractionMethod || doc.extracted_data.extraction_method || "").toLowerCase().includes("ocr") ? "PaddleOCR" : "PyMuPDF"}
+                            {doc.extracted_data.confidence ? ` (${doc.extracted_data.confidence > 1 ? doc.extracted_data.confidence.toFixed(0) : (doc.extracted_data.confidence * 100).toFixed(0)}%)` : ""}
+                          </span>
+                        </div>
                       ) : (
                         <span className="badge status-submitted">Stored in Vault</span>
                       )}

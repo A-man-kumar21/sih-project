@@ -15,6 +15,9 @@ export default function BidderProfile() {
     pan: "",
     gstin: "",
     udyam_number: "",
+    cin: "",
+    epfo_number: "",
+    esic_number: "",
     epfo_esic_number: "",
     business_constitution: "",
     registered_address: "",
@@ -49,6 +52,9 @@ export default function BidderProfile() {
             pan: ep.pan?.value || prof.statutory?.pan || "",
             gstin: ep.gstin?.value || prof.statutory?.gstin || "",
             udyam_number: ep.udyam_number?.value || prof.statutory?.udyam_number || "",
+            cin: ep.cin?.value || prof.statutory?.cin || "",
+            epfo_number: ep.epfo_number?.value || prof.statutory?.epfo_number || "",
+            esic_number: ep.esic_number?.value || prof.statutory?.esic_number || "",
             epfo_esic_number: ep.epfo_esic_number?.value || prof.statutory?.epfo_esic_number || "",
             business_constitution: ep.business_constitution?.value || "",
             registered_address: ep.registered_address?.value || "",
@@ -85,7 +91,10 @@ export default function BidderProfile() {
           pan: formData.pan,
           gstin: formData.gstin,
           udyam_number: formData.udyam_number,
-          epfo_esic_number: formData.epfo_esic_number,
+          cin: formData.cin,
+          epfo_number: formData.epfo_number,
+          esic_number: formData.esic_number,
+          epfo_esic_number: formData.epfo_esic_number || formData.epfo_number,
           business_constitution: formData.business_constitution,
           registered_address: formData.registered_address,
           registration_date: formData.registration_date,
@@ -110,13 +119,26 @@ export default function BidderProfile() {
     const meta = provenance[fieldKey];
     if (!meta || !meta.value) {
       return (
-        <span style={{ fontSize: "0.75rem", color: "#94a3b8", fontStyle: "italic" }}>
-          Pending document upload or manual entry
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.25rem",
+            fontSize: "0.75rem",
+            backgroundColor: "#fffbeb",
+            color: "#b45309",
+            padding: "0.15rem 0.5rem",
+            borderRadius: "4px",
+            fontWeight: 500,
+            border: "1px solid #fde68a",
+          }}
+        >
+          ⚠ Could not extract [Edit manually]
         </span>
       );
     }
 
-    if (meta.source === "Manual Entry") {
+    if (meta.source === "Manual Entry" || meta.extraction_status === "manual") {
       return (
         <span
           style={{
@@ -136,6 +158,15 @@ export default function BidderProfile() {
       );
     }
 
+    const methodStr = meta.extraction_method
+      ? meta.extraction_method.toLowerCase().includes("ocr")
+        ? "PaddleOCR"
+        : "PyMuPDF"
+      : "";
+    const confVal = meta.confidence ? (meta.confidence > 1 ? meta.confidence : meta.confidence * 100) : null;
+    const confStr = confVal ? `${confVal.toFixed(0)}% conf` : "";
+    const details = [methodStr, confStr].filter(Boolean).join(", ");
+
     return (
       <span
         style={{
@@ -151,8 +182,8 @@ export default function BidderProfile() {
           border: "1px solid #a7f3d0",
         }}
       >
-        ✓ Auto-extracted from {meta.source}
-        {meta.confidence ? ` (${(meta.confidence * 100).toFixed(0)}% conf)` : ""}
+        ✓ Auto-extracted from {meta.source || "Document"}
+        {details ? ` (${details})` : ""}
         {meta.source_doc_name ? ` • ${meta.source_doc_name}` : ""}
       </span>
     );
@@ -351,14 +382,44 @@ export default function BidderProfile() {
 
           <div className="form-group">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.3rem" }}>
-              <label style={{ margin: 0 }}>EPFO / ESIC Establishment Code</label>
-              {renderProvenanceBadge("epfo_esic_number")}
+              <label style={{ margin: 0 }}>Corporate Identification Number (CIN)</label>
+              {renderProvenanceBadge("cin")}
             </div>
             <input
               type="text"
-              placeholder="e.g. DLCPM1234567000"
-              value={formData.epfo_esic_number}
-              onChange={(e) => setFormData({ ...formData, epfo_esic_number: e.target.value })}
+              placeholder="e.g. U72900MH2021PTC123456"
+              value={formData.cin}
+              onChange={(e) => setFormData({ ...formData, cin: e.target.value.toUpperCase() })}
+              style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
+            />
+          </div>
+        </div>
+
+        <div className="form-grid-2">
+          <div className="form-group">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.3rem" }}>
+              <label style={{ margin: 0 }}>EPFO Establishment Code</label>
+              {renderProvenanceBadge("epfo_number")}
+            </div>
+            <input
+              type="text"
+              placeholder="e.g. MH/BAN/0012345/000"
+              value={formData.epfo_number}
+              onChange={(e) => setFormData({ ...formData, epfo_number: e.target.value.toUpperCase() })}
+              style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
+            />
+          </div>
+
+          <div className="form-group">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.3rem" }}>
+              <label style={{ margin: 0 }}>ESIC Employer Code</label>
+              {renderProvenanceBadge("esic_number")}
+            </div>
+            <input
+              type="text"
+              placeholder="e.g. 31000123450000101"
+              value={formData.esic_number}
+              onChange={(e) => setFormData({ ...formData, esic_number: e.target.value.toUpperCase() })}
               style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
             />
           </div>
