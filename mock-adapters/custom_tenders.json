@@ -383,5 +383,102 @@
     ],
     "description": "Custom tender requiring: udyam, gstn, pan_it, epfo_esic, digilocker, blacklist",
     "created_at": "2026-09-11T20:23:37.101172Z"
+  },
+  "GEM/2026/B/882100": {
+    "tender_id": "GEM/2026/B/882100",
+    "title": "Procurement of High-Grade Medical Diagnostic Equipment",
+    "category": "Medical Devices",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it",
+      "epfo_esic",
+      "blacklist"
+    ],
+    "description": "Comprehensive supply, installation, and multi-year calibration of hospital MANDATORY STATUTORY ELIGIBILITY REQUIREMENTS: 1. Valid UDYAM / MSME Registration certificate.",
+    "created_at": "2026-09-11T20:54:33.317276Z"
+  },
+  "TENDER-STAT-1789160085639": {
+    "tender_id": "TENDER-STAT-1789160085639",
+    "title": "Statutory Verification Compliance Tender",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Requires PAN, GST, and Udyam compliance verification.",
+    "created_at": "2026-09-11T20:54:45.992663Z"
+  },
+  "TENDER-A1-1789160095581": {
+    "tender_id": "TENDER-A1-1789160095581",
+    "title": "Officer A High-Performance Computing Cluster",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Procurement of specialized supercomputing GPU cluster nodes",
+    "created_at": "2026-09-11T20:54:56.165207Z"
+  },
+  "TENDER-B1-1789160095581": {
+    "tender_id": "TENDER-B1-1789160095581",
+    "title": "Officer B Drone Surveillance Equipment",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "blacklist"
+    ],
+    "description": "Procurement of aerial UAV surveillance equipment for border defense",
+    "created_at": "2026-09-11T20:54:56.258947Z"
+  },
+  "TENDER-C1-1789160095581": {
+    "tender_id": "TENDER-C1-1789160095581",
+    "title": "Officer C Clean Energy Solar Grid",
+    "category": "Works",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn"
+    ],
+    "description": "Installation and verification of solar PV grid infrastructure",
+    "created_at": "2026-09-11T20:54:58.021707Z"
+  },
+  "TENDER-A-1789160183579": {
+    "tender_id": "TENDER-A-1789160183579",
+    "title": "Secure Server Infrastructure Tender A",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T20:56:24.262489Z"
+  },
+  "TENDER-B-1789160183579": {
+    "tender_id": "TENDER-B-1789160183579",
+    "title": "Office Stationery Supplies Tender B",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Custom tender requiring: pan_it, gstn, udyam",
+    "created_at": "2026-09-11T20:56:24.348814Z"
+  },
+  "TENDER-DET-1789160209371": {
+    "tender_id": "TENDER-DET-1789160209371",
+    "title": "Solar PV Rooftop Generation Equipment",
+    "category": "Solar Equipment",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it"
+    ],
+    "description": "Procurement of high efficiency solar PV modules for government buildings",
+    "created_at": "2026-09-11T20:56:58.692584Z"
   }
 }

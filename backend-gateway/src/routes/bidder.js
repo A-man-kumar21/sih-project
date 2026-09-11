@@ -53,7 +53,10 @@ const VALID_DOC_TYPES = new Set([
   "epfo_esic_cert",
   "digilocker_proof",
   "other",
+  "other_statutory",
 ]);
+
+export const isMultiDocCategory = (type) => type === "other" || type === "other_statutory";
 
 // Map tender mandatory checks to document types
 export const CHECK_TO_DOC_TYPE = {
@@ -62,6 +65,7 @@ export const CHECK_TO_DOC_TYPE = {
   pan_it: "pan_card",
   epfo_esic: "epfo_esic_cert",
   digilocker: "digilocker_proof",
+  blacklist: "other",
 };
 
 // Map document types to friendly labels
@@ -71,7 +75,8 @@ export const DOC_TYPE_LABELS = {
   pan_card: "Permanent Account Number (PAN) Card",
   epfo_esic_cert: "EPFO / ESIC Establishment Proof",
   digilocker_proof: "DigiLocker Verified Credential",
-  other: "Other Statutory Document",
+  other: "Other Statutory / Technical Document",
+  other_statutory: "Other Statutory / Technical Document",
 };
 
 import {
@@ -119,18 +124,112 @@ export function mergeExtractedIntoProfile(existingProfile, extracted, docType, d
   const sourceLabel = DOC_TYPE_LABELS[docType] || docType || "Uploaded Document";
 
   const updateField = (key, val) => {
-    if (val && typeof val === "string" && val.trim()) {
+    if (!val || typeof val !== "string" || !val.trim()) return;
+    const newVal = val.trim();
+    const current = profile[key] || { value: "", extraction_status: "empty" };
+    const currentVal = (current.value || "").trim();
+
+    // Check equivalence (ignoring whitespace and casing)
+    const isCleanMatch =
+      currentVal.toLowerCase().replace(/[\s\-_]/g, "") ===
+      newVal.toLowerCase().replace(/[\s\-_]/g, "");
+
+    if (currentVal && !isCleanMatch) {
+      // Conflicting value detected: do not silently overwrite reliable existing data
+      // 1. If currently manual / user-confirmed, preserve manual value and flag conflict
+      if (current.extraction_status === "manual") {
+        profile[key].conflict = {
+          detected: true,
+          conflicting_value: newVal,
+          conflicting_source: sourceLabel,
+          conflicting_doc_name: docName || null,
+          confidence: confidence != null ? confidence : 0.98,
+          extraction_method: extractionMethod || "pymupdf",
+          timestamp: nowIso,
+          reason: "Newly extracted value differs from manually confirmed profile value",
+        };
+        return;
+      }
+
+      // 2. Primary document authority takes precedence over secondary/other documents
+      const isCurrentPrimary =
+        (key === "pan" && (current.source?.includes("PAN") || current.source_doc_name?.toLowerCase().includes("pan"))) ||
+        (key === "gstin" && (current.source?.includes("GST") || current.source_doc_name?.toLowerCase().includes("gst"))) ||
+        ((key === "udyam_number" || key === "udyam") && (current.source?.includes("Udyam") || current.source_doc_name?.toLowerCase().includes("udyam")));
+
+      const isNewPrimary =
+        (key === "pan" && docType === "pan_card") ||
+        (key === "gstin" && docType === "gstin_cert") ||
+        ((key === "udyam_number" || key === "udyam") && docType === "udyam_cert");
+
+      if (isCurrentPrimary && !isNewPrimary) {
+        profile[key].conflict = {
+          detected: true,
+          conflicting_value: newVal,
+          conflicting_source: sourceLabel,
+          conflicting_doc_name: docName || null,
+          confidence: confidence != null ? confidence : 0.98,
+          extraction_method: extractionMethod || "pymupdf",
+          timestamp: nowIso,
+          reason: "Extracted value differs from authoritative primary certificate",
+        };
+        return;
+      }
+
+      // 3. Compare confidences
+      const currentConf = current.confidence != null ? current.confidence : 0.98;
+      const newConf = confidence != null ? confidence : 0.98;
+
+      if (currentConf >= newConf && !isNewPrimary) {
+        profile[key].conflict = {
+          detected: true,
+          conflicting_value: newVal,
+          conflicting_source: sourceLabel,
+          conflicting_doc_name: docName || null,
+          confidence: newConf,
+          extraction_method: extractionMethod || "pymupdf",
+          timestamp: nowIso,
+          reason: "Extracted value has lower or equal confidence than existing record",
+        };
+        return;
+      }
+
+      // If new extraction is primary or significantly higher confidence, adopt with audit trail
       profile[key] = {
-        value: val.trim(),
+        value: newVal,
         source: sourceLabel,
         source_doc_id: docId ? docId.toString() : null,
         source_doc_name: docName || null,
-        confidence: confidence != null ? confidence : 0.98,
+        confidence: newConf,
         extraction_method: extractionMethod || "pymupdf",
         extraction_status: "successful",
         last_updated: nowIso,
+        conflict: {
+          detected: true,
+          previous_value: currentVal,
+          previous_source: current.source,
+          conflicting_value: newVal,
+          conflicting_source: sourceLabel,
+          conflicting_doc_name: docName || null,
+          timestamp: nowIso,
+          reason: "Updated to higher confidence / primary extraction",
+        },
       };
+      return;
     }
+
+    // No conflict or previously empty: populate field cleanly
+    profile[key] = {
+      value: newVal,
+      source: sourceLabel,
+      source_doc_id: docId ? docId.toString() : null,
+      source_doc_name: docName || null,
+      confidence: confidence != null ? confidence : 0.98,
+      extraction_method: extractionMethod || "pymupdf",
+      extraction_status: current.extraction_status === "manual" && isCleanMatch ? "manual" : "successful",
+      last_updated: nowIso,
+      conflict: null,
+    };
   };
 
   const fields = extracted?.fields || extracted?.extracted || extracted || {};
@@ -394,6 +493,7 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
           extraction_method: "manual",
           extraction_status: cleanVal ? "manual" : "empty",
           last_updated: nowIso,
+          conflict: null,
         };
       }
     };
@@ -479,6 +579,9 @@ router.put("/profile", requireAuth, requireRole("bidder"), async (request, respo
         },
       }
     );
+
+    // Sync canonical compliance resolver with AI engine
+    await resolveBidderCompliance(request.user.id);
 
     return response.json({
       success: true,
@@ -588,11 +691,16 @@ router.post(
         }
       }
 
-      // Check if document of this type already exists in vault -> replace with newer version
-      const existingDoc = await docs.findOne({
-        bidder_id: request.user.bidder_id,
-        document_type: docType,
-      });
+      // Check if document of this type already exists in vault
+      // Singleton categories (PAN, GST, Udyam, etc.) replace with newer version.
+      // Multi-document categories ("other", "other_statutory") NEVER replace existing documents.
+      const isMulti = isMultiDocCategory(docType);
+      const existingDoc = isMulti
+        ? null
+        : await docs.findOne({
+            bidder_id: request.user.bidder_id,
+            document_type: docType,
+          });
 
       const now = new Date();
       let docId;
@@ -774,7 +882,10 @@ router.get("/tenders", requireAuth, requireRole("bidder"), async (request, respo
       // Determine required document types and which ones are currently satisfied
       const requirements = mandatoryChecks.map((check) => {
         const docType = CHECK_TO_DOC_TYPE[check];
-        const hasDoc = docType ? availableDocTypes.has(docType) : true;
+        let hasDoc = docType ? availableDocTypes.has(docType) : true;
+        if (!hasDoc && (docType === "other" || docType === "other_statutory")) {
+          hasDoc = availableDocTypes.has("other") || availableDocTypes.has("other_statutory");
+        }
         return {
           check_key: check,
           doc_type: docType || null,
@@ -870,7 +981,10 @@ export const applyForTender = async (request, response, next) => {
     for (const check of mandatoryChecks) {
       const requiredDocType = CHECK_TO_DOC_TYPE[check];
       if (requiredDocType) {
-        const found = docMap.get(requiredDocType);
+        let found = docMap.get(requiredDocType);
+        if (!found && (requiredDocType === "other" || requiredDocType === "other_statutory")) {
+          found = docMap.get("other_statutory") || docMap.get("other");
+        }
         if (!found) {
           missingDocs.push({
             check,

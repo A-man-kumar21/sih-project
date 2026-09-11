@@ -8,7 +8,7 @@ const DOCUMENT_TYPES = [
   { value: "udyam_cert", label: "Udyam / MSME Certificate", check: "udyam" },
   { value: "epfo_esic_cert", label: "EPFO & ESIC Labor Compliance Proof", check: "epfo_esic" },
   { value: "digilocker_proof", label: "DigiLocker Verified Credential", check: "digilocker" },
-  { value: "other", label: "Other Statutory / Technical Document", check: "other" },
+  { value: "other_statutory", label: "Other Statutory / Technical Document", check: "other" },
 ];
 
 export default function DocumentVault() {
@@ -311,6 +311,116 @@ export default function DocumentVault() {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Feature 2: Dedicated Other Statutory / Technical Documents Section */}
+      <div className="dashboard-section">
+        <div className="section-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <h3>Other Statutory / Technical Documents ({documents.filter((d) => d.document_type === "other" || d.document_type === "other_statutory").length})</h3>
+            <p className="section-subtext">
+              Supports multiple technical certificates, ISO proofs, OEM authorizations, and experience credentials. Each document coexists independently without replacement.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => {
+              setSelectedType("other_statutory");
+              const formEl = document.getElementById("vault-upload-card");
+              if (formEl) formEl.scrollIntoView({ behavior: "smooth" });
+              const fileIn = document.getElementById("vault-file-input");
+              if (fileIn) fileIn.focus();
+            }}
+            style={{ fontSize: "0.85rem", padding: "0.45rem 0.9rem", whiteSpace: "nowrap", cursor: "pointer" }}
+          >
+            + Upload Another Document
+          </button>
+        </div>
+
+        {documents.filter((d) => d.document_type === "other" || d.document_type === "other_statutory").length === 0 ? (
+          <div style={{ padding: "1.25rem", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px dashed #cbd5e1", textAlign: "center", color: "#64748b", fontSize: "0.88rem" }}>
+            No technical or additional statutory documents uploaded yet. Click <strong>+ Upload Another Document</strong> to upload ISO certificates, OEM authorizations, or technical credentials.
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+            {documents
+              .filter((d) => d.document_type === "other" || d.document_type === "other_statutory")
+              .map((doc) => {
+                const ext = doc.extracted_data;
+                const method = (ext?.extractionMethod || ext?.extraction_method || "").toLowerCase().includes("ocr") ? "PaddleOCR" : "PyMuPDF";
+                const conf = ext?.confidence ? (ext.confidence > 1 ? ext.confidence.toFixed(0) : (ext.confidence * 100).toFixed(0)) : null;
+                return (
+                  <div
+                    key={doc.id}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      backgroundColor: "white",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "8px",
+                      padding: "0.85rem 1.25rem",
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
+                    }}
+                  >
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                        <strong style={{ color: "#1e293b", fontSize: "0.95rem" }}>{doc.original_name}</strong>
+                        <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                          ({(doc.file_size / 1024).toFixed(1)} KB • {new Date(doc.uploaded_at).toLocaleDateString()})
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        {ext?.success === false ? (
+                          <span style={{ fontSize: "0.75rem", color: "#991b1b", backgroundColor: "#fef2f2", padding: "0.15rem 0.5rem", borderRadius: "4px", border: "1px solid #fecaca" }}>
+                            ⚠ Could not extract [Edit manually]
+                          </span>
+                        ) : ext ? (
+                          <>
+                            <span style={{ fontSize: "0.75rem", color: "#065f46", backgroundColor: "#ecfdf5", padding: "0.15rem 0.5rem", borderRadius: "4px", border: "1px solid #a7f3d0", fontWeight: 600 }}>
+                              ✓ Extracted & Synced
+                            </span>
+                            <span style={{ fontSize: "0.72rem", color: "#475569", backgroundColor: "#f1f5f9", padding: "0.15rem 0.45rem", borderRadius: "4px", border: "1px solid #cbd5e1" }}>
+                              {method} {conf ? `(${conf}%)` : ""}
+                            </span>
+                          </>
+                        ) : (
+                          <span style={{ fontSize: "0.75rem", color: "#475569" }}>Stored in Vault</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                      <button
+                        type="button"
+                        onClick={() => handleView(doc)}
+                        className="btn-action-view"
+                      >
+                        View
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDownload(doc)}
+                        className="btn-secondary"
+                        style={{ padding: "0.3rem 0.6rem", fontSize: "0.8rem" }}
+                      >
+                        Download
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(doc.id, doc.original_name || doc.document_label)}
+                        className="btn-reject"
+                        style={{ padding: "0.3rem 0.6rem", fontSize: "0.8rem" }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        )}
       </div>
 
       {/* Vault Inventory Table */}

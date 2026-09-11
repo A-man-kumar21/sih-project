@@ -17,6 +17,7 @@ export const DOC_TYPE_LABELS = {
   epfo_esic_cert: "EPFO / ESIC Establishment Proof",
   digilocker_proof: "DigiLocker Verified Credential",
   other: "Other Statutory Document",
+  other_statutory: "Other Statutory / Technical Document",
 };
 
 export const CHECK_TO_DOC_TYPE = {

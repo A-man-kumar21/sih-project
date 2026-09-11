@@ -566,116 +566,233 @@ def heuristic_extract_bidder(text: str, document_type: str | None = None) -> dic
     }
 
 
+def parse_date_to_iso(date_str: str) -> str:
+    """Helper to parse extracted date string into ISO YYYY-MM-DD format."""
+    if not date_str:
+        return ""
+    clean = re.sub(r"[^\w\s\-/]", "", date_str).strip()
+    for fmt in (
+        "%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%m/%d/%Y",
+        "%d.%m.%Y", "%Y/%m/%d",
+        "%d %b %Y", "%d %B %Y",
+        "%d-%b-%Y", "%d-%B-%Y"
+    ):
+        try:
+            dt = datetime.strptime(clean, fmt)
+            return dt.strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    m = re.search(r"\b(20\d{2})[-/](0[1-9]|1[0-2])[-/](0[1-9]|[12]\d|3[01])\b", clean)
+    if m:
+        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+    m2 = re.search(r"\b(0[1-9]|[12]\d|3[01])[-/](0[1-9]|1[0-2])[-/](20\d{2})\b", clean)
+    if m2:
+        return f"{m2.group(3)}-{m2.group(2)}-{m2.group(1)}"
+    return ""
+
+
 def extract_tender_from_pdf(pdf_bytes: bytes, simulate_failure: bool = False) -> dict[str, Any]:
-    """Extract candidate fields from an uploaded tender notice PDF using LLM with heuristic fallback."""
+    """
+    100% Local deterministic tender notice extractor using PyMuPDF & PaddleOCR.
+    Zero external LLM or cloud API calls.
+    Extracts tenderReferenceId, title, category, description, submissionDeadline, and mandatoryChecks.
+    """
     if simulate_failure:
         return {
+            "text": "",
+            "fields": {
+                "tenderReferenceId": "",
+                "title": "",
+                "category": "Goods",
+                "description": "",
+                "submissionDeadline": "",
+                "mandatoryChecks": [],
+            },
+            "extractionMethod": "none",
+            "confidence": 0,
             "success": False,
-            "message": "Couldn't auto-extract, please fill manually (simulated failure).",
+            "error": "Couldn't auto-extract, please fill manually (simulated failure).",
             "extracted": {},
         }
 
     try:
-        raw_text = extract_text_from_pdf(pdf_bytes)
+        raw_text, method = extract_text_and_method(pdf_bytes, filename="tender.pdf")
     except Exception as e:
         return {
+            "text": "",
+            "fields": {
+                "tenderReferenceId": "",
+                "title": "",
+                "category": "Goods",
+                "description": "",
+                "submissionDeadline": "",
+                "mandatoryChecks": [],
+            },
+            "extractionMethod": "none",
+            "confidence": 0,
             "success": False,
-            "message": f"Could not read PDF file text ({str(e)}). Please fill manually.",
+            "error": f"Could not read PDF file text ({str(e)}). Please fill manually.",
             "extracted": {},
         }
 
     if not raw_text.strip():
         return {
-            "success": False,
-            "message": "Couldn't auto-extract: PDF contains no readable text. Please fill manually.",
-            "extracted": {},
-        }
-
-    prompt = f"""You are a GeM tender document analyzer.
-Extract the key tender parameters from the following tender notice text:
-
---- TENDER TEXT START ---
-{raw_text[:4000]}
---- TENDER TEXT END ---
-
-Extract:
-- tender_id: Tender Reference ID / Bid Number (e.g. GEM/2026/B/123456 or TENDER-2026-...)
-- title: Brief descriptive title of what is being procured
-- category: One of ["Goods", "Services", "Works", "IT & Telecom"]
-- mandatory_checks: Array of required compliance checks for this tender chosen from:
-  ["udyam", "gstn", "pan_it", "epfo_esic", "digilocker", "blacklist"]
-  Include a check ONLY if the text indicates it is mandatory or required.
-
-Respond with ONLY valid JSON:
-{{
-  "tender_id": "string",
-  "title": "string",
-  "category": "string",
-  "mandatory_checks": ["string"]
-}}"""
-
-    try:
-        llm_response, used_model = call_gemini(
-            prompt=prompt,
-            system_instruction="You are an accurate, deterministic JSON extractor for Indian government procurement tenders. Output only valid JSON.",
-            json_mode=True,
-            timeout=12.0,
-        )
-        parsed = json.loads(llm_response)
-        checks = [c for c in parsed.get("mandatory_checks", []) if c in {"udyam", "gstn", "pan_it", "epfo_esic", "digilocker", "blacklist"}]
-        return {
-            "success": True,
-            "source": "gemini_llm",
-            "model": used_model,
-            "extracted": {
-                "tender_id": parsed.get("tender_id", "").strip(),
-                "title": parsed.get("title", "").strip(),
-                "category": parsed.get("category", "Goods").strip(),
-                "mandatory_checks": checks or ["udyam", "gstn", "pan_it", "blacklist"],
+            "text": "",
+            "fields": {
+                "tenderReferenceId": "",
+                "title": "",
+                "category": "Goods",
+                "description": "",
+                "submissionDeadline": "",
+                "mandatoryChecks": [],
             },
-            "raw_snippet": raw_text[:250],
-        }
-    except Exception as e:
-        # Heuristic fallback for tenders
-        tender_id_match = re.search(r"\b(?:GEM/\d{4}/[A-Z]/\d+|TENDER-[A-Za-z0-9\-]+)\b", raw_text)
-        tender_id = tender_id_match.group(0) if tender_id_match else ""
-        
-        checks = ["gstn", "pan_it"]
-        if re.search(r"\budyam|msme|micro|small\b", raw_text, re.IGNORECASE):
-            checks.append("udyam")
-        if re.search(r"\bepfo|provident|esic|labor|labour\b", raw_text, re.IGNORECASE):
-            checks.append("epfo_esic")
-        if re.search(r"\bblacklist|debar|vigilance\b", raw_text, re.IGNORECASE):
-            checks.append("blacklist")
-
-        category = "Goods"
-        if re.search(r"\bservices|maintenance|facility|manpower\b", raw_text, re.IGNORECASE):
-            category = "Services"
-        elif re.search(r"\bworks|construction|civil|infrastructure\b", raw_text, re.IGNORECASE):
-            category = "Works"
-        elif re.search(r"\bsoftware|it|cloud|telecom\b", raw_text, re.IGNORECASE):
-            category = "IT & Telecom"
-
-        if tender_id or len(checks) > 2:
-            return {
-                "success": True,
-                "source": "heuristic_fallback",
-                "model": "local_text_parser",
-                "extracted": {
-                    "tender_id": tender_id,
-                    "title": "Procurement Tender (Extracted from Document)",
-                    "category": category,
-                    "mandatory_checks": checks,
-                },
-                "notice": f"Auto-extracted via local document parser (LLM unavailable: {str(e)[:60]}).",
-                "raw_snippet": raw_text[:250],
-            }
-
-        return {
+            "extractionMethod": method,
+            "confidence": 0,
             "success": False,
-            "message": "Couldn't auto-extract, please fill manually.",
+            "error": "Couldn't auto-extract: PDF contains no readable text. Please fill manually.",
             "extracted": {},
         }
+
+    norm_text = normalize_text(raw_text)
+
+    # 1. Tender Reference ID
+    tender_id = ""
+    gem_match = re.search(r"\bGEM/\d{4}/[A-Z0-9]+/\d+\b", norm_text, re.IGNORECASE)
+    if gem_match:
+        tender_id = gem_match.group(0).upper()
+    else:
+        lbl_match = re.search(
+            r"(?i)(?:Tender\s*(?:Reference\s*)?(?:No|ID|Number)|Bid\s*(?:Reference\s*)?(?:No|ID|Number)|NIT\s*(?:No|Number)|RFP\s*(?:No|Number)|Bid\s*Number)\s*[:\-]\s*([A-Za-z0-9_/\.\-]+)",
+            norm_text,
+        )
+        if lbl_match:
+            candidate = lbl_match.group(1).strip().strip(".,;:").upper()
+            if len(candidate) >= 4 and not candidate.startswith("HTTP"):
+                tender_id = candidate
+        else:
+            gen_match = re.search(r"\b(?:TENDER|NIT|RFP|BID)[/-][A-Za-z0-9_/\.\-]+\b", norm_text, re.IGNORECASE)
+            if gen_match:
+                tender_id = gen_match.group(0).upper()
+
+    # 2. Title
+    title = ""
+    title_match = re.search(
+        r"(?i)(?:Tender\s*Title|Name\s*of\s*(?:the\s*)?Work|Title\s*of\s*(?:the\s*)?Tender|Subject|Project\s*Title|Work\s*Description|Item\s*Description|Brief\s*Scope)\s*[:\-]\s*([^\n\r]+)",
+        norm_text,
+    )
+    if title_match:
+        cand_title = title_match.group(1).strip().strip('"\'')
+        if len(cand_title) >= 5:
+            title = cand_title[:120].strip()
+    else:
+        header_match = re.search(
+            r"(?i)(?:INVITATION\s*FOR\s*BIDS\s*(?:FOR)?|NOTICE\s*INVITING\s*TENDER\s*(?:FOR)?|TENDER\s*FOR\s*(?:THE\s*)?(?:SUPPLY\s*OF)?|REQUEST\s*FOR\s*PROPOSAL\s*(?:FOR)?)\s*[:\-]?\s*([^\n\r]+)",
+            norm_text,
+        )
+        if header_match:
+            cand_title = header_match.group(1).strip().strip('"\'')
+            if len(cand_title) >= 5:
+                title = cand_title[:120].strip()
+
+    # 3. Category
+    category = "Goods"
+    if re.search(r"(?i)\b(?:medical|hospital|healthcare|diagnostic|clinical|pharmaceutical|surgical|patient|ventilator)\b", norm_text):
+        category = "Medical Devices"
+    elif re.search(r"(?i)\b(?:software|cloud|telecom|network|cyber|server|computing|it\s*infrastructure|cyber\s*defense)\b", norm_text):
+        category = "IT & Telecom"
+    elif re.search(r"(?i)\b(?:works|construction|civil|infrastructure|building|renovation|road|pipeline)\b", norm_text):
+        category = "Works & Infrastructure"
+    elif re.search(r"(?i)\b(?:services|maintenance|facility|manpower|consultancy|consulting|security|housekeeping|annual\s*maintenance|amc)\b", norm_text):
+        category = "Services"
+
+    # 4. Description & Scope of Work
+    description = ""
+    desc_match = re.search(
+        r"(?i)(?:Description\s*(?:&|and)?\s*Scope(?:\s*of\s*Work)?|Detailed\s*Scope(?:\s*of\s*Work)?|Scope\s*of\s*(?:Work|Contract|Supply)|Brief\s*Description|Work\s*Scope)\s*[:\-]\s*([^\n\r]+(?:\n[^\n\r]+){0,3})",
+        norm_text,
+    )
+    if desc_match:
+        cand_desc = desc_match.group(1).strip()
+        lines = [l.strip() for l in cand_desc.split("\n") if l.strip() and not re.search(r"(?i)deadline|date|signature", l)]
+        if lines:
+            description = " ".join(lines)[:400].strip()
+    if not description and title:
+        description = f"Procurement scope and technical specifications for {title} as outlined in the tender notification."
+
+    # 5. Submission Deadline
+    deadline_str = ""
+    dl_match = re.search(
+        r"(?i)(?:Bid\s*Submission\s*End\s*Date|Submission\s*Deadline|Bid\s*Closing\s*Date|Last\s*Date\s*(?:&|and)?\s*Time\s*for\s*(?:Bid\s*)?Submission|Closing\s*Date|Due\s*Date|End\s*Date)\s*[:\-]?\s*([0-9]{1,2}[-/\.][0-9]{1,2}[-/\.][0-9]{2,4}|[0-9]{4}[-/\.][0-9]{1,2}[-/\.][0-9]{1,2}|[0-9]{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+[0-9]{4})",
+        norm_text,
+    )
+    if dl_match:
+        parsed_iso = parse_date_to_iso(dl_match.group(1))
+        if parsed_iso:
+            deadline_str = parsed_iso
+
+    # 6. Mandatory Statutory Compliance Checks
+    checks = []
+    if re.search(r"(?i)\b(?:udyam|msme|micro\s*(?:and|&)?\s*small|udyam\s*registration)\b", norm_text):
+        checks.append("udyam")
+    if re.search(r"(?i)\b(?:gst|gstin|goods\s*and\s*services\s*tax|gst\s*registration)\b", norm_text):
+        checks.append("gstn")
+    if re.search(r"(?i)\b(?:pan|permanent\s*account\s*number|income\s*tax|itr)\b", norm_text):
+        checks.append("pan_it")
+    if re.search(r"(?i)\b(?:epfo|esic|provident\s*fund|employee(?:s)?\s*state\s*insurance|labor\s*compliance|labour\s*compliance)\b", norm_text):
+        checks.append("epfo_esic")
+    if re.search(r"(?i)\b(?:digilocker|digital\s*locker|cryptographic\s*verification)\b", norm_text):
+        checks.append("digilocker")
+    if re.search(r"(?i)\b(?:blacklist|blacklisted|debarment|debarred|non-debarment|central\s*debarment|vigilance)\b", norm_text):
+        checks.append("blacklist")
+
+    # Confidence calculation
+    conf = 0
+    if tender_id:
+        conf += 30
+    if title:
+        conf += 25
+    if category != "Goods" or re.search(r"(?i)\bgoods|equipment|supplies\b", norm_text):
+        conf += 15
+    if deadline_str:
+        conf += 15
+    if checks:
+        conf += 15
+    confidence = min(max(conf, 40 if (tender_id or title) else 0), 98)
+
+    success = bool(tender_id or title)
+
+    fields = {
+        "tenderReferenceId": tender_id,
+        "title": title,
+        "category": category,
+        "description": description,
+        "submissionDeadline": deadline_str,
+        "mandatoryChecks": checks,
+        # Backward compatibility aliases
+        "tender_id": tender_id,
+        "deadline": deadline_str,
+        "mandatory_checks": checks,
+    }
+
+    return {
+        "text": raw_text,
+        "fields": fields,
+        "extractionMethod": method,
+        "confidence": confidence,
+        "success": success,
+        "error": None if success else "Could not extract mandatory tender fields. Please fill manually.",
+        # Backward compatibility aliases
+        "extracted": {
+            "tender_id": tender_id,
+            "title": title,
+            "category": category,
+            "description": description,
+            "deadline": deadline_str,
+            "mandatory_checks": checks,
+        },
+        "source": f"local_{method}",
+        "model": f"local_{method}",
+    }
 
 
 # =====================================================================

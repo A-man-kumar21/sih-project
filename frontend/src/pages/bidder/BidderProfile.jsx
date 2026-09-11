@@ -189,6 +189,62 @@ export default function BidderProfile() {
     );
   };
 
+  const renderConflictBadge = (fieldKey, formProp) => {
+    const meta = provenance[fieldKey];
+    if (!meta || !meta.conflict || !meta.conflict.conflicting_value) return null;
+
+    const conflictVal = meta.conflict.conflicting_value;
+    const conflictSrc = meta.conflict.conflicting_source || "Another Document";
+    const conflictDoc = meta.conflict.conflicting_doc_name ? ` (${meta.conflict.conflicting_doc_name})` : "";
+
+    return (
+      <div
+        style={{
+          marginTop: "0.35rem",
+          padding: "0.4rem 0.65rem",
+          backgroundColor: "#fffbeb",
+          border: "1px solid #fde68a",
+          borderRadius: "6px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "0.5rem",
+          fontSize: "0.8rem",
+          color: "#92400e",
+        }}
+      >
+        <span>
+          ⚠ <strong>Conflicting Data:</strong> Extracted <strong>"{conflictVal}"</strong> from {conflictSrc}{conflictDoc}.
+        </span>
+        <button
+          type="button"
+          onClick={() => {
+            setFormData((prev) => {
+              const updated = { ...prev, [formProp || fieldKey]: conflictVal };
+              if (fieldKey === "enterprise_name") {
+                updated.company_name = conflictVal;
+              }
+              return updated;
+            });
+          }}
+          className="btn-secondary"
+          style={{
+            fontSize: "0.75rem",
+            padding: "0.2rem 0.55rem",
+            whiteSpace: "nowrap",
+            backgroundColor: "#fef3c7",
+            border: "1px solid #d97706",
+            color: "#92400e",
+            cursor: "pointer",
+            fontWeight: 600,
+          }}
+        >
+          Use "{conflictVal}"
+        </button>
+      </div>
+    );
+  };
+
   if (loading) {
     return <div className="loading-state">Loading enterprise profile...</div>;
   }
@@ -261,6 +317,7 @@ export default function BidderProfile() {
               onChange={(e) => setFormData({ ...formData, enterprise_name: e.target.value, company_name: e.target.value })}
               required
             />
+            {renderConflictBadge("enterprise_name", "enterprise_name")}
           </div>
 
           <div className="form-group">
@@ -274,6 +331,7 @@ export default function BidderProfile() {
               value={formData.business_constitution}
               onChange={(e) => setFormData({ ...formData, business_constitution: e.target.value })}
             />
+            {renderConflictBadge("business_constitution", "business_constitution")}
           </div>
         </div>
 
@@ -294,6 +352,7 @@ export default function BidderProfile() {
               <option value="Medium">Medium Enterprise</option>
               <option value="Large">Large / Non-MSME Enterprise</option>
             </select>
+            {renderConflictBadge("enterprise_type", "enterprise_type")}
           </div>
 
           <div className="form-group">
@@ -307,6 +366,7 @@ export default function BidderProfile() {
               value={formData.registration_date}
               onChange={(e) => setFormData({ ...formData, registration_date: e.target.value })}
             />
+            {renderConflictBadge("registration_date", "registration_date")}
           </div>
         </div>
 
@@ -321,6 +381,7 @@ export default function BidderProfile() {
             value={formData.registered_address}
             onChange={(e) => setFormData({ ...formData, registered_address: e.target.value })}
           />
+          {renderConflictBadge("registered_address", "registered_address")}
         </div>
 
         <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "2rem 0 1.5rem" }} />
@@ -347,6 +408,7 @@ export default function BidderProfile() {
               style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
               required
             />
+            {renderConflictBadge("pan", "pan")}
           </div>
 
           <div className="form-group">
@@ -362,6 +424,7 @@ export default function BidderProfile() {
               style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
               required
             />
+            {renderConflictBadge("gstin", "gstin")}
           </div>
         </div>
 
@@ -378,6 +441,7 @@ export default function BidderProfile() {
               onChange={(e) => setFormData({ ...formData, udyam_number: e.target.value.toUpperCase() })}
               style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
             />
+            {renderConflictBadge("udyam_number", "udyam_number")}
           </div>
 
           <div className="form-group">
@@ -392,6 +456,7 @@ export default function BidderProfile() {
               onChange={(e) => setFormData({ ...formData, cin: e.target.value.toUpperCase() })}
               style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
             />
+            {renderConflictBadge("cin", "cin")}
           </div>
         </div>
 
@@ -408,6 +473,7 @@ export default function BidderProfile() {
               onChange={(e) => setFormData({ ...formData, epfo_number: e.target.value.toUpperCase() })}
               style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
             />
+            {renderConflictBadge("epfo_number", "epfo_number")}
           </div>
 
           <div className="form-group">
@@ -422,6 +488,7 @@ export default function BidderProfile() {
               onChange={(e) => setFormData({ ...formData, esic_number: e.target.value.toUpperCase() })}
               style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
             />
+            {renderConflictBadge("esic_number", "esic_number")}
           </div>
         </div>
 
