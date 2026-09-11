@@ -25,5 +25,65 @@
     ],
     "description": "Custom tender requiring: gstn, pan_it, blacklist, udyam, digilocker, epfo_esic",
     "created_at": "2026-09-06T20:20:23.682002Z"
+  },
+  "TENDER-TEST-1789142115644": {
+    "tender_id": "TENDER-TEST-1789142115644",
+    "title": "Advanced Perimeter Defense & Cybersecurity Hardware",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "High-integrity procurement requiring verified PAN, GSTN, and Udyam MSME certification.",
+    "created_at": "2026-09-11T15:55:16.320173Z"
+  },
+  "TENDER-DEBUG-001": {
+    "tender_id": "TENDER-DEBUG-001",
+    "title": "Debug Tender",
+    "category": "Goods",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "Scope",
+    "created_at": "2026-09-11T15:55:22.161253Z"
+  },
+  "TENDER-TEST-1789142171579": {
+    "tender_id": "TENDER-TEST-1789142171579",
+    "title": "Advanced Perimeter Defense & Cybersecurity Hardware",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "High-integrity procurement requiring verified PAN, GSTN, and Udyam MSME certification.",
+    "created_at": "2026-09-11T15:56:13.339298Z"
+  },
+  "TENDER-TEST-1789142341365": {
+    "tender_id": "TENDER-TEST-1789142341365",
+    "title": "Advanced Perimeter Defense & Cybersecurity Hardware",
+    "category": "IT & Telecom",
+    "mandatory_checks": [
+      "pan_it",
+      "gstn",
+      "udyam"
+    ],
+    "description": "High-integrity procurement requiring verified PAN, GSTN, and Udyam MSME certification.",
+    "created_at": "2026-09-11T15:59:02.718424Z"
+  },
+  "GEM/2026/A/6766": {
+    "tender_id": "GEM/2026/A/6766",
+    "title": "SUPPLY MISSLE",
+    "category": "Goods",
+    "mandatory_checks": [
+      "udyam",
+      "gstn",
+      "pan_it"
+    ],
+    "description": "HEAVY MISSLE",
+    "created_at": "2026-09-11T16:11:19.882020Z"
   }
 }

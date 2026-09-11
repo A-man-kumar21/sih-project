@@ -1,7 +1,20 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
-import { getAuditCollection } from "./db.js";
+import multer from "multer";
+import { getAuditCollection, getApplicationsCollection, getTendersCollection } from "./db.js";
+import { optionalAuth, requireAuth, requireRole } from "./middleware/auth.js";
+
+import authRouter from "./routes/auth.js";
+import bidderRouter, { applyForTender, resubmitInfo } from "./routes/bidder.js";
+import officerRouter, {
+  getTenderApplicants,
+  getApplicationDetail,
+  approveApplication,
+  rejectApplication,
+  requestInfo,
+} from "./routes/officer.js";
+import documentsRouter from "./routes/documents.js";
 
 const app = express();
 app.use(cors());
@@ -13,6 +26,26 @@ app.get("/health", (_request, response) => {
 
 const ENGINE_URL = process.env.AI_ENGINE_URL || "http://127.0.0.1:8000";
 const VALID_DECISIONS = new Set(["approve", "reject", "request_more_info"]);
+
+// Mount Feature Routers
+app.use("/api/auth", authRouter);
+app.use("/api/bidder", bidderRouter);
+app.use("/api/officer", officerRouter);
+app.use("/api/documents", documentsRouter);
+
+// Direct top-level application & tender endpoints
+app.post("/api/tenders/:id/apply", requireAuth, requireRole("bidder"), applyForTender);
+app.get("/api/tenders/:id/applications", requireAuth, requireRole("officer"), getTenderApplicants);
+app.get("/api/applications/:id", requireAuth, getApplicationDetail);
+app.post("/api/applications/:id/approve", requireAuth, requireRole("officer"), approveApplication);
+app.post("/api/applications/:id/reject", requireAuth, requireRole("officer"), rejectApplication);
+app.post("/api/applications/:id/request-info", requireAuth, requireRole("officer"), requestInfo);
+app.post("/api/applications/:id/resubmit-info", requireAuth, requireRole("bidder"), resubmitInfo);
+
+
+// =============================================================================
+// PRESERVED BIDDER APIS
+// =============================================================================
 
 app.get("/api/bidders", async (_request, response, next) => {
   try {
@@ -50,14 +83,12 @@ app.delete("/api/bidders/:bidderId", async (request, response, next) => {
   }
 });
 
-import multer from "multer";
-
-const upload = multer({
+const memoryUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit
 });
 
-app.post("/api/extract/bidder-pdf", upload.single("file"), async (request, response, next) => {
+app.post("/api/extract/bidder-pdf", memoryUpload.single("file"), async (request, response, next) => {
   try {
     if (!request.file) {
       return response.status(400).json({ success: false, message: "No PDF file uploaded" });
@@ -78,7 +109,7 @@ app.post("/api/extract/bidder-pdf", upload.single("file"), async (request, respo
   }
 });
 
-app.post("/api/extract/tender-pdf", upload.single("file"), async (request, response, next) => {
+app.post("/api/extract/tender-pdf", memoryUpload.single("file"), async (request, response, next) => {
   try {
     if (!request.file) {
       return response.status(400).json({ success: false, message: "No PDF file uploaded" });
@@ -99,6 +130,10 @@ app.post("/api/extract/tender-pdf", upload.single("file"), async (request, respo
   }
 });
 
+// =============================================================================
+// PRESERVED TENDER APIS
+// =============================================================================
+
 app.get("/api/tenders", async (_request, response, next) => {
   try {
     const engineResponse = await fetch(`${ENGINE_URL}/tenders`);
@@ -109,15 +144,56 @@ app.get("/api/tenders", async (_request, response, next) => {
   }
 });
 
-app.post("/api/tenders", async (request, response, next) => {
+app.post("/api/tenders", optionalAuth, async (request, response, next) => {
   try {
+    // If request is authenticated, enforce that user must be an officer
+    if (request.user && request.user.role !== "officer") {
+      return response.status(403).json({
+        error: "Access denied. Only authenticated government officers can create tenders.",
+      });
+    }
+
     const engineResponse = await fetch(`${ENGINE_URL}/tenders`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(request.body),
     });
     const data = await engineResponse.json();
-    return response.status(engineResponse.status).json(data);
+    if (!engineResponse.ok) {
+      return response.status(engineResponse.status).json(data);
+    }
+
+    let createdBy = null;
+    let createdByName = null;
+    if (request.user) {
+      createdBy = request.user.id;
+      createdByName = request.user.full_name;
+      const tenders = await getTendersCollection();
+      await tenders.updateOne(
+        { tender_id: request.body.tender_id },
+        {
+          $set: {
+            ...data.tender,
+            created_by: createdBy,
+            created_by_name: createdByName,
+            deadline: request.body.deadline || null,
+            updated_at: new Date(),
+          },
+        },
+        { upsert: true }
+      );
+    }
+
+    const resTender = {
+      ...data.tender,
+      created_by: createdBy,
+      created_by_name: createdByName,
+    };
+
+    return response.status(201).json({
+      status: "registered",
+      tender: resTender,
+    });
   } catch (error) {
     return next(error);
   }
@@ -135,10 +211,10 @@ app.delete("/api/tenders/:tenderId", async (request, response, next) => {
   }
 });
 
-/**
- * Overview dashboard route: returns all active bidders with their compliance score,
- * risk level, and latest MongoDB officer decision status for the active tender.
- */
+// =============================================================================
+// OVERVIEW DASHBOARD ROUTE (PRESERVED)
+// =============================================================================
+
 app.get("/api/overview", async (request, response, next) => {
   try {
     const tenderId = request.query.tender_id || "TENDER-ALL-MANDATORY";
@@ -230,9 +306,12 @@ app.get("/api/overview", async (request, response, next) => {
   }
 });
 
+// =============================================================================
+// COMPLIANCE EVALUATION & AUDIT TRAIL (PRESERVED & SYNCHRONIZED)
+// =============================================================================
+
 /**
- * Proxies the AI engine unchanged. The assessment is persisted separately; the
- * gateway never recalculates or changes the engine response.
+ * Proxies the AI engine unchanged. The assessment is persisted separately.
  */
 app.post("/api/compliance/verify", async (request, response, next) => {
   try {
@@ -266,10 +345,16 @@ app.post("/api/compliance/verify", async (request, response, next) => {
   }
 });
 
-/** Records a human decision without modifying AI assessment fields. */
-app.post("/api/audit/decision", async (request, response, next) => {
+/**
+ * Records a human officer decision without modifying AI assessment fields.
+ * Derives officer_id from authenticated session when available, preserving audit sync.
+ */
+app.post("/api/audit/decision", optionalAuth, async (request, response, next) => {
   try {
-    const { bidder_id: bidderId, decision, officer_id: officerId } = request.body;
+    const { bidder_id: bidderId, decision } = request.body;
+    // Derive officer_id from authenticated JWT session; fallback to body for legacy tests
+    const officerId = request.user?.id || request.user?.full_name || request.body.officer_id;
+
     if (!bidderId || !officerId || !VALID_DECISIONS.has(decision)) {
       return response.status(400).json({
         error: "bidder_id, officer_id, and decision (approve/reject/request_more_info) are required.",
@@ -279,7 +364,7 @@ app.post("/api/audit/decision", async (request, response, next) => {
     const audit = await getAuditCollection();
     const result = await audit.findOneAndUpdate(
       { bidder_id: bidderId, officer_decision: null },
-      { $set: { officer_decision: decision, officer_id: officerId } },
+      { $set: { officer_decision: decision, officer_id: officerId, decided_at: new Date() } },
       { sort: { timestamp: -1 }, returnDocument: "after" },
     );
 
@@ -288,6 +373,26 @@ app.post("/api/audit/decision", async (request, response, next) => {
         error: "No undecided scoring audit entry exists for this bidder.",
       });
     }
+
+    // Keep tender_applications synchronized if an application exists for this bidder
+    try {
+      const applications = await getApplicationsCollection();
+      const mappedStatus = decision === "approve" ? "approved" : decision === "reject" ? "rejected" : "info_requested";
+      await applications.updateOne(
+        { bidder_id: bidderId, status: { $in: ["submitted", "under_review", "info_requested"] } },
+        {
+          $set: {
+            status: mappedStatus,
+            officer_id: officerId,
+            decided_at: new Date(),
+            updated_at: new Date(),
+          },
+        }
+      );
+    } catch (syncErr) {
+      console.warn("Notice: Application status sync warning:", syncErr.message);
+    }
+
     return response.json(result);
   } catch (error) {
     return next(error);
@@ -310,7 +415,7 @@ app.get("/api/audit/:bidderId", async (request, response, next) => {
 
 app.use((error, _request, response, _next) => {
   console.error(error);
-  response.status(502).json({ error: "Gateway could not complete the requested operation." });
+  response.status(502).json({ error: error.message || "Gateway could not complete the requested operation." });
 });
 
 const port = process.env.PORT || 3001;

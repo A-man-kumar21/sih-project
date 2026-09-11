@@ -1,0 +1,555 @@
+import express from "express";
+import { ObjectId } from "mongodb";
+import {
+  getTendersCollection,
+  getApplicationsCollection,
+  getAuditCollection,
+  getDocumentsCollection,
+} from "../db.js";
+import { requireAuth, requireRole } from "../middleware/auth.js";
+
+const router = express.Router();
+const ENGINE_URL = process.env.AI_ENGINE_URL || "http://127.0.0.1:8000";
+
+/**
+ * GET /api/officer/overview
+ * Overview metrics for the Officer Dashboard.
+ */
+router.get("/overview", requireAuth, requireRole("officer"), async (_request, response, next) => {
+  try {
+    const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
+    const tendersList = await tendersRes.json();
+
+    const applications = await getApplicationsCollection();
+    const allApps = await applications.find({}).toArray();
+
+    const totalApplications = allApps.length;
+    const underReview = allApps.filter((a) => a.status === "under_review" || a.status === "submitted").length;
+    const approved = allApps.filter((a) => a.status === "approved").length;
+    const rejected = allApps.filter((a) => a.status === "rejected").length;
+    const infoRequested = allApps.filter((a) => a.status === "info_requested").length;
+
+    return response.json({
+      success: true,
+      metrics: {
+        total_tenders: tendersList.length,
+        active_tenders: tendersList.length,
+        total_applications: totalApplications,
+        under_review: underReview,
+        approved,
+        rejected,
+        info_requested: infoRequested,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+/**
+ * GET /api/officer/tenders
+ * Lists all tenders with their applicant counts.
+ */
+router.get("/tenders", requireAuth, requireRole("officer"), async (_request, response, next) => {
+  try {
+    const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
+    const tendersList = await tendersRes.json();
+
+    const applications = await getApplicationsCollection();
+    const allApps = await applications.find({}).toArray();
+
+    const appCounts = new Map();
+    for (const app of allApps) {
+      const current = appCounts.get(app.tender_id) || {
+        total: 0,
+        under_review: 0,
+        approved: 0,
+        rejected: 0,
+        info_requested: 0,
+      };
+      current.total += 1;
+      if (app.status === "submitted" || app.status === "under_review") current.under_review += 1;
+      if (app.status === "approved") current.approved += 1;
+      if (app.status === "rejected") current.rejected += 1;
+      if (app.status === "info_requested") current.info_requested += 1;
+      appCounts.set(app.tender_id, current);
+    }
+
+    const tendersWithCounts = tendersList.map((t) => ({
+      ...t,
+      applications_summary: appCounts.get(t.tender_id) || {
+        total: 0,
+        under_review: 0,
+        approved: 0,
+        rejected: 0,
+        info_requested: 0,
+      },
+    }));
+
+    return response.json({
+      success: true,
+      tenders: tendersWithCounts,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+/**
+ * POST /api/tenders
+ * Officer creates a new procurement tender with dynamic compliance requirements.
+ */
+router.post("/tenders", requireAuth, requireRole("officer"), async (request, response, next) => {
+  try {
+    const { tender_id, title, category, description, mandatory_checks, deadline } = request.body;
+
+    if (!tender_id || !title || !category || !mandatory_checks || !mandatory_checks.length) {
+      return response.status(400).json({
+        error: "Tender ID, Title, Category, and at least one Mandatory Compliance Check are required.",
+      });
+    }
+
+    // 1. Register tender with AI Engine
+    const engineRes = await fetch(`${ENGINE_URL}/tenders`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        tender_id: tender_id.trim().toUpperCase(),
+        title: title.trim(),
+        category: category.trim(),
+        description: (description || "").trim(),
+        mandatory_checks,
+      }),
+    });
+
+    const engineData = await engineRes.json();
+    if (!engineRes.ok) {
+      return response.status(engineRes.status).json(engineData);
+    }
+
+    // 2. Persist tender record in MongoDB with Officer Ownership
+    const tenders = await getTendersCollection();
+    const now = new Date();
+    const tenderRecord = {
+      tender_id: tender_id.trim().toUpperCase(),
+      title: title.trim(),
+      category: category.trim(),
+      description: (description || "").trim(),
+      mandatory_checks,
+      deadline: deadline || null,
+      created_by: request.user.id,
+      created_by_name: request.user.full_name || "Procurement Officer",
+      created_at: now,
+      updated_at: now,
+    };
+
+    await tenders.updateOne(
+      { tender_id: tenderRecord.tender_id },
+      { $set: tenderRecord },
+      { upsert: true }
+    );
+
+    return response.status(201).json({
+      success: true,
+      status: "registered",
+      message: `Tender '${tenderRecord.tender_id}' created successfully.`,
+      tender: tenderRecord,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+/**
+ * GET /api/tenders/:id/applications
+ * Displays applicants for a tender, ranked strictly by COMPLIANCE SCORE DESCENDING.
+ */
+export const getTenderApplicants = async (request, response, next) => {
+  try {
+    const tenderId = request.params.id;
+
+    // Fetch tender details
+    const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
+    const tendersList = await tendersRes.json();
+    const tender = tendersList.find((t) => t.tender_id === tenderId);
+
+    const applications = await getApplicationsCollection();
+
+    // FETCH ONLY BIDDERS WHO ACTUALLY APPLIED TO THIS TENDER
+    // SORT IN COMPLIANCE SCORE DESCENDING ORDER (HIGHEST FIRST)
+    const appList = await applications
+      .find({ tender_id: tenderId })
+      .sort({ compliance_score: -1, applied_at: 1 })
+      .toArray();
+
+    const rankedApplicants = appList.map((app, index) => ({
+      rank: index + 1,
+      id: app._id.toString(),
+      bidder_id: app.bidder_id,
+      company_name: app.company_name,
+      contact_person: app.contact_person,
+      email: app.email,
+      phone: app.phone,
+      compliance_score: app.compliance_score,
+      risk_level: app.risk_level,
+      status: app.status,
+      submitted_documents_count: app.submitted_documents?.length || 0,
+      applied_at: app.applied_at,
+      decided_at: app.decided_at,
+      officer_comment: app.officer_comment,
+    }));
+
+    return response.json({
+      success: true,
+      tender: tender || { tender_id: tenderId },
+      total_applicants: rankedApplicants.length,
+      applicants: rankedApplicants,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+router.get("/tenders/:id/applications", requireAuth, requireRole("officer"), getTenderApplicants);
+
+/**
+ * GET /api/applications/:id
+ * Retrieves detailed evaluation, statutory check breakdown, and document references.
+ */
+export const getApplicationDetail = async (request, response, next) => {
+  try {
+    const applications = await getApplicationsCollection();
+    let query;
+    try {
+      query = { _id: new ObjectId(request.params.id) };
+    } catch (e) {
+      return response.status(400).json({ error: "Invalid application ID format." });
+    }
+
+    const app = await applications.findOne(query);
+    if (!app) {
+      return response.status(404).json({ error: "Application not found." });
+    }
+
+    // Role security check: Bidder can only view own application
+    if (request.user.role === "bidder") {
+      if (app.bidder_user_id !== request.user.id && app.bidder_id !== request.user.bidder_id) {
+        return response.status(403).json({ error: "Access denied. You can only view your own applications." });
+      }
+    }
+
+    // Enrich submitted documents with secure download/view URLs
+    const docs = await getDocumentsCollection();
+    const enrichedDocs = await Promise.all(
+      (app.submitted_documents || []).map(async (docRef) => {
+        let originalDoc = null;
+        try {
+          originalDoc = await docs.findOne({ _id: new ObjectId(docRef.document_id) });
+        } catch (e) {}
+
+        return {
+          document_id: docRef.document_id,
+          document_type: docRef.document_type,
+          file_name: docRef.file_name,
+          mime_type: originalDoc?.mime_type || "application/pdf",
+          file_size: originalDoc?.file_size || null,
+          uploaded_at: docRef.uploaded_at || originalDoc?.uploaded_at,
+          download_url: `/api/documents/${docRef.document_id}/download`,
+          view_url: `/api/documents/${docRef.document_id}/view`,
+        };
+      })
+    );
+
+    return response.json({
+      success: true,
+      application: {
+        id: app._id.toString(),
+        tender_id: app.tender_id,
+        tender_title: app.tender_title,
+        tender_category: app.tender_category,
+        bidder_id: app.bidder_id,
+        company_name: app.company_name,
+        contact_person: app.contact_person,
+        phone: app.phone,
+        email: app.email,
+        compliance_score: app.compliance_score,
+        risk_level: app.risk_level,
+        checks: app.checks || [],
+        llm_briefing: app.llm_briefing || null,
+        status: app.status,
+        submitted_documents: enrichedDocs,
+        applied_at: app.applied_at,
+        updated_at: app.updated_at,
+        decided_at: app.decided_at,
+        officer_id: app.officer_id,
+        officer_name: app.officer_name,
+        officer_comment: app.officer_comment,
+        bidder_response_note: app.bidder_response_note || null,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+router.get("/applications/:id", requireAuth, getApplicationDetail);
+
+/**
+ * POST /api/applications/:id/approve
+ * Approves applicant and synchronizes with immutable MongoDB audit trail.
+ */
+export const approveApplication = async (request, response, next) => {
+  try {
+    const { comment } = request.body;
+    const applications = await getApplicationsCollection();
+
+    let query;
+    try {
+      query = { _id: new ObjectId(request.params.id) };
+    } catch (e) {
+      return response.status(400).json({ error: "Invalid application ID format." });
+    }
+
+    const app = await applications.findOne(query);
+    if (!app) {
+      return response.status(404).json({ error: "Application not found." });
+    }
+
+    const now = new Date();
+    const officerId = request.user.id;
+    const officerName = request.user.full_name || "Procurement Officer";
+    const decisionComment = (comment || "Approved by procurement officer.").trim();
+
+    // 1. Update tender application
+    await applications.updateOne(
+      { _id: app._id },
+      {
+        $set: {
+          status: "approved",
+          officer_id: officerId,
+          officer_name: officerName,
+          officer_comment: decisionComment,
+          decided_at: now,
+          updated_at: now,
+        },
+      }
+    );
+
+    // 2. Synchronize with MongoDB audit trail
+    const audit = await getAuditCollection();
+    const updateAudit = await audit.findOneAndUpdate(
+      { bidder_id: app.bidder_id, officer_decision: null },
+      {
+        $set: {
+          officer_decision: "approve",
+          officer_id: officerId,
+          officer_comment: decisionComment,
+          decided_at: now,
+        },
+      },
+      { sort: { timestamp: -1 }, returnDocument: "after" }
+    );
+
+    if (!updateAudit) {
+      // Fallback insert if no undecided entry existed
+      await audit.insertOne({
+        bidder_id: app.bidder_id,
+        tender_id: app.tender_id,
+        timestamp: now.toISOString(),
+        compliance_score: app.compliance_score,
+        risk_level: app.risk_level,
+        pending_manual_review: false,
+        llm_briefing: app.llm_briefing?.text || null,
+        officer_decision: "approve",
+        officer_id: officerId,
+        officer_comment: decisionComment,
+        decided_at: now,
+      });
+    }
+
+    return response.json({
+      success: true,
+      message: `Application for ${app.company_name} approved successfully.`,
+      status: "approved",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+router.post("/applications/:id/approve", requireAuth, requireRole("officer"), approveApplication);
+
+/**
+ * POST /api/applications/:id/reject
+ * Rejects applicant with mandatory reason and synchronizes with audit trail.
+ */
+export const rejectApplication = async (request, response, next) => {
+  try {
+    const { comment } = request.body;
+    if (!comment || !comment.trim()) {
+      return response.status(400).json({ error: "A rejection reason/comment is required." });
+    }
+
+    const applications = await getApplicationsCollection();
+
+    let query;
+    try {
+      query = { _id: new ObjectId(request.params.id) };
+    } catch (e) {
+      return response.status(400).json({ error: "Invalid application ID format." });
+    }
+
+    const app = await applications.findOne(query);
+    if (!app) {
+      return response.status(404).json({ error: "Application not found." });
+    }
+
+    const now = new Date();
+    const officerId = request.user.id;
+    const officerName = request.user.full_name || "Procurement Officer";
+    const decisionComment = comment.trim();
+
+    // 1. Update application
+    await applications.updateOne(
+      { _id: app._id },
+      {
+        $set: {
+          status: "rejected",
+          officer_id: officerId,
+          officer_name: officerName,
+          officer_comment: decisionComment,
+          decided_at: now,
+          updated_at: now,
+        },
+      }
+    );
+
+    // 2. Synchronize with MongoDB audit trail
+    const audit = await getAuditCollection();
+    const updateAudit = await audit.findOneAndUpdate(
+      { bidder_id: app.bidder_id, officer_decision: null },
+      {
+        $set: {
+          officer_decision: "reject",
+          officer_id: officerId,
+          officer_comment: decisionComment,
+          decided_at: now,
+        },
+      },
+      { sort: { timestamp: -1 }, returnDocument: "after" }
+    );
+
+    if (!updateAudit) {
+      await audit.insertOne({
+        bidder_id: app.bidder_id,
+        tender_id: app.tender_id,
+        timestamp: now.toISOString(),
+        compliance_score: app.compliance_score,
+        risk_level: app.risk_level,
+        pending_manual_review: false,
+        llm_briefing: app.llm_briefing?.text || null,
+        officer_decision: "reject",
+        officer_id: officerId,
+        officer_comment: decisionComment,
+        decided_at: now,
+      });
+    }
+
+    return response.json({
+      success: true,
+      message: `Application for ${app.company_name} rejected.`,
+      status: "rejected",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+router.post("/applications/:id/reject", requireAuth, requireRole("officer"), rejectApplication);
+
+/**
+ * POST /api/applications/:id/request-info
+ * Requests more information with mandatory message and synchronizes with audit trail.
+ */
+export const requestInfo = async (request, response, next) => {
+  try {
+    const { comment } = request.body;
+    if (!comment || !comment.trim()) {
+      return response.status(400).json({
+        error: "Please enter an explanation of what document or clarification is required.",
+      });
+    }
+
+    const applications = await getApplicationsCollection();
+
+    let query;
+    try {
+      query = { _id: new ObjectId(request.params.id) };
+    } catch (e) {
+      return response.status(400).json({ error: "Invalid application ID format." });
+    }
+
+    const app = await applications.findOne(query);
+    if (!app) {
+      return response.status(404).json({ error: "Application not found." });
+    }
+
+    const now = new Date();
+    const officerId = request.user.id;
+    const officerName = request.user.full_name || "Procurement Officer";
+    const decisionComment = comment.trim();
+
+    // 1. Update application
+    await applications.updateOne(
+      { _id: app._id },
+      {
+        $set: {
+          status: "info_requested",
+          officer_id: officerId,
+          officer_name: officerName,
+          officer_comment: decisionComment,
+          decided_at: now,
+          updated_at: now,
+        },
+      }
+    );
+
+    // 2. Synchronize with MongoDB audit trail
+    const audit = await getAuditCollection();
+    const updateAudit = await audit.findOneAndUpdate(
+      { bidder_id: app.bidder_id, officer_decision: null },
+      {
+        $set: {
+          officer_decision: "request_more_info",
+          officer_id: officerId,
+          officer_comment: decisionComment,
+          decided_at: now,
+        },
+      },
+      { sort: { timestamp: -1 }, returnDocument: "after" }
+    );
+
+    if (!updateAudit) {
+      await audit.insertOne({
+        bidder_id: app.bidder_id,
+        tender_id: app.tender_id,
+        timestamp: now.toISOString(),
+        compliance_score: app.compliance_score,
+        risk_level: app.risk_level,
+        pending_manual_review: true,
+        llm_briefing: app.llm_briefing?.text || null,
+        officer_decision: "request_more_info",
+        officer_id: officerId,
+        officer_comment: decisionComment,
+        decided_at: now,
+      });
+    }
+
+    return response.json({
+      success: true,
+      message: `Information request sent to ${app.company_name}.`,
+      status: "info_requested",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+router.post("/applications/:id/request-info", requireAuth, requireRole("officer"), requestInfo);
+
+export default router;

@@ -134,6 +134,8 @@ scratch/
 temp/
 tmp/
 *.tmp
+uploads/
+**/uploads/
 
 logs/
 *.log
