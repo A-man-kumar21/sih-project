@@ -49,8 +49,13 @@ const DEFAULT_TENDERS = [
   },
 ];
 
-async function api(url, options) {
-  const response = await fetch(url, options);
+async function api(url, options = {}) {
+  const token = localStorage.getItem("gem_auth_token");
+  const headers = { ...(options.headers || {}) };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  const response = await fetch(url, { ...options, headers });
   const body = await response.json();
   if (!response.ok) throw new Error(body.error || body.detail || "Request failed");
   return body;
@@ -62,9 +67,9 @@ const Status = ({ value }) => <span className={`badge status-${value}`}>{value?.
 export default function ComplianceCockpit() {
   const [currentView, setCurrentView] = useState("detail"); // "overview" | "detail"
   const [bidders, setBidders] = useState([]);
-  const [tenders, setTenders] = useState(DEFAULT_TENDERS);
+  const [tenders, setTenders] = useState([]);
   const [selectedBidderId, setSelectedBidderId] = useState("");
-  const [selectedTenderId, setSelectedTenderId] = useState("TENDER-ALL-MANDATORY");
+  const [selectedTenderId, setSelectedTenderId] = useState("");
   const [assessment, setAssessment] = useState(null);
   const [trail, setTrail] = useState([]);
   const [decision, setDecision] = useState();
@@ -111,7 +116,7 @@ export default function ComplianceCockpit() {
   });
 
   const activeTender = useMemo(() => {
-    return tenders.find((t) => t.tender_id === selectedTenderId) || tenders[0];
+    return tenders.find((t) => t.tender_id === selectedTenderId) || tenders[0] || null;
   }, [tenders, selectedTenderId]);
 
   const activeBidder = useMemo(() => {
@@ -183,33 +188,40 @@ export default function ComplianceCockpit() {
   useEffect(() => {
     async function init() {
       try {
-        let loadedTenders = DEFAULT_TENDERS;
+        setLoading(true);
+        let loadedTenders = [];
 
         try {
-          const remoteTenders = await api("/api/tenders");
-          if (Array.isArray(remoteTenders) && remoteTenders.length > 0) {
-            loadedTenders = remoteTenders;
-            setTenders(remoteTenders);
+          const res = await api("/api/officer/tenders");
+          if (res && Array.isArray(res.tenders)) {
+            loadedTenders = res.tenders;
+            setTenders(res.tenders);
           }
         } catch (e) {
-          console.warn("Using fallback tenders:", e.message);
+          console.warn("Could not load officer tenders:", e.message);
         }
 
-        const initialTenderId = loadedTenders[0]?.tender_id || "TENDER-ALL-MANDATORY";
-        setSelectedTenderId(initialTenderId);
+        if (loadedTenders.length > 0) {
+          const initialTenderId = loadedTenders[0].tender_id;
+          setSelectedTenderId(initialTenderId);
 
-        const applicants = await loadOverview(initialTenderId);
-        if (applicants && applicants.length > 0) {
-          const initialBidderId = applicants[0].bidder_id;
-          setSelectedBidderId(initialBidderId);
-          await runVerification(initialBidderId, initialTenderId, loadedTenders, false);
+          const applicants = await loadOverview(initialTenderId);
+          if (applicants && applicants.length > 0) {
+            const initialBidderId = applicants[0].bidder_id;
+            setSelectedBidderId(initialBidderId);
+            await runVerification(initialBidderId, initialTenderId, loadedTenders, false);
+          } else {
+            setSelectedBidderId("");
+            setAssessment(null);
+          }
         } else {
+          setSelectedTenderId("");
           setSelectedBidderId("");
           setAssessment(null);
-          setLoading(false);
         }
       } catch (err) {
         setError(err.message);
+      } finally {
         setLoading(false);
       }
     }
@@ -452,7 +464,8 @@ export default function ComplianceCockpit() {
       });
 
       const newTenderId = res.tender.tender_id;
-      const updatedTenders = await api("/api/tenders");
+      const resTenders = await api("/api/officer/tenders");
+      const updatedTenders = resTenders.tenders || [];
       setTenders(updatedTenders);
       setSelectedTenderId(newTenderId);
       setShowTenderModal(false);
@@ -534,7 +547,7 @@ export default function ComplianceCockpit() {
       <header>
         <div>
           <p className="eyebrow">Public Procurement Governance · GeM Operations</p>
-          <h1>BidSetu — Compliance Verification Cockpit</h1>
+          <h1>TenderFlow — Compliance Verification Cockpit</h1>
         </div>
       </header>
 
@@ -557,9 +570,28 @@ export default function ComplianceCockpit() {
         </button>
       </nav>
 
-      {/* Active Tender Selector Bar */}
-      {/* Active Tender Selector Bar & Complete Tender Information Panel */}
-      <section className="tender-selector-card">
+      {error && <div className="alert-box alert-error" style={{ margin: "1rem 0" }}>{error}</div>}
+
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "3rem", color: "#64748b" }}>
+          Loading AI Evaluation Cockpit...
+        </div>
+      ) : tenders.length === 0 ? (
+        <div className="empty-state-card" style={{ padding: "3.5rem 2rem", textAlign: "center", background: "#fff", borderRadius: "10px", border: "1px solid #e2e8f0", margin: "2rem 0" }}>
+          <div style={{ fontSize: "2.8rem", marginBottom: "1rem" }}>📋</div>
+          <h2 style={{ fontSize: "1.4rem", color: "#1e293b", marginBottom: "0.5rem" }}>No Tenders Created Yet</h2>
+          <p style={{ color: "#64748b", maxWidth: "520px", margin: "0 auto 1.5rem", lineHeight: "1.6" }}>
+            You do not have any active procurement tenders in your cockpit. Create your first tender to establish mandatory statutory compliance requirements and begin evaluating bidder submissions.
+          </p>
+          <button onClick={() => setShowTenderModal(true)} className="btn-primary" style={{ fontSize: "1rem", padding: "0.65rem 1.4rem" }}>
+            + Create New Tender
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Active Tender Selector Bar */}
+          {/* Active Tender Selector Bar & Complete Tender Information Panel */}
+          <section className="tender-selector-card">
         <div className="tender-selector-top">
           <div className="tender-selector-group">
             <label htmlFor="tender-select">Active Tender:</label>
@@ -1075,6 +1107,8 @@ export default function ComplianceCockpit() {
           )}
         </div>
       )}
+      </>
+    )}
 
       {/* MODAL: Register New Bidder with PDF Upload */}
       {showBidderModal && (

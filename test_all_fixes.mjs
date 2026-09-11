@@ -18,28 +18,28 @@ async function run() {
   // 1A & 1C: Navbar checks
   const navbarSrc = fs.readFileSync("frontend/src/components/Navbar.jsx", "utf-8");
   assert(!navbarSrc.includes("btn-login-cta"), "Navbar: Redundant top-right Sign In button (btn-login-cta) removed");
-  assert(navbarSrc.includes("BidSetu"), "Navbar: Brand title updated to 'BidSetu'");
+  assert(navbarSrc.includes("TenderFlow"), "Navbar: Brand title updated to 'TenderFlow'");
   assert(!navbarSrc.includes("SIH 2026"), "Navbar: Visible 'SIH 2026' string removed");
 
   // 1B: ComplianceCockpit checks
   const cockpitSrc = fs.readFileSync("frontend/src/pages/ComplianceCockpit.jsx", "utf-8");
   assert(!cockpitSrc.includes("SIH 2026"), "ComplianceCockpit: Visible 'SIH 2026' removed");
-  assert(cockpitSrc.includes("BidSetu"), "ComplianceCockpit: Heading uses 'BidSetu'");
+  assert(cockpitSrc.includes("TenderFlow"), "ComplianceCockpit: Heading uses 'TenderFlow'");
   assert(!cockpitSrc.includes("+ Register New Bidder"), "ComplianceCockpit: '+ Register New Bidder' button removed");
   assert(!cockpitSrc.includes("+ New Tender"), "ComplianceCockpit: '+ New Tender' button removed");
 
   // 1C: Auth pages & index.html
   const indexHtml = fs.readFileSync("frontend/index.html", "utf-8");
-  assert(indexHtml.includes("BidSetu"), "index.html: Page title updated to 'BidSetu'");
+  assert(indexHtml.includes("TenderFlow"), "index.html: Page title updated to 'TenderFlow'");
 
   const loginSrc = fs.readFileSync("frontend/src/pages/auth/Login.jsx", "utf-8");
-  assert(loginSrc.includes("Sign In to BidSetu"), "Login.jsx: Form title updated to 'Sign In to BidSetu'");
+  assert(loginSrc.includes("Sign In to TenderFlow"), "Login.jsx: Form title updated to 'Sign In to TenderFlow'");
 
   const regOfficerSrc = fs.readFileSync("frontend/src/pages/auth/RegisterOfficer.jsx", "utf-8");
-  assert(regOfficerSrc.includes("BidSetu"), "RegisterOfficer.jsx: Emblem updated to 'BidSetu'");
+  assert(regOfficerSrc.includes("TenderFlow"), "RegisterOfficer.jsx: Emblem updated to 'TenderFlow'");
 
   const regBidderSrc = fs.readFileSync("frontend/src/pages/auth/RegisterBidder.jsx", "utf-8");
-  assert(regBidderSrc.includes("BidSetu"), "RegisterBidder.jsx: Emblem updated to 'BidSetu'");
+  assert(regBidderSrc.includes("TenderFlow"), "RegisterBidder.jsx: Emblem updated to 'TenderFlow'");
 
   console.log("  ✓ All branding, title, SIH removal, and button cleanup tests PASSED!");
 

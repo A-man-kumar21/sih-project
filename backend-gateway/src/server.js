@@ -13,6 +13,7 @@ import officerRouter, {
   approveApplication,
   rejectApplication,
   requestInfo,
+  verifyOfficerTenderAccess,
 } from "./routes/officer.js";
 import documentsRouter from "./routes/documents.js";
 
@@ -150,8 +151,19 @@ app.post("/api/extract/tender-pdf", memoryUpload.single("file"), async (request,
 // PRESERVED TENDER APIS
 // =============================================================================
 
-app.get("/api/tenders", async (_request, response, next) => {
+app.get("/api/tenders", optionalAuth, async (request, response, next) => {
   try {
+    // If requested by an authenticated officer, return ONLY tenders created by that officer
+    if (request.user && request.user.role === "officer") {
+      const tenders = await getTendersCollection();
+      const officerTenders = await tenders
+        .find({ created_by: request.user.id })
+        .sort({ created_at: -1 })
+        .toArray();
+      return response.json(officerTenders);
+    }
+
+    // For public / bidder browsing, return all published tenders
     const engineResponse = await fetch(`${ENGINE_URL}/tenders`);
     const data = await engineResponse.json();
     return response.status(engineResponse.status).json(data);
@@ -215,12 +227,21 @@ app.post("/api/tenders", optionalAuth, async (request, response, next) => {
   }
 });
 
-app.delete("/api/tenders/:tenderId", async (request, response, next) => {
+app.delete("/api/tenders/:tenderId", requireAuth, requireRole("officer"), async (request, response, next) => {
   try {
+    const access = await verifyOfficerTenderAccess(request.params.tenderId, request.user.id);
+    if (!access.allowed) {
+      return response.status(access.status || 403).json({ error: access.error });
+    }
+
     const engineResponse = await fetch(`${ENGINE_URL}/tenders/${request.params.tenderId}`, {
       method: "DELETE",
     });
     const data = await engineResponse.json();
+
+    const tenders = await getTendersCollection();
+    await tenders.deleteOne({ tender_id: request.params.tenderId });
+
     return response.status(engineResponse.status).json(data);
   } catch (error) {
     return next(error);
@@ -231,16 +252,54 @@ app.delete("/api/tenders/:tenderId", async (request, response, next) => {
 // OVERVIEW DASHBOARD ROUTE (PRESERVED)
 // =============================================================================
 
-app.get("/api/overview", async (request, response, next) => {
+app.get("/api/overview", optionalAuth, async (request, response, next) => {
   try {
-    const rawId = request.query.tender_id || "TENDER-ALL-MANDATORY";
-    const tenderId = decodeURIComponent(rawId).trim();
+    const rawId = request.query.tender_id;
+    let targetTenderId = rawId ? decodeURIComponent(rawId).trim() : null;
+
+    // If requested by an authenticated officer, enforce ownership
+    if (request.user && request.user.role === "officer") {
+      const tenders = await getTendersCollection();
+      if (targetTenderId) {
+        const access = await verifyOfficerTenderAccess(targetTenderId, request.user.id);
+        if (!access.allowed) {
+          return response.status(access.status || 403).json({ error: access.error });
+        }
+      } else {
+        // Default to the officer's first tender
+        const firstTender = await tenders.findOne({ created_by: request.user.id });
+        if (!firstTender) {
+          return response.json({
+            tender_id: null,
+            tender_title: "No Tenders Created Yet",
+            tender_category: "General",
+            aggregates: {
+              total_bidders: 0,
+              low_risk: 0,
+              medium_risk: 0,
+              high_risk: 0,
+              pending_decision: 0,
+              decided: 0,
+            },
+            bidders: [],
+          });
+        }
+        targetTenderId = firstTender.tender_id;
+      }
+    } else {
+      if (!targetTenderId) {
+        targetTenderId = "TENDER-ALL-MANDATORY";
+      }
+    }
 
     // 1. Fetch tender details
-    const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
-    const tendersList = await tendersRes.json();
-    const activeTender = tendersList.find((t) => t.tender_id === tenderId);
-    const targetTenderId = tenderId;
+    const tenders = await getTendersCollection();
+    let activeTender = await tenders.findOne({ tender_id: targetTenderId });
+    if (!activeTender) {
+      const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
+      const tendersList = await tendersRes.json();
+      activeTender = tendersList.find((t) => t.tender_id === targetTenderId);
+    }
 
     // 2. Fetch ONLY actual applications submitted for this specific tender
     const applications = await getApplicationsCollection();
@@ -317,8 +376,15 @@ app.get("/api/overview", async (request, response, next) => {
 /**
  * Proxies the AI engine unchanged. The assessment is persisted separately.
  */
-app.post("/api/compliance/verify", async (request, response, next) => {
+app.post("/api/compliance/verify", optionalAuth, async (request, response, next) => {
   try {
+    // If called by an officer with a specific tender_id, verify ownership
+    if (request.user && request.user.role === "officer" && request.body.tender_id) {
+      const access = await verifyOfficerTenderAccess(request.body.tender_id, request.user.id);
+      if (!access.allowed) {
+        return response.status(access.status || 403).json({ error: access.error });
+      }
+    }
     const engineResponse = await fetch(`${ENGINE_URL}/verify-compliance`, {
       method: "POST",
       headers: { "content-type": "application/json" },

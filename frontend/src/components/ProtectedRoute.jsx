@@ -11,7 +11,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "60vh" }}>
         <div style={{ textAlign: "center" }}>
           <div className="spinner" style={{ margin: "0 auto 1rem" }}></div>
-          <p style={{ color: "#5d6e86", fontWeight: 600 }}>Verifying BidSetu Secure Session...</p>
+          <p style={{ color: "#5d6e86", fontWeight: 600 }}>Verifying TenderFlow Secure Session...</p>
         </div>
       </div>
     );

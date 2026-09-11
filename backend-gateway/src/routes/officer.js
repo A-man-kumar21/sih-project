@@ -12,28 +12,63 @@ const router = express.Router();
 const ENGINE_URL = process.env.AI_ENGINE_URL || "http://127.0.0.1:8000";
 
 /**
- * GET /api/officer/overview
- * Overview metrics for the Officer Dashboard.
+ * Helper to verify that a tender belongs to the authenticated government officer.
+ * Returns { allowed: true, tender } or { allowed: false, status, error }
  */
-router.get("/overview", requireAuth, requireRole("officer"), async (_request, response, next) => {
+export async function verifyOfficerTenderAccess(tenderId, officerId) {
+  if (!tenderId) {
+    return { allowed: false, status: 400, error: "Missing required tender reference ID." };
+  }
+  if (!officerId) {
+    return { allowed: false, status: 401, error: "Authentication required." };
+  }
+
+  const tenders = await getTendersCollection();
+  const tender = await tenders.findOne({ tender_id: tenderId });
+  if (!tender) {
+    return { allowed: false, status: 404, error: `Tender '${tenderId}' not found.` };
+  }
+
+  if (!tender.created_by || String(tender.created_by) !== String(officerId)) {
+    return {
+      allowed: false,
+      status: 403,
+      error: "Access denied. You can only view and manage tenders you created.",
+    };
+  }
+
+  return { allowed: true, tender };
+}
+
+/**
+ * GET /api/officer/overview
+ * Overview metrics strictly for the authenticated Officer's own Dashboard.
+ */
+router.get("/overview", requireAuth, requireRole("officer"), async (request, response, next) => {
   try {
-    const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
-    const tendersList = await tendersRes.json();
+    const tenders = await getTendersCollection();
+    const officerTenders = await tenders.find({ created_by: request.user.id }).toArray();
+    const officerTenderIds = officerTenders.map((t) => t.tender_id);
 
     const applications = await getApplicationsCollection();
-    const allApps = await applications.find({}).toArray();
+    const officerApps =
+      officerTenderIds.length > 0
+        ? await applications.find({ tender_id: { $in: officerTenderIds } }).toArray()
+        : [];
 
-    const totalApplications = allApps.length;
-    const underReview = allApps.filter((a) => a.status === "under_review" || a.status === "submitted").length;
-    const approved = allApps.filter((a) => a.status === "approved").length;
-    const rejected = allApps.filter((a) => a.status === "rejected").length;
-    const infoRequested = allApps.filter((a) => a.status === "info_requested").length;
+    const totalApplications = officerApps.length;
+    const underReview = officerApps.filter(
+      (a) => a.status === "under_review" || a.status === "submitted"
+    ).length;
+    const approved = officerApps.filter((a) => a.status === "approved").length;
+    const rejected = officerApps.filter((a) => a.status === "rejected").length;
+    const infoRequested = officerApps.filter((a) => a.status === "info_requested").length;
 
     return response.json({
       success: true,
       metrics: {
-        total_tenders: tendersList.length,
-        active_tenders: tendersList.length,
+        total_tenders: officerTenders.length,
+        active_tenders: officerTenders.length,
         total_applications: totalApplications,
         under_review: underReview,
         approved,
@@ -48,18 +83,26 @@ router.get("/overview", requireAuth, requireRole("officer"), async (_request, re
 
 /**
  * GET /api/officer/tenders
- * Lists all tenders with their applicant counts.
+ * Lists ONLY tenders created by the authenticated officer with their applicant counts.
  */
-router.get("/tenders", requireAuth, requireRole("officer"), async (_request, response, next) => {
+router.get("/tenders", requireAuth, requireRole("officer"), async (request, response, next) => {
   try {
-    const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
-    const tendersList = await tendersRes.json();
+    const tenders = await getTendersCollection();
+    const officerTenders = await tenders
+      .find({ created_by: request.user.id })
+      .sort({ created_at: -1 })
+      .toArray();
+
+    const officerTenderIds = officerTenders.map((t) => t.tender_id);
 
     const applications = await getApplicationsCollection();
-    const allApps = await applications.find({}).toArray();
+    const officerApps =
+      officerTenderIds.length > 0
+        ? await applications.find({ tender_id: { $in: officerTenderIds } }).toArray()
+        : [];
 
     const appCounts = new Map();
-    for (const app of allApps) {
+    for (const app of officerApps) {
       const current = appCounts.get(app.tender_id) || {
         total: 0,
         under_review: 0,
@@ -75,8 +118,17 @@ router.get("/tenders", requireAuth, requireRole("officer"), async (_request, res
       appCounts.set(app.tender_id, current);
     }
 
-    const tendersWithCounts = tendersList.map((t) => ({
-      ...t,
+    const tendersWithCounts = officerTenders.map((t) => ({
+      tender_id: t.tender_id,
+      title: t.title,
+      category: t.category,
+      description: t.description,
+      mandatory_checks: t.mandatory_checks,
+      deadline: t.deadline,
+      created_by: t.created_by,
+      created_by_name: t.created_by_name,
+      created_at: t.created_at,
+      updated_at: t.updated_at,
       applications_summary: appCounts.get(t.tender_id) || {
         total: 0,
         under_review: 0,
@@ -173,10 +225,22 @@ export const getTenderApplicants = async (request, response, next) => {
       return response.status(400).json({ error: "Missing required tender_id parameter." });
     }
 
+    // Role security check: Officer can ONLY view applicants for tenders they created
+    if (request.user?.role === "officer") {
+      const access = await verifyOfficerTenderAccess(tenderId, request.user.id);
+      if (!access.allowed) {
+        return response.status(access.status || 403).json({ error: access.error });
+      }
+    }
+
     // Fetch tender details
-    const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
-    const tendersList = await tendersRes.json();
-    const tender = tendersList.find((t) => t.tender_id === tenderId);
+    const tenders = await getTendersCollection();
+    let tender = await tenders.findOne({ tender_id: tenderId });
+    if (!tender) {
+      const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
+      const tendersList = await tendersRes.json();
+      tender = tendersList.find((t) => t.tender_id === tenderId);
+    }
 
     const applications = await getApplicationsCollection();
 
@@ -243,6 +307,14 @@ export const getApplicationDetail = async (request, response, next) => {
     if (request.user.role === "bidder") {
       if (app.bidder_user_id !== request.user.id && app.bidder_id !== request.user.bidder_id) {
         return response.status(403).json({ error: "Access denied. You can only view your own applications." });
+      }
+    }
+
+    // Role security check: Officer can only view applications for their own tenders
+    if (request.user.role === "officer") {
+      const access = await verifyOfficerTenderAccess(app.tender_id, request.user.id);
+      if (!access.allowed) {
+        return response.status(access.status || 403).json({ error: access.error });
       }
     }
 
@@ -320,6 +392,12 @@ export const approveApplication = async (request, response, next) => {
     const app = await applications.findOne(query);
     if (!app) {
       return response.status(404).json({ error: "Application not found." });
+    }
+
+    // Role security check: Officer can only approve applications for their own tenders
+    const access = await verifyOfficerTenderAccess(app.tender_id, request.user.id);
+    if (!access.allowed) {
+      return response.status(access.status || 403).json({ error: access.error });
     }
 
     const now = new Date();
@@ -410,6 +488,12 @@ export const rejectApplication = async (request, response, next) => {
       return response.status(404).json({ error: "Application not found." });
     }
 
+    // Role security check: Officer can only reject applications for their own tenders
+    const access = await verifyOfficerTenderAccess(app.tender_id, request.user.id);
+    if (!access.allowed) {
+      return response.status(access.status || 403).json({ error: access.error });
+    }
+
     const now = new Date();
     const officerId = request.user.id;
     const officerName = request.user.full_name || "Procurement Officer";
@@ -497,6 +581,12 @@ export const requestInfo = async (request, response, next) => {
     const app = await applications.findOne(query);
     if (!app) {
       return response.status(404).json({ error: "Application not found." });
+    }
+
+    // Role security check: Officer can only request information for their own tenders
+    const access = await verifyOfficerTenderAccess(app.tender_id, request.user.id);
+    if (!access.allowed) {
+      return response.status(access.status || 403).json({ error: access.error });
     }
 
     const now = new Date();

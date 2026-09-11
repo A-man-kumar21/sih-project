@@ -23,9 +23,9 @@ export default function Navbar() {
       <nav className="gem-main-nav">
         <div className="nav-brand-section">
           <Link to="/" className="brand-link">
-            <div className="gem-logo-badge">BidSetu</div>
+            <div className="gem-logo-badge">TenderFlow</div>
             <div className="brand-text-block">
-              <span className="brand-title">BidSetu</span>
+              <span className="brand-title">TenderFlow</span>
               <span className="brand-subtitle">AI-Powered Bid Compliance Verification Platform</span>
             </div>
           </Link>

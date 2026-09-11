@@ -70,6 +70,14 @@ export default function OfficerTenders() {
 
       {loading ? (
         <div className="loading-state">Loading tenders...</div>
+      ) : tenders.length === 0 ? (
+        <div className="empty-state-card">
+          <h3>No Tenders Created Yet</h3>
+          <p>You have not published any procurement tenders yet.</p>
+          <button onClick={() => setShowCreateModal(true)} className="btn-primary" style={{ marginTop: "1rem" }}>
+            + Create Your First Tender
+          </button>
+        </div>
       ) : filteredTenders.length === 0 ? (
         <div className="empty-state-card">
           <h3>No Matching Tenders Found</h3>

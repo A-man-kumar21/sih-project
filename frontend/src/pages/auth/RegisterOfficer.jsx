@@ -56,7 +56,7 @@ export default function RegisterOfficer() {
     <div className="auth-page-container">
       <div className="auth-card" style={{ maxWidth: "600px" }}>
         <div className="auth-header">
-          <div className="auth-emblem">BidSetu</div>
+          <div className="auth-emblem">TenderFlow</div>
           <h2>Government Officer Registration</h2>
           <p className="auth-subtext">
             Official portal for public procurement officers and statutory compliance evaluators
