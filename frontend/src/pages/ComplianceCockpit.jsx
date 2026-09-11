@@ -13,43 +13,8 @@ const SOURCE_LABELS = {
   blacklist: "Debarment & Blacklist Clearance",
 };
 
-const DEFAULT_BIDDERS = [
-  { bidder_id: "BIDDER-ALPHA", display_name: "Aarohan Office Systems Private Limited" },
-  { bidder_id: "BIDDER-BRAVO", display_name: "Bharat Supplies and Services LLP" },
-  { bidder_id: "BIDDER-CHARLIE", display_name: "Crestline Engineering Works" },
-  { bidder_id: "BIDDER-DELTA", display_name: "Disha Digital Solutions Private Limited" },
-];
 
-const DEFAULT_TENDERS = [
-  {
-    tender_id: "TENDER-ALL-MANDATORY",
-    title: "Comprehensive High-Value Procurement",
-    category: "Works & Infrastructure",
-    mandatory_checks: ["udyam", "gstn", "pan_it", "epfo_esic", "digilocker", "blacklist"],
-    description: "All 6 statutory checks mandatory for scoring.",
-  },
-  {
-    tender_id: "TENDER-MSE-GOODS",
-    title: "MSE Reserved Goods Supply Tender",
-    category: "Goods",
-    mandatory_checks: ["udyam", "gstn", "pan_it", "blacklist"],
-    description: "Goods tender with MSE preference. Labor & DigiLocker excluded from score.",
-  },
-  {
-    tender_id: "TENDER-SERVICES-LABOR",
-    title: "Facility Management & Services",
-    category: "Services",
-    mandatory_checks: ["gstn", "pan_it", "epfo_esic", "blacklist"],
-    description: "Manpower tender with mandatory labor compliance. Udyam excluded from score.",
-  },
-  {
-    tender_id: "TENDER-STARTUP-TECH",
-    title: "GovTech Digital Innovation Software",
-    category: "IT & Telecom",
-    mandatory_checks: ["gstn", "pan_it", "digilocker", "blacklist"],
-    description: "Software supply tender. Udyam and EPFO are excluded from score.",
-  },
-];
+
 
 async function api(url, options = {}) {
   const token = localStorage.getItem("gem_token") || localStorage.getItem("gem_auth_token");
