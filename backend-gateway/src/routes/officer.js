@@ -24,7 +24,14 @@ export async function verifyOfficerTenderAccess(tenderId, officerId) {
   }
 
   const tenders = await getTendersCollection();
-  const tender = await tenders.findOne({ tender_id: tenderId });
+  const query = {
+    $or: [{ tender_id: tenderId }, { tender_id: tenderId.toUpperCase() }],
+  };
+  if (ObjectId.isValid(tenderId)) {
+    query.$or.push({ _id: new ObjectId(tenderId) });
+  }
+
+  const tender = await tenders.findOne(query);
   if (!tender) {
     return { allowed: false, status: 404, error: `Tender '${tenderId}' not found.` };
   }
@@ -650,5 +657,84 @@ export const requestInfo = async (request, response, next) => {
   }
 };
 router.post("/applications/:id/request-info", requireAuth, requireRole("officer"), requestInfo);
+
+/**
+ * DELETE /api/officer/tenders/:id or /api/tenders/:id
+ * Safely deletes a tender owned by the authenticated officer, ensuring no orphaned applications.
+ */
+export const deleteTender = async (request, response, next) => {
+  try {
+    const rawId =
+      request.params.id ||
+      request.params.tenderId ||
+      request.params[0] ||
+      request.query?.tender_id ||
+      request.body?.tender_id ||
+      "";
+    const tenderId = decodeURIComponent(rawId).trim();
+
+    if (!tenderId) {
+      return response.status(400).json({ error: "Missing required tender identifier." });
+    }
+
+    // 1. Ownership & Existence check — officer can only delete their own tenders
+    const access = await verifyOfficerTenderAccess(tenderId, request.user.id);
+    if (!access.allowed) {
+      return response.status(access.status || 403).json({ error: access.error });
+    }
+    const tender = access.tender;
+    const resolvedTenderId = tender.tender_id;
+
+    // 2. Cascade delete dependent applications belonging exclusively to this tender
+    const applications = await getApplicationsCollection();
+    const appCount = await applications.countDocuments({ tender_id: resolvedTenderId });
+    if (appCount > 0) {
+      await applications.deleteMany({ tender_id: resolvedTenderId });
+    }
+
+    // 3. Remove from AI engine in-memory list (fire-and-forget; not all tenders
+    // exist there, so 404 from the engine is acceptable)
+    try {
+      await fetch(`${ENGINE_URL}/tenders/${encodeURIComponent(resolvedTenderId)}`, { method: "DELETE" });
+    } catch (_) {
+      // AI engine unavailability must not block MongoDB deletion
+    }
+
+    // 4. Delete tender from MongoDB (authoritative store)
+    const tenders = await getTendersCollection();
+    await tenders.deleteOne({ _id: tender._id });
+
+    // 5. Record immutable audit event preserving compliance history
+    try {
+      const audit = await getAuditCollection();
+      await audit.insertOne({
+        action: "tender_deleted",
+        tender_id: resolvedTenderId,
+        officer_id: request.user.id,
+        officer_email: request.user.email,
+        tender_title: tender.title,
+        applications_deleted: appCount,
+        timestamp: new Date().toISOString(),
+        deleted_at: new Date(),
+      });
+    } catch (_) {}
+
+    return response.json({
+      success: true,
+      message:
+        appCount > 0
+          ? `Tender '${resolvedTenderId}' and ${appCount} application${appCount === 1 ? "" : "s"} deleted successfully.`
+          : `Tender '${resolvedTenderId}' deleted successfully.`,
+      tender_id: resolvedTenderId,
+      applications_deleted: appCount,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+router.delete(/^\/tenders\/(.+)$/, requireAuth, requireRole("officer"), deleteTender);
+router.delete("/tenders/:id", requireAuth, requireRole("officer"), deleteTender);
+router.delete("/tenders", requireAuth, requireRole("officer"), deleteTender);
 
 export default router;

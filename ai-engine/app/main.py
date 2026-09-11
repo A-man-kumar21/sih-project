@@ -112,7 +112,7 @@ def create_tender(request: TenderCreateRequest) -> dict:
     return {"status": "registered", "tender": created}
 
 
-@app.delete("/tenders/{tender_id}")
+@app.delete("/tenders/{tender_id:path}")
 def remove_tender(tender_id: str) -> dict:
     success = delete_tender(tender_id)
     if not success:

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import CreateTenderModal from "./CreateTenderModal";
+import DeleteTenderModal from "./DeleteTenderModal";
 
 export default function OfficerDashboard() {
   const { user, authFetch } = useAuth();
@@ -19,7 +20,9 @@ export default function OfficerDashboard() {
   const [tenders, setTenders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [tenderToDelete, setTenderToDelete] = useState(null);
 
   const loadDashboardData = async () => {
     setLoading(true);
@@ -44,6 +47,11 @@ export default function OfficerDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteClick = (tender, e) => {
+    e?.stopPropagation();
+    setTenderToDelete(tender);
   };
 
   useEffect(() => {
@@ -89,6 +97,7 @@ export default function OfficerDashboard() {
       </div>
 
       {error && <div className="alert-box alert-error">{error}</div>}
+      {successMsg && <div className="alert-box alert-success">{successMsg}</div>}
 
       {/* Primary KPI Metrics Cards (Using REAL backend values) */}
       <div className="metrics-grid">
@@ -199,12 +208,19 @@ export default function OfficerDashboard() {
                           {tender.deadline ? new Date(tender.deadline).toLocaleDateString() : "Open"}
                         </span>
                       </td>
-                      <td>
+                      <td style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
                         <button
                           onClick={() => navigate(`/officer/tenders/${encodeURIComponent(tender.tender_id)}`)}
                           className="btn-action-view"
                         >
                           View Applicants ({summary.total}) &rarr;
+                        </button>
+                        <button
+                          onClick={(e) => handleDeleteClick(tender, e)}
+                          className="btn-delete-item"
+                          title={`Delete tender ${tender.tender_id}`}
+                        >
+                          🗑
                         </button>
                       </td>
                     </tr>
@@ -278,6 +294,16 @@ export default function OfficerDashboard() {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreated={() => loadDashboardData()}
+      />
+
+      <DeleteTenderModal
+        isOpen={Boolean(tenderToDelete)}
+        tender={tenderToDelete}
+        onClose={() => setTenderToDelete(null)}
+        onDeleted={(tenderId, data) => {
+          setSuccessMsg(data?.message || `Tender '${tenderId}' deleted successfully.`);
+          loadDashboardData();
+        }}
       />
     </div>
   );

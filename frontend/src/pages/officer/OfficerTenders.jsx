@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import CreateTenderModal from "./CreateTenderModal";
+import DeleteTenderModal from "./DeleteTenderModal";
 
 export default function OfficerTenders() {
   const { authFetch } = useAuth();
@@ -10,7 +11,9 @@ export default function OfficerTenders() {
   const [tenders, setTenders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [tenderToDelete, setTenderToDelete] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const loadTenders = async () => {
@@ -28,6 +31,11 @@ export default function OfficerTenders() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteClick = (tender, e) => {
+    e?.stopPropagation();
+    setTenderToDelete(tender);
   };
 
   useEffect(() => {
@@ -57,6 +65,7 @@ export default function OfficerTenders() {
       </div>
 
       {error && <div className="alert-box alert-error">{error}</div>}
+      {successMsg && <div className="alert-box alert-success">{successMsg}</div>}
 
       <div className="search-filter-bar">
         <input
@@ -111,13 +120,23 @@ export default function OfficerTenders() {
                   <div className="applicant-stat">
                     <strong>{summary.total}</strong> Applicant{summary.total === 1 ? "" : "s"}
                   </div>
-                  <button
-                    onClick={() => navigate(`/officer/tenders/${encodeURIComponent(tender.tender_id)}`)}
-                    className="btn-primary"
-                    style={{ fontSize: "0.85rem", padding: "0.45rem 0.85rem" }}
-                  >
-                    View Applicants &rarr;
-                  </button>
+                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                    <button
+                      onClick={() => navigate(`/officer/tenders/${encodeURIComponent(tender.tender_id)}`)}
+                      className="btn-primary"
+                      style={{ fontSize: "0.85rem", padding: "0.45rem 0.85rem" }}
+                    >
+                      View Applicants &rarr;
+                    </button>
+                    <button
+                      onClick={(e) => handleDeleteClick(tender, e)}
+                      className="btn-delete-tender"
+                      style={{ padding: "0.45rem 0.75rem", fontSize: "0.82rem" }}
+                      title={`Delete tender ${tender.tender_id}`}
+                    >
+                      🗑 Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -129,6 +148,16 @@ export default function OfficerTenders() {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreated={() => loadTenders()}
+      />
+
+      <DeleteTenderModal
+        isOpen={Boolean(tenderToDelete)}
+        tender={tenderToDelete}
+        onClose={() => setTenderToDelete(null)}
+        onDeleted={(tenderId, data) => {
+          setSuccessMsg(data?.message || `Tender '${tenderId}' deleted successfully.`);
+          loadTenders();
+        }}
       />
     </div>
   );

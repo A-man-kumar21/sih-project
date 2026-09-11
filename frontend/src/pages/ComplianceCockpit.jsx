@@ -53,6 +53,7 @@ export default function ComplianceCockpit() {
   const [decisionSuccessMsg, setDecisionSuccessMsg] = useState(null);
   const [decisionErrorMsg, setDecisionErrorMsg] = useState(null);
   const [error, setError] = useState();
+  const [tenderSuccessMsg, setTenderSuccessMsg] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [simulateFailure, setSimulateFailure] = useState(false);
@@ -256,36 +257,51 @@ export default function ComplianceCockpit() {
     }
   }
 
-  // FEATURE 1: Delete Tender (Removes from active selectable list only, preserves MongoDB audit logs)
+  // Delete Tender — encodes tenderId so IDs containing "/" (e.g. GEM/2026/A/6766)
+  // are sent as a single encoded URL segment (GEM%2F2026%2FA%2F6766) which the
+  // backend regex route decodes back to the full ID.
   async function handleDeleteTender(tenderId, e) {
     e?.stopPropagation();
     const confirmed = window.confirm(
-      `Are you sure you want to remove tender "${tenderId}" from the active tenders list?\n\n` +
-      `Historical audit records referencing this tender will remain fully preserved.`
+      `Delete Tender?\n\n"${tenderId}"\n\nThis action cannot be undone.`
     );
     if (!confirmed) return;
 
     try {
       setError(null);
-      await api(`/api/tenders/${tenderId}`, { method: "DELETE" });
+      setTenderSuccessMsg(null);
+      // encodeURIComponent ensures slashes in the ID become %2F — one URL segment
+      const result = await api(`/api/tenders/${encodeURIComponent(tenderId)}`, { method: "DELETE" });
+      setTenderSuccessMsg(result.message || `Tender '${tenderId}' deleted successfully.`);
 
-      const updatedTenders = await api("/api/tenders");
-      setTenders(updatedTenders);
+      // Reload tender list from backend (authoritative)
+      try {
+        const res = await api("/api/officer/tenders");
+        const updatedTenders = res.tenders || [];
+        setTenders(updatedTenders);
 
-      if (selectedTenderId === tenderId) {
-        const nextTenderId = updatedTenders[0]?.tender_id || null;
-        setSelectedTenderId(nextTenderId);
-        if (nextTenderId && selectedBidderId) {
-          runVerification(selectedBidderId, nextTenderId, updatedTenders, simulateFailure);
-          loadOverview(nextTenderId);
+        if (selectedTenderId === tenderId) {
+          const nextTenderId = updatedTenders[0]?.tender_id || null;
+          setSelectedTenderId(nextTenderId || "");
+          if (nextTenderId && selectedBidderId) {
+            runVerification(selectedBidderId, nextTenderId, updatedTenders, simulateFailure);
+            loadOverview(nextTenderId);
+          } else {
+            setAssessment(null);
+            setBidders([]);
+          }
+        } else {
+          loadOverview(selectedTenderId);
         }
-      } else {
-        loadOverview(selectedTenderId);
+      } catch (_) {
+        // fallback: remove locally if reload fails
+        setTenders((prev) => prev.filter((t) => t.tender_id !== tenderId));
       }
     } catch (err) {
-      alert(`Could not delete tender: ${err.message}`);
+      setError(`Could not delete tender: ${err.message}`);
     }
   }
+
 
   // Handle PDF upload for Bidder Registration
   async function handleBidderPdfUpload(e) {
@@ -548,6 +564,7 @@ export default function ComplianceCockpit() {
       </nav>
 
       {error && <div className="alert-box alert-error" style={{ margin: "1rem 0" }}>{error}</div>}
+      {tenderSuccessMsg && <div className="alert-box alert-success" style={{ margin: "1rem 0" }}>{tenderSuccessMsg}</div>}
 
       {loading ? (
         <div style={{ textAlign: "center", padding: "3rem", color: "#64748b" }}>

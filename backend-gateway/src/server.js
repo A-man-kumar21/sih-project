@@ -13,6 +13,7 @@ import officerRouter, {
   approveApplication,
   rejectApplication,
   requestInfo,
+  deleteTender,
   verifyOfficerTenderAccess,
 } from "./routes/officer.js";
 import documentsRouter from "./routes/documents.js";
@@ -59,6 +60,13 @@ app.post("/api/applications/:id/approve", requireAuth, requireRole("officer"), a
 app.post("/api/applications/:id/reject", requireAuth, requireRole("officer"), rejectApplication);
 app.post("/api/applications/:id/request-info", requireAuth, requireRole("officer"), requestInfo);
 app.post("/api/applications/:id/resubmit-info", requireAuth, requireRole("bidder"), resubmitInfo);
+
+// Direct top-level tender delete endpoints (supports slash IDs, encoded IDs, MongoDB _ids)
+app.delete(/^\/api\/(?:officer\/)?tenders\/(.+)$/, requireAuth, requireRole("officer"), deleteTender);
+app.delete("/api/tenders/:id", requireAuth, requireRole("officer"), deleteTender);
+app.delete("/api/tenders", requireAuth, requireRole("officer"), deleteTender);
+app.delete("/api/officer/tenders/:id", requireAuth, requireRole("officer"), deleteTender);
+app.delete("/api/officer/tenders", requireAuth, requireRole("officer"), deleteTender);
 
 
 // =============================================================================
@@ -223,27 +231,6 @@ app.post("/api/tenders", optionalAuth, async (request, response, next) => {
       status: "registered",
       tender: resTender,
     });
-  } catch (error) {
-    return next(error);
-  }
-});
-
-app.delete("/api/tenders/:tenderId", requireAuth, requireRole("officer"), async (request, response, next) => {
-  try {
-    const access = await verifyOfficerTenderAccess(request.params.tenderId, request.user.id);
-    if (!access.allowed) {
-      return response.status(access.status || 403).json({ error: access.error });
-    }
-
-    const engineResponse = await fetch(`${ENGINE_URL}/tenders/${request.params.tenderId}`, {
-      method: "DELETE",
-    });
-    const data = await engineResponse.json();
-
-    const tenders = await getTendersCollection();
-    await tenders.deleteOne({ tender_id: request.params.tenderId });
-
-    return response.status(engineResponse.status).json(data);
   } catch (error) {
     return next(error);
   }

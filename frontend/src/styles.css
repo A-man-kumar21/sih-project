@@ -633,6 +633,84 @@ time {
   border-color: #fca5a5;
 }
 
+/* Delete Tender Modal Styles */
+.modal-card-delete {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+}
+.delete-tender-info {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+.delete-scope-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  margin-top: 0.75rem;
+}
+@media (min-width: 540px) {
+  .delete-scope-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.scope-group {
+  padding: 0.85rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+.remove-group {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+.keep-group {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+.scope-heading {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.5rem;
+}
+.text-danger {
+  color: #b91c1c;
+}
+.text-safe {
+  color: #15803d;
+}
+.scope-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: #334155;
+  line-height: 1.4;
+}
+.btn-destructive {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.btn-destructive:hover:not(:disabled) {
+  background: #b91c1c;
+}
+.btn-destructive:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Overview Dashboard Styles */
 .overview-card {
   background: #ffffff;
