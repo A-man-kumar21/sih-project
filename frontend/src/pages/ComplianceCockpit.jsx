@@ -62,7 +62,17 @@ async function api(url, options = {}) {
 }
 
 const Risk = ({ value }) => <span className={`badge risk-${value?.toLowerCase()}`}>{value}</span>;
-const Status = ({ value }) => <span className={`badge status-${value}`}>{value?.replaceAll("_", " ")}</span>;
+const Status = ({ value }) => {
+  const displayVal =
+    value === "compliant"
+      ? "Found / Verified"
+      : value === "not_found"
+      ? "Not Found"
+      : value === "non_compliant"
+      ? "Non-Compliant"
+      : value?.replaceAll("_", " ");
+  return <span className={`badge status-${value}`}>{displayVal}</span>;
+};
 
 export default function ComplianceCockpit() {
   const [currentView, setCurrentView] = useState("detail"); // "overview" | "detail"
@@ -930,38 +940,88 @@ export default function ComplianceCockpit() {
                     Only mandatory checks affect the score & risk level.
                   </small>
                 </h3>
-                {assessment.checks.map((check) => (
-                  <details key={check.source} open={check.is_mandatory || check.status !== "compliant"}>
-                    <summary>
-                      <span>
-                        {SOURCE_LABELS[check.source] || check.source}{" "}
-                        <code style={{ fontSize: "0.78rem", color: "#64748b" }}>({check.source})</code>
-                      </span>
-                      <div className="summary-badges">
-                        {check.is_mandatory ? (
-                          <span className="badge tag-mandatory">Mandatory</span>
-                        ) : (
-                          <span className="badge tag-optional">Informational (Excluded)</span>
+                {assessment.checks.map((check) => {
+                  const verifiedVal =
+                    check.verified_value ||
+                    check.raw_fields?.udyam_registration_number ||
+                    check.raw_fields?.gstin ||
+                    check.raw_fields?.pan ||
+                    check.raw_fields?.epfo_establishment_id ||
+                    (check.raw_fields?.debarment_status ? `${check.raw_fields.debarment_status} (${check.raw_fields.registry_search_reference || "Registry"})` : null);
+
+                  const extractionSource =
+                    check.extraction_source ||
+                    check.provenance?.source ||
+                    (check.status === "compliant"
+                      ? check.source === "udyam"
+                        ? "✓ Auto-extracted from Udyam / MSME Certificate"
+                        : check.source === "gstn"
+                        ? "✓ Auto-extracted from GST Certificate"
+                        : check.source === "pan_it"
+                        ? "✓ Auto-extracted from PAN Document"
+                        : check.source === "epfo_esic"
+                        ? "✓ Auto-extracted from EPFO / ESIC Establishment Proof"
+                        : check.source === "digilocker"
+                        ? "✓ Auto-verified via DigiLocker Legal Entity Anchor"
+                        : "✓ Verified against Central Procurement Debarment Registry"
+                      : null);
+
+                  return (
+                    <details key={check.source} open={check.is_mandatory || check.status !== "compliant"}>
+                      <summary>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
+                          <span>
+                            <strong>{SOURCE_LABELS[check.source] || check.source}</strong>{" "}
+                            <code style={{ fontSize: "0.78rem", color: "#64748b" }}>({check.source})</code>
+                          </span>
+                          {extractionSource && check.status === "compliant" && (
+                            <span style={{ fontSize: "0.78rem", color: "#16a34a", fontWeight: "600" }}>
+                              {extractionSource}
+                            </span>
+                          )}
+                        </div>
+                        <div className="summary-badges">
+                          {check.is_mandatory ? (
+                            <span className="badge tag-mandatory">Mandatory</span>
+                          ) : (
+                            <span className="badge tag-optional">Informational (Excluded)</span>
+                          )}
+                          <Status value={check.status} />
+                        </div>
+                      </summary>
+                      <dl>
+                        {verifiedVal && (
+                          <div>
+                            <dt>Verified Identifier / Record</dt>
+                            <dd>
+                              <code style={{ fontSize: "0.9rem", fontWeight: "700", color: "#0f172a" }}>
+                                {verifiedVal}
+                              </code>
+                            </dd>
+                          </div>
                         )}
-                        <Status value={check.status} />
-                      </div>
-                    </summary>
-                    <dl>
-                      <div>
-                        <dt>Confidence</dt>
-                        <dd>{Math.round(check.confidence * 100)}%</dd>
-                      </div>
-                      <div>
-                        <dt>Weight Applied</dt>
-                        <dd>{check.weight_applied} pts</dd>
-                      </div>
-                      <div>
-                        <dt>Engine Evaluation Note</dt>
-                        <dd>{check.note}</dd>
-                      </div>
-                    </dl>
-                  </details>
-                ))}
+                        {extractionSource && (
+                          <div>
+                            <dt>Extraction Source</dt>
+                            <dd style={{ color: "#16a34a", fontWeight: "600" }}>{extractionSource}</dd>
+                          </div>
+                        )}
+                        <div>
+                          <dt>Confidence</dt>
+                          <dd>{Math.round(check.confidence * 100)}%</dd>
+                        </div>
+                        <div>
+                          <dt>Weight Applied</dt>
+                          <dd>{check.weight_applied} pts</dd>
+                        </div>
+                        <div>
+                          <dt>Engine Evaluation Note</dt>
+                          <dd>{check.note}</dd>
+                        </div>
+                      </dl>
+                    </details>
+                  );
+                })}
               </section>
 
               {/* Pending Manual Review */}

@@ -171,13 +171,14 @@ PROFILES = {
 
 def verify_profile(bidder_id: str, source: str) -> dict:
     """Return an isolated, normalized source result for a known bidder."""
-    profile = PROFILES.get(bidder_id.upper())
+    norm_id = (bidder_id or "").strip().upper()
+    profile = PROFILES.get(norm_id)
     if profile is None:
         return {
             "source": source,
             "status": "not_found",
             "last_updated": "2026-09-01T06:00:00Z",
-            "raw_fields": {"bidder_id": bidder_id, "registry_match": False},
+            "raw_fields": {"bidder_id": norm_id, "registry_match": False},
             "confidence": 0.0,
         }
 
@@ -257,7 +258,7 @@ def delete_bidder_profile(bidder_id: str) -> bool:
 import re
 
 # Validation patterns for Indian statutory procurement registries
-UDYAM_REGEX = re.compile(r"^UDYAM-[A-Z]{2}-\d{2}-\d{7}$", re.IGNORECASE)
+UDYAM_REGEX = re.compile(r"^UDYAM-[A-Z]{2}-[A-Z0-9]{2}-\d{7}$", re.IGNORECASE)
 GSTIN_REGEX = re.compile(r"^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$", re.IGNORECASE)
 PAN_REGEX = re.compile(r"^[A-Z]{5}\d{4}[A-Z]$", re.IGNORECASE)
 EPFO_ESIC_REGEX = re.compile(r"^(?:[A-Z]{2}[A-Z0-9]{3}\d{7}\d{3}|[A-Z]{2}/[A-Z0-9]+/\d+/\d+|\d{17})$", re.IGNORECASE)
@@ -285,10 +286,10 @@ def register_bidder_profile(
     normalized_id = bidder_id.strip().upper()
     now_iso = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
-    u_clean = udyam_number.strip().upper()
-    g_clean = gstin.strip().upper()
-    p_clean = pan.strip().upper()
-    e_clean = epfo_esic_number.strip().upper()
+    u_clean = re.sub(r"\s+", "", udyam_number or "").replace("—", "-").replace("–", "-").upper()
+    g_clean = re.sub(r"\s+", "", gstin or "").upper()
+    p_clean = re.sub(r"\s+", "", pan or "").upper()
+    e_clean = re.sub(r"\s+", "", epfo_esic_number or "").upper()
 
     # If PAN is empty but a valid GSTIN is present, auto-extract PAN from characters 3-12 of GSTIN
     if not p_clean and g_clean and GSTIN_REGEX.match(g_clean):

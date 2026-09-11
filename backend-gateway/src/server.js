@@ -16,6 +16,7 @@ import officerRouter, {
   verifyOfficerTenderAccess,
 } from "./routes/officer.js";
 import documentsRouter from "./routes/documents.js";
+import { resolveBidderCompliance } from "./complianceResolver.js";
 
 const app = express();
 app.use(cors());
@@ -308,6 +309,57 @@ app.get("/api/overview", optionalAuth, async (request, response, next) => {
       .sort({ compliance_score: -1, applied_at: 1 })
       .toArray();
 
+    // Auto-heal applications that have compliance_score === 0 but have valid extracted documents
+    for (const app of apps) {
+      if ((app.compliance_score === 0 || !app.compliance_score) && targetTenderId) {
+        try {
+          const resolved = await resolveBidderCompliance(app.bidder_id || app.bidder_user_id);
+          const hasAnyStat = resolved.statutory.pan || resolved.statutory.gstin || resolved.statutory.udyam_number;
+          if (hasAnyStat) {
+            const reqChecks = activeTender?.mandatory_checks || ["udyam", "gstn", "pan_it"];
+            const evalRes = await fetch(`${ENGINE_URL}/verify-compliance`, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                bidder_id: resolved.bidder_id,
+                tender_id: targetTenderId,
+                required_checks: reqChecks,
+                company_name: resolved.statutory.company_name || app.company_name,
+                udyam_number: resolved.statutory.udyam_number || "",
+                gstin: resolved.statutory.gstin || "",
+                pan: resolved.statutory.pan || "",
+                cin: resolved.statutory.cin || "",
+                epfo_esic_number: resolved.statutory.epfo_esic_number || "",
+              }),
+            });
+            if (evalRes.ok) {
+              const assessment = await evalRes.json();
+              if (assessment.compliance_score > 0) {
+                app.compliance_score = assessment.compliance_score;
+                app.risk_level = assessment.risk_level;
+                app.checks = assessment.checks;
+                app.llm_briefing = assessment.llm_briefing;
+                await applications.updateOne(
+                  { _id: app._id },
+                  {
+                    $set: {
+                      compliance_score: assessment.compliance_score,
+                      risk_level: assessment.risk_level,
+                      checks: assessment.checks,
+                      llm_briefing: assessment.llm_briefing,
+                      updated_at: new Date(),
+                    },
+                  }
+                );
+              }
+            }
+          }
+        } catch (e) {
+          // Ignore background self-heal errors
+        }
+      }
+    }
+
     // 3. Map each application to an applicant overview card
     const bidderCards = apps.map((app) => ({
       bidder_id: app.bidder_id,
@@ -385,10 +437,39 @@ app.post("/api/compliance/verify", optionalAuth, async (request, response, next)
         return response.status(access.status || 403).json({ error: access.error });
       }
     }
+
+    // Resolve authoritative bidder compliance credentials across MongoDB layers
+    const bidderId = request.body.bidder_id;
+    const resolved = await resolveBidderCompliance(bidderId, {
+      tenderId: request.body.tender_id,
+      requiredChecks: request.body.required_checks,
+      logDiagnostics: true,
+    });
+
+    const stat = resolved.statutory;
+    const provenance = resolved.provenance;
+
+    const enginePayload = {
+      bidder_id: resolved.bidder_id || bidderId,
+      tender_id: request.body.tender_id || null,
+      required_checks: request.body.required_checks || null,
+      simulate_llm_failure: Boolean(request.body.simulate_llm_failure),
+      company_name: stat.company_name || resolved.user?.company_name || request.body.company_name,
+      udyam_number: stat.udyam_number || "",
+      gstin: stat.gstin || "",
+      pan: stat.pan || "",
+      cin: stat.cin || "",
+      epfo_esic_number: stat.epfo_esic_number || "",
+      business_constitution: stat.business_constitution || "",
+      registered_address: stat.registered_address || "",
+      registration_date: stat.registration_date || "",
+      enterprise_type: stat.enterprise_type || "",
+    };
+
     const engineResponse = await fetch(`${ENGINE_URL}/verify-compliance`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify(request.body),
+      body: JSON.stringify(enginePayload),
     });
     const assessment = await engineResponse.json();
 
@@ -396,11 +477,34 @@ app.post("/api/compliance/verify", optionalAuth, async (request, response, next)
       return response.status(engineResponse.status).json(assessment);
     }
 
+    // Enrich assessment checks with extraction provenance & verified values
+    if (Array.isArray(assessment.checks)) {
+      for (const chk of assessment.checks) {
+        if (chk.source === "udyam" && stat.udyam_number) {
+          chk.verified_value = stat.udyam_number;
+          chk.extraction_source = provenance.udyam?.source || "✓ Auto-extracted from Udyam Certificate";
+          chk.provenance = provenance.udyam;
+        } else if (chk.source === "gstn" && stat.gstin) {
+          chk.verified_value = stat.gstin;
+          chk.extraction_source = provenance.gstin?.source || "✓ Auto-extracted from GST Certificate";
+          chk.provenance = provenance.gstin;
+        } else if (chk.source === "pan_it" && stat.pan) {
+          chk.verified_value = stat.pan;
+          chk.extraction_source = provenance.pan?.source || "✓ Auto-extracted from PAN Document";
+          chk.provenance = provenance.pan;
+        } else if (chk.source === "epfo_esic" && stat.epfo_esic_number) {
+          chk.verified_value = stat.epfo_esic_number;
+          chk.extraction_source = provenance.epfo_esic?.source || "✓ Auto-extracted from EPFO / ESIC Document";
+          chk.provenance = provenance.epfo_esic;
+        }
+      }
+    }
+
     const audit = await getAuditCollection();
     await audit.insertOne({
       bidder_id: assessment.bidder_id,
       tender_id: assessment.tender_id || request.body.tender_id || "ALL_CHECKS",
-      timestamp: assessment.audit_log_entry.timestamp,
+      timestamp: assessment.audit_log_entry?.timestamp || new Date().toISOString(),
       compliance_score: assessment.compliance_score,
       risk_level: assessment.risk_level,
       pending_manual_review: assessment.pending_manual_review,
@@ -408,6 +512,26 @@ app.post("/api/compliance/verify", optionalAuth, async (request, response, next)
       officer_decision: null,
       officer_id: null,
     });
+
+    // Self-healing / snapshot synchronization with tender_applications in MongoDB
+    if (request.body.tender_id) {
+      const applications = await getApplicationsCollection();
+      await applications.updateOne(
+        {
+          tender_id: request.body.tender_id,
+          $or: [{ bidder_id: resolved.bidder_id }, { bidder_id: bidderId }],
+        },
+        {
+          $set: {
+            compliance_score: assessment.compliance_score,
+            risk_level: assessment.risk_level,
+            checks: assessment.checks,
+            llm_briefing: assessment.llm_briefing || null,
+            updated_at: new Date(),
+          },
+        }
+      );
+    }
 
     return response.json(assessment);
   } catch (error) {

@@ -82,6 +82,7 @@ def evaluate_bidder(
             "weight_applied": weight,
             "note": note,
             "is_mandatory": is_required,
+            "raw_fields": result.get("raw_fields", {}),
         })
 
     # A failure is a confidence-scaled negative contribution; scores cannot be

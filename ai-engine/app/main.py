@@ -21,6 +21,16 @@ class ComplianceRequest(BaseModel):
     tender_id: str | None = None
     required_checks: list[str] | None = None
     simulate_llm_failure: bool = False
+    company_name: str | None = None
+    udyam_number: str | None = None
+    gstin: str | None = None
+    pan: str | None = None
+    cin: str | None = None
+    epfo_esic_number: str | None = None
+    business_constitution: str | None = None
+    registered_address: str | None = None
+    registration_date: str | None = None
+    enterprise_type: str | None = None
 
 
 class BidderCreateRequest(BaseModel):
@@ -137,6 +147,21 @@ async def extract_tender_pdf(
 
 @app.post("/verify-compliance")
 def verify_compliance(request: ComplianceRequest) -> dict:
+    # If bidder statutory fields are provided, ensure profile is registered/updated in memory
+    if request.udyam_number or request.gstin or request.pan or request.company_name or request.epfo_esic_number:
+        register_bidder_profile(
+            bidder_id=request.bidder_id,
+            company_name=request.company_name or request.bidder_id,
+            udyam_number=request.udyam_number or "",
+            gstin=request.gstin or "",
+            pan=request.pan or "",
+            epfo_esic_number=request.epfo_esic_number or "",
+            business_constitution=request.business_constitution or "",
+            registered_address=request.registered_address or "",
+            registration_date=request.registration_date or "",
+            enterprise_type=request.enterprise_type or "",
+        )
+
     checks = request.required_checks
     if checks is None or len(checks) == 0:
         if request.tender_id:

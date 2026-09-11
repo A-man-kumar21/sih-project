@@ -74,10 +74,15 @@ export const DOC_TYPE_LABELS = {
   other: "Other Statutory Document",
 };
 
-// Validation patterns for statutory identifiers
-const PAN_REGEX = /^[A-Z]{5}\d{4}[A-Z]$/i;
-const GSTIN_REGEX = /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/i;
-const UDYAM_REGEX = /^UDYAM-[A-Z]{2}-[A-Z0-9]{2}-\d{7}$/i;
+import {
+  cleanIdentifier,
+  resolveBidderCompliance,
+  PAN_REGEX,
+  GSTIN_REGEX,
+  UDYAM_REGEX,
+  EPFO_ESIC_REGEX,
+  CIN_REGEX,
+} from "../complianceResolver.js";
 
 export function buildDefaultEnterpriseProfile() {
   const emptyField = () => ({
@@ -94,6 +99,7 @@ export function buildDefaultEnterpriseProfile() {
   return {
     enterprise_name: emptyField(),
     udyam_number: emptyField(),
+    udyam: emptyField(),
     enterprise_type: emptyField(),
     gstin: emptyField(),
     pan: emptyField(),
@@ -127,30 +133,49 @@ export function mergeExtractedIntoProfile(existingProfile, extracted, docType, d
     }
   };
 
-  const fields = extracted?.fields || extracted || {};
+  const fields = extracted?.fields || extracted?.extracted || extracted || {};
 
-  if (fields.enterprise_name || fields.company_name || fields.legal_name) {
-    updateField("enterprise_name", fields.enterprise_name || fields.company_name || fields.legal_name);
+  // Company / Enterprise Name aliases
+  const compName = fields.enterprise_name || fields.company_name || fields.companyName || fields.legal_name || fields.trade_name;
+  if (compName && typeof compName === "string" && compName.trim() && !compName.includes("DEMO DOCUMENT")) {
+    updateField("enterprise_name", compName.trim());
   }
-  if (fields.udyam_number) {
-    updateField("udyam_number", fields.udyam_number.toUpperCase());
+
+  // Udyam aliases
+  const udyamVal = fields.udyam || fields.udyam_number || fields.udyamNumber || fields.udyam_registration || fields.udyam_registration_number || fields.msme;
+  if (udyamVal) {
+    const cleaned = cleanIdentifier(udyamVal);
+    updateField("udyam_number", cleaned);
+    updateField("udyam", cleaned);
   }
+
   if (fields.enterprise_type) {
     updateField("enterprise_type", fields.enterprise_type);
   }
-  if (fields.gstin) {
-    updateField("gstin", fields.gstin.toUpperCase());
+
+  // GST aliases
+  const gstVal = fields.gstin || fields.gst || fields.gstNumber || fields.gst_registration || fields.gst_number;
+  if (gstVal) {
+    const cleaned = cleanIdentifier(gstVal);
+    updateField("gstin", cleaned);
     // Auto-derive PAN if not separately provided
-    if (!fields.pan && fields.gstin.length === 15) {
-      updateField("pan", fields.gstin.substring(2, 12).toUpperCase());
+    if (!fields.pan && cleaned.length === 15) {
+      updateField("pan", cleaned.substring(2, 12).toUpperCase());
     }
   }
-  if (fields.pan) {
-    updateField("pan", fields.pan.toUpperCase());
+
+  // PAN aliases
+  const panVal = fields.pan || fields.panNumber || fields.pan_it || fields.pan_it_number || fields.pan_card;
+  if (panVal) {
+    updateField("pan", cleanIdentifier(panVal));
   }
-  if (fields.cin) {
-    updateField("cin", fields.cin.toUpperCase());
+
+  // CIN aliases
+  const cinVal = fields.cin || fields.cin_number;
+  if (cinVal) {
+    updateField("cin", cleanIdentifier(cinVal));
   }
+
   if (fields.business_constitution) {
     updateField("business_constitution", fields.business_constitution);
   }
@@ -160,20 +185,26 @@ export function mergeExtractedIntoProfile(existingProfile, extracted, docType, d
   if (fields.registration_date) {
     updateField("registration_date", fields.registration_date);
   }
-  if (fields.epfo_number) {
-    updateField("epfo_number", fields.epfo_number.toUpperCase());
+
+  // EPFO / ESIC aliases
+  const epfoVal = fields.epfo_number || fields.epfo || fields.epfo_esic_number;
+  if (epfoVal) {
+    const cleanedEpfo = cleanIdentifier(epfoVal);
+    updateField("epfo_number", cleanedEpfo);
     if (!fields.epfo_esic_number) {
-      updateField("epfo_esic_number", fields.epfo_number.toUpperCase());
+      updateField("epfo_esic_number", cleanedEpfo);
     }
   }
-  if (fields.esic_number) {
-    updateField("esic_number", fields.esic_number.toUpperCase());
-    if (!fields.epfo_esic_number && !fields.epfo_number) {
-      updateField("epfo_esic_number", fields.esic_number.toUpperCase());
+  const esicVal = fields.esic_number || fields.esic;
+  if (esicVal) {
+    const cleanedEsic = cleanIdentifier(esicVal);
+    updateField("esic_number", cleanedEsic);
+    if (!profile.epfo_esic_number?.value) {
+      updateField("epfo_esic_number", cleanedEsic);
     }
   }
   if (fields.epfo_esic_number) {
-    updateField("epfo_esic_number", fields.epfo_esic_number.toUpperCase());
+    updateField("epfo_esic_number", cleanIdentifier(fields.epfo_esic_number));
   }
 
   return profile;
@@ -627,75 +658,18 @@ router.post(
             method
           );
 
-          // Update statutory credentials with authoritative extracted values
-          const currentStat = user.statutory || {};
-
-          if (ext.pan && PAN_REGEX.test(ext.pan)) {
-            currentStat.pan = ext.pan.trim().toUpperCase();
-          }
-          if (ext.gstin && GSTIN_REGEX.test(ext.gstin)) {
-            currentStat.gstin = ext.gstin.trim().toUpperCase();
-            // Automatically derive PAN from GSTIN if PAN is missing or unverified
-            if (!currentStat.pan || !PAN_REGEX.test(currentStat.pan)) {
-              currentStat.pan = currentStat.gstin.substring(2, 12).toUpperCase();
-            }
-          }
-          if (ext.udyam_number && UDYAM_REGEX.test(ext.udyam_number)) {
-            currentStat.udyam_number = ext.udyam_number.trim().toUpperCase();
-          }
-          if (ext.cin && ext.cin.trim()) {
-            currentStat.cin = ext.cin.trim().toUpperCase();
-          }
-          if (ext.epfo_number && ext.epfo_number.trim()) {
-            currentStat.epfo_number = ext.epfo_number.trim().toUpperCase();
-          }
-          if (ext.esic_number && ext.esic_number.trim()) {
-            currentStat.esic_number = ext.esic_number.trim().toUpperCase();
-          }
-          if (ext.epfo_esic_number && ext.epfo_esic_number.trim()) {
-            currentStat.epfo_esic_number = ext.epfo_esic_number.trim().toUpperCase();
-          } else if (ext.epfo_number && ext.epfo_number.trim()) {
-            currentStat.epfo_esic_number = ext.epfo_number.trim().toUpperCase();
-          }
-
-          const compName = enterpriseProfile.enterprise_name?.value || user.company_name;
-
           await users.updateOne(
             { _id: new ObjectId(request.user.id) },
             {
               $set: {
                 enterprise_profile: enterpriseProfile,
-                statutory: currentStat,
-                company_name: compName,
                 updated_at: new Date(),
               },
             }
           );
 
-          // Sync updated statutory details with AI Engine
-          try {
-            await fetch(`${ENGINE_URL}/bidders`, {
-              method: "POST",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify({
-                bidder_id: request.user.bidder_id,
-                company_name: compName,
-                udyam_number: currentStat.udyam_number || "",
-                gstin: currentStat.gstin || "",
-                pan: currentStat.pan || "",
-                cin: currentStat.cin || "",
-                epfo_number: currentStat.epfo_number || "",
-                esic_number: currentStat.esic_number || "",
-                epfo_esic_number: currentStat.epfo_esic_number || "",
-                business_constitution: enterpriseProfile.business_constitution?.value || "",
-                registered_address: enterpriseProfile.registered_address?.value || "",
-                registration_date: enterpriseProfile.registration_date?.value || "",
-                enterprise_type: enterpriseProfile.enterprise_type?.value || "",
-              }),
-            });
-          } catch (e) {
-            console.warn("AI Engine sync error on upload:", e.message);
-          }
+          // Canonical statutory resolution and deterministic AI Engine synchronization
+          await resolveBidderCompliance(request.user.id, { logDiagnostics: true });
         }
       }
 
@@ -924,94 +898,14 @@ export const applyForTender = async (request, response, next) => {
     }
 
     // Ensure bidder's statutory credentials from profile and vault documents are synchronized to AI Engine
-    const users = await getUsersCollection();
-    const currentUser = await users.findOne({ _id: new ObjectId(request.user.id) });
-    const currentStat = currentUser?.statutory || {};
-    let enterpriseProfile = currentUser?.enterprise_profile || buildDefaultEnterpriseProfile();
-    let statUpdated = false;
+    const resolvedCompliance = await resolveBidderCompliance(request.user.id, {
+      tenderId: tender.tender_id,
+      requiredChecks: mandatoryChecks,
+      logDiagnostics: true,
+    });
 
-    // Inspect myDocs for authoritative extracted statutory credentials
-    for (const d of myDocs) {
-      const ext = d.extracted_data?.extracted || d.extracted_data;
-      if (ext && typeof ext === "object") {
-        const conf = d.extracted_data?.confidence || 0.98;
-        enterpriseProfile = mergeExtractedIntoProfile(
-          enterpriseProfile,
-          ext,
-          d.document_type,
-          d._id,
-          d.original_name || d.file_name,
-          conf
-        );
-
-        if (ext.pan && PAN_REGEX.test(ext.pan)) {
-          if (currentStat.pan !== ext.pan.trim().toUpperCase()) {
-            currentStat.pan = ext.pan.trim().toUpperCase();
-            statUpdated = true;
-          }
-        }
-        if (ext.gstin && GSTIN_REGEX.test(ext.gstin)) {
-          if (currentStat.gstin !== ext.gstin.trim().toUpperCase()) {
-            currentStat.gstin = ext.gstin.trim().toUpperCase();
-            statUpdated = true;
-          }
-        }
-        if (ext.udyam_number && UDYAM_REGEX.test(ext.udyam_number)) {
-          if (currentStat.udyam_number !== ext.udyam_number.trim().toUpperCase()) {
-            currentStat.udyam_number = ext.udyam_number.trim().toUpperCase();
-            statUpdated = true;
-          }
-        }
-        if (ext.epfo_esic_number && ext.epfo_esic_number.trim()) {
-          if (currentStat.epfo_esic_number !== ext.epfo_esic_number.trim().toUpperCase()) {
-            currentStat.epfo_esic_number = ext.epfo_esic_number.trim().toUpperCase();
-            statUpdated = true;
-          }
-        }
-      }
-    }
-
-    // If PAN is missing or unverified, but GSTIN is valid, derive PAN from GSTIN
-    if ((!currentStat.pan || !PAN_REGEX.test(currentStat.pan)) && currentStat.gstin && GSTIN_REGEX.test(currentStat.gstin)) {
-      currentStat.pan = currentStat.gstin.substring(2, 12).toUpperCase();
-      statUpdated = true;
-    }
-
-    if (statUpdated || !currentUser?.enterprise_profile) {
-      await users.updateOne(
-        { _id: new ObjectId(request.user.id) },
-        {
-          $set: {
-            statutory: currentStat,
-            enterprise_profile: enterpriseProfile,
-            company_name: enterpriseProfile.enterprise_name?.value || currentUser?.company_name || request.user.company_name,
-            updated_at: new Date(),
-          },
-        }
-      );
-    }
-
-    // Always sync latest statutory credentials and profile details with AI Engine before running verification
-    try {
-      await fetch(`${ENGINE_URL}/bidders`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          bidder_id: request.user.bidder_id,
-          company_name: enterpriseProfile.enterprise_name?.value || currentUser?.company_name || request.user.company_name,
-          udyam_number: currentStat.udyam_number || "",
-          gstin: currentStat.gstin || "",
-          pan: currentStat.pan || "",
-          epfo_esic_number: currentStat.epfo_esic_number || "",
-          business_constitution: enterpriseProfile.business_constitution?.value || "",
-          registered_address: enterpriseProfile.registered_address?.value || "",
-          registration_date: enterpriseProfile.registration_date?.value || "",
-          enterprise_type: enterpriseProfile.enterprise_type?.value || "",
-        }),
-      });
-    } catch (e) {
-      console.warn("Notice: AI Engine profile sync before verification:", e.message);
-    }
+    const stat = resolvedCompliance.statutory;
+    const provenance = resolvedCompliance.provenance;
 
     // 4. Trigger AI Engine deterministic compliance verification for THIS tender
     const evalRes = await fetch(`${ENGINE_URL}/verify-compliance`, {
@@ -1021,12 +915,45 @@ export const applyForTender = async (request, response, next) => {
         bidder_id: request.user.bidder_id,
         tender_id: tender.tender_id,
         required_checks: mandatoryChecks,
+        company_name: stat.company_name || request.user.company_name,
+        udyam_number: stat.udyam_number || "",
+        gstin: stat.gstin || "",
+        pan: stat.pan || "",
+        cin: stat.cin || "",
+        epfo_esic_number: stat.epfo_esic_number || "",
+        business_constitution: stat.business_constitution || "",
+        registered_address: stat.registered_address || "",
+        registration_date: stat.registration_date || "",
+        enterprise_type: stat.enterprise_type || "",
       }),
     });
 
     const assessment = await evalRes.json();
     if (!evalRes.ok) {
       return response.status(evalRes.status).json(assessment);
+    }
+
+    // Enrich assessment checks with extraction provenance & verified values
+    if (Array.isArray(assessment.checks)) {
+      for (const chk of assessment.checks) {
+        if (chk.source === "udyam" && stat.udyam_number) {
+          chk.verified_value = stat.udyam_number;
+          chk.extraction_source = provenance.udyam?.source || "✓ Auto-extracted from Udyam Certificate";
+          chk.provenance = provenance.udyam;
+        } else if (chk.source === "gstn" && stat.gstin) {
+          chk.verified_value = stat.gstin;
+          chk.extraction_source = provenance.gstin?.source || "✓ Auto-extracted from GST Certificate";
+          chk.provenance = provenance.gstin;
+        } else if (chk.source === "pan_it" && stat.pan) {
+          chk.verified_value = stat.pan;
+          chk.extraction_source = provenance.pan?.source || "✓ Auto-extracted from PAN Document";
+          chk.provenance = provenance.pan;
+        } else if (chk.source === "epfo_esic" && stat.epfo_esic_number) {
+          chk.verified_value = stat.epfo_esic_number;
+          chk.extraction_source = provenance.epfo_esic?.source || "✓ Auto-extracted from EPFO / ESIC Document";
+          chk.provenance = provenance.epfo_esic;
+        }
+      }
     }
 
     const now = new Date();
