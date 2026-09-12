@@ -4,6 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TenderFlow — AI-Powered Bid Compliance Verification Platform</title>
+    <script>
+      // Document preview uses an async authenticated fetch before calling window.open.
+      // Reserve a tab during the original click so browsers do not block the preview.
+      (() => {
+        let previewWindow = null;
+        const originalOpen = window.open.bind(window);
+
+        document.addEventListener("click", (event) => {
+          const button = event.target.closest?.(".btn-action-view, .btn-doc-link");
+          if (!button || !button.textContent?.trim().toLowerCase().startsWith("view")) return;
+          if (previewWindow && !previewWindow.closed) return;
+          previewWindow = originalOpen("about:blank", "_blank");
+        }, true);
+
+        window.open = (url, target, features) => {
+          if (url && previewWindow && !previewWindow.closed && target === "_blank") {
+            previewWindow.location.href = url;
+            const result = previewWindow;
+            previewWindow = null;
+            return result;
+          }
+          return originalOpen(url, target, features);
+        };
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
