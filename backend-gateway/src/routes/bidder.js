@@ -888,9 +888,31 @@ router.delete("/documents/:id", requireAuth, requireRole("bidder"), async (reque
  */
 router.get("/tenders", requireAuth, requireRole("bidder"), async (request, response, next) => {
   try {
-    // 1. Fetch all tenders
-    const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
-    const tendersList = await tendersRes.json();
+    // 1. Fetch all tenders from MongoDB database & AI engine
+    const tendersCol = await getTendersCollection();
+    const dbTenders = await tendersCol.find({}).sort({ created_at: -1 }).toArray();
+
+    let engineTenders = [];
+    try {
+      const tendersRes = await fetch(`${ENGINE_URL}/tenders`);
+      if (tendersRes.ok) {
+        engineTenders = await tendersRes.json();
+      }
+    } catch (e) {
+      console.warn("Notice: Engine tenders fetch:", e.message);
+    }
+
+    const tenderMap = new Map();
+    for (const et of engineTenders) {
+      tenderMap.set(et.tender_id, et);
+    }
+    for (const dt of dbTenders) {
+      tenderMap.set(dt.tender_id, {
+        ...tenderMap.get(dt.tender_id),
+        ...dt,
+      });
+    }
+    const tendersList = Array.from(tenderMap.values());
 
     // 2. Fetch all applications by this bidder
     const applications = await getApplicationsCollection();

@@ -172,10 +172,31 @@ app.get("/api/tenders", optionalAuth, async (request, response, next) => {
       return response.json(officerTenders);
     }
 
-    // For public / bidder browsing, return all published tenders
-    const engineResponse = await fetch(`${ENGINE_URL}/tenders`);
-    const data = await engineResponse.json();
-    return response.status(engineResponse.status).json(data);
+    // For public / bidder browsing, return all published tenders merged from MongoDB & AI engine
+    const tendersCol = await getTendersCollection();
+    const dbTenders = await tendersCol.find({}).sort({ created_at: -1 }).toArray();
+
+    let engineTenders = [];
+    try {
+      const engineResponse = await fetch(`${ENGINE_URL}/tenders`);
+      if (engineResponse.ok) {
+        engineTenders = await engineResponse.json();
+      }
+    } catch (e) {
+      console.warn("Notice: Engine tenders fetch:", e.message);
+    }
+
+    const tenderMap = new Map();
+    for (const et of engineTenders) {
+      tenderMap.set(et.tender_id, et);
+    }
+    for (const dt of dbTenders) {
+      tenderMap.set(dt.tender_id, {
+        ...tenderMap.get(dt.tender_id),
+        ...dt,
+      });
+    }
+    return response.json(Array.from(tenderMap.values()));
   } catch (error) {
     return next(error);
   }
@@ -276,7 +297,9 @@ app.get("/api/overview", optionalAuth, async (request, response, next) => {
       }
     } else {
       if (!targetTenderId) {
-        targetTenderId = "TENDER-ALL-MANDATORY";
+        const tendersCol = await getTendersCollection();
+        const firstDbTender = await tendersCol.findOne({});
+        targetTenderId = firstDbTender ? firstDbTender.tender_id : null;
       }
     }
 

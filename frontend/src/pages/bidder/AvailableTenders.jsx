@@ -174,8 +174,8 @@ export default function AvailableTenders() {
         <div className="loading-state">Loading open tenders...</div>
       ) : filteredTenders.length === 0 ? (
         <div className="empty-state-card">
-          <h3>No Open Tenders Found</h3>
-          <p>There are currently no tenders matching your criteria.</p>
+          <h3>No tenders available</h3>
+          <p>New procurement opportunities will appear here when published.</p>
         </div>
       ) : (
         <div className="tenders-grid">

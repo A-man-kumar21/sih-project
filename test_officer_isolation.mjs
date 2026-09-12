@@ -401,6 +401,24 @@ async function runTests() {
   assert.strictEqual(ovA_afterApprove.metrics.under_review, 0, "Officer A under_review count is 0");
   console.log("✓ Officer A overview updated: approved=1, under_review=0");
 
+  // Cleanup test tenders created during test run
+  console.log("\nCleaning up test tenders...");
+  await fetch(`${GATEWAY}/api/tenders/${encodeURIComponent(tenderA1Id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${tokenA}` },
+  });
+  await fetch(`${GATEWAY}/api/tenders/${encodeURIComponent(tenderB1Id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${tokenB}` },
+  });
+  if (typeof tokenC !== "undefined" && typeof tenderC1Id !== "undefined") {
+    await fetch(`${GATEWAY}/api/tenders/${encodeURIComponent(tenderC1Id)}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${tokenC}` },
+    });
+  }
+  console.log("✓ Test tenders cleaned up successfully.");
+
   console.log("\n================================================================================");
   console.log("     ALL 9 OFFICER ISOLATION & VISIBILITY TESTS PASSED WITH 100% SUCCESS!");
   console.log("================================================================================\n");

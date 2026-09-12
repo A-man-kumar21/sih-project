@@ -5,36 +5,7 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 
-DEFAULT_TENDERS = {
-    "TENDER-ALL-MANDATORY": {
-        "tender_id": "TENDER-ALL-MANDATORY",
-        "title": "Comprehensive High-Value Procurement (All Checks Required)",
-        "category": "Works & Infrastructure",
-        "mandatory_checks": ["udyam", "gstn", "pan_it", "epfo_esic", "digilocker", "blacklist"],
-        "description": "Standard high-value procurement requiring all 6 statutory compliance verifications.",
-    },
-    "TENDER-MSE-GOODS": {
-        "tender_id": "TENDER-MSE-GOODS",
-        "title": "MSE Reserved Goods Supply Tender",
-        "category": "Goods",
-        "mandatory_checks": ["udyam", "gstn", "pan_it", "blacklist"],
-        "description": "Goods tender with MSE purchase preference. Labor (EPFO/ESIC) and DigiLocker excluded from score.",
-    },
-    "TENDER-SERVICES-LABOR": {
-        "tender_id": "TENDER-SERVICES-LABOR",
-        "title": "Facility Management & Manpower Services",
-        "category": "Services",
-        "mandatory_checks": ["gstn", "pan_it", "epfo_esic", "blacklist"],
-        "description": "Service procurement requiring stringent statutory labor compliance (EPFO/ESIC). Udyam excluded from score.",
-    },
-    "TENDER-STARTUP-TECH": {
-        "tender_id": "TENDER-STARTUP-TECH",
-        "title": "GovTech Digital Innovation Software Procurement",
-        "category": "IT & Telecom",
-        "mandatory_checks": ["gstn", "pan_it", "digilocker", "blacklist"],
-        "description": "Technology supply tender where Udyam and EPFO are not mandatory for preliminary compliance.",
-    },
-}
+DEFAULT_TENDERS = {}
 
 TENDERS = deepcopy(DEFAULT_TENDERS)
 
