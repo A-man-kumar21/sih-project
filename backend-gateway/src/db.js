@@ -1,4 +1,4 @@
-import { GridFSBucket, MongoClient } from "mongodb";
+import { MongoClient } from "mongodb";
 
 let client;
 let database;
@@ -7,7 +7,6 @@ let usersCollection;
 let documentsCollection;
 let applicationsCollection;
 let tendersCollection;
-let documentFilesBucket;
 
 export async function getDatabase() {
   if (database) return database;
@@ -21,17 +20,6 @@ export async function getDatabase() {
   await client.connect();
   database = client.db(process.env.MONGODB_DB_NAME || "gem_bid_compliance");
   return database;
-}
-
-/**
- * Durable document storage for Render and other ephemeral container runtimes.
- * Files are stored in MongoDB GridFS instead of depending on the container disk.
- */
-export async function getDocumentFilesBucket() {
-  if (documentFilesBucket) return documentFilesBucket;
-  const db = await getDatabase();
-  documentFilesBucket = new GridFSBucket(db, { bucketName: "document_files" });
-  return documentFilesBucket;
 }
 
 export async function getAuditCollection() {
@@ -57,7 +45,6 @@ export async function getDocumentsCollection() {
   documentsCollection = db.collection("bidder_documents");
   await documentsCollection.createIndex({ bidder_id: 1, document_type: 1 });
   await documentsCollection.createIndex({ bidder_user_id: 1 });
-  await documentsCollection.createIndex({ gridfs_file_id: 1 }, { sparse: true });
   return documentsCollection;
 }
 
@@ -104,5 +91,4 @@ export async function closeMongoConnection() {
   documentsCollection = undefined;
   applicationsCollection = undefined;
   tendersCollection = undefined;
-  documentFilesBucket = undefined;
 }
